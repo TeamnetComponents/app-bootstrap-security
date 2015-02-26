@@ -11,7 +11,7 @@
         <relativePath />
     </parent>
 
-    <artifactId>security-bootstrap</artifactId>
+    <artifactId>app-bootstrap-security</artifactId>
     <version>0.1</version>
     <packaging>jar</packaging>
 

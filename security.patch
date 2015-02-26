@@ -373,6 +373,122 @@ Index: src/main/resources/config/liquibase/changelog/20150102000001_changelog.xm
 -    </changeSet>
 -
 -</databaseChangeLog>
+Index: src/main/java/ro/teamnet/bootstrap/config/SecurityConfiguration.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/config/SecurityConfiguration.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/config/SecurityConfiguration.java	(revision )
+@@ -1,10 +1,10 @@
+ package ro.teamnet.bootstrap.config;
+ 
+-import ro.teamnet.bootstrap.security.*;
++import org.springframework.beans.factory.annotation.Qualifier;
+ import org.springframework.context.annotation.Bean;
+ import org.springframework.context.annotation.Configuration;
++import org.springframework.context.annotation.Import;
+ import org.springframework.core.env.Environment;
+-
+ import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+ import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+ import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
+@@ -13,14 +13,16 @@
+ import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+ import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+ import org.springframework.security.core.userdetails.UserDetailsService;
+-import org.springframework.security.crypto.password.PasswordEncoder;
+ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+-import org.springframework.security.web.authentication.RememberMeServices;import ro.teamnet.bootstrap.security.AjaxAuthenticationFailureHandler;import ro.teamnet.bootstrap.security.AjaxAuthenticationSuccessHandler;import ro.teamnet.bootstrap.security.AjaxLogoutSuccessHandler;import ro.teamnet.bootstrap.security.AuthoritiesConstants;import ro.teamnet.bootstrap.security.Http401UnauthorizedEntryPoint;
++import org.springframework.security.crypto.password.PasswordEncoder;
++import org.springframework.security.web.authentication.RememberMeServices;
++import ro.teamnet.bootstrap.security.*;
+ 
+-import javax.inject.Inject;import java.lang.Exception;import java.lang.Override;
++import javax.inject.Inject;
+ 
+ @Configuration
+ @EnableWebSecurity
++@Import(AdditionalSpringSecurityConfiguration.class)
+ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+ 
+     @Inject
+@@ -38,8 +40,10 @@
+     @Inject
+     private Http401UnauthorizedEntryPoint authenticationEntryPoint;
+ 
++
+     @Inject
+-    private UserDetailsService userDetailsService;
++    @Qualifier(value = "customUserDetailsService")
++    private UserDetailsService customUserDetailsService;
+ 
+     @Inject
+     private RememberMeServices rememberMeServices;
+@@ -52,8 +56,8 @@
+     @Inject
+     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+         auth
+-            .userDetailsService(userDetailsService)
++            .userDetailsService(customUserDetailsService)
+-                .passwordEncoder(passwordEncoder());
++            .passwordEncoder(passwordEncoder());
+     }
+ 
+     @Override
+Index: src/main/resources/config/liquibase/changelog/20150203000001_changelog.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/config/liquibase/changelog/20150203000001_changelog.xml	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/resources/config/liquibase/changelog/20150203000001_changelog.xml	(revision )
+@@ -30,6 +30,12 @@
+         </createTable>
+         <addPrimaryKey columnNames="menu_id, authority" tableName="T_MENU_AUTHORITY"/>
+ 
++        <addForeignKeyConstraint baseColumnNames="authority"
++                                 baseTableName="T_MENU_AUTHORITY"
++                                 constraintName="fk_authority_name"
++                                 referencedColumnNames="code"
++                                 referencedTableName="T_ROLE"/>
++
+         <addForeignKeyConstraint baseColumnNames="menu_id"
+                                  baseTableName="T_MENU_AUTHORITY"
+                                  constraintName="fk_menu_id"
+Index: src/main/java/ro/teamnet/bootstrap/domain/Menu.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/domain/Menu.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/domain/Menu.java	(revision )
+@@ -41,9 +41,9 @@
+     @JoinTable(
+         name = "T_MENU_AUTHORITY",
+         joinColumns = {@JoinColumn(name = "menu_id", referencedColumnName = "id")},
+-        inverseJoinColumns = {@JoinColumn(name = "authority", referencedColumnName = "name")}
++        inverseJoinColumns = {@JoinColumn(name = "authority", referencedColumnName = "code")}
+     )
+-    private Set<Authority> roles = new HashSet<>();
++    private Set<Role> roles = new HashSet<>();
+ 
+     public Long getId() {
+         return id;
+@@ -85,11 +85,11 @@
+         this.cssClass = cssClass;
+     }
+ 
+-    public Set<Authority> getRoles() {
++    public Set<Role> getRoles() {
+         return roles;
+     }
+ 
+-    public void setRoles(Set<Authority> roles) {
++    public void setRoles(Set<Role> roles) {
+         this.roles = roles;
+     }
+ 
 Index: src/main/java/ro/teamnet/bootstrap/web/rest/UserResource.java
 ===================================================================
 --- src/main/java/ro/teamnet/bootstrap/web/rest/UserResource.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
@@ -425,6 +541,44 @@ Index: src/main/java/ro/teamnet/bootstrap/web/rest/UserResource.java
 -        return user;
 -    }
 -}
+Index: src/main/java/ro/teamnet/bootstrap/web/rest/dto/MenuDTO.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/web/rest/dto/MenuDTO.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/web/rest/dto/MenuDTO.java	(revision )
+@@ -1,7 +1,7 @@
+ package ro.teamnet.bootstrap.web.rest.dto;
+ 
+-import ro.teamnet.bootstrap.domain.Authority;
+ import ro.teamnet.bootstrap.domain.Menu;
++import ro.teamnet.bootstrap.domain.Role;
+ 
+ import java.util.ArrayList;
+ import java.util.HashSet;
+@@ -20,7 +20,7 @@
+     private Long sortNo;
+     private Long active;
+     private List<MenuDTO> items = new ArrayList<MenuDTO>();
+-    private Set<Authority> roles = new HashSet<>();
++    private Set<Role> roles = new HashSet<>();
+ 
+     public MenuDTO(Menu menu) {
+         fetchMenuData(menu);
+@@ -72,10 +72,10 @@
+     public void setCssClass(String cssClass) {
+         this.cssClass = cssClass;
+     }
+-    public Set<Authority> getRoles() {
++    public Set<Role> getRoles() {
+         return roles;
+     }
+-    public void setRoles(Set<Authority> roles) {
++    public void setRoles(Set<Role> roles) {
+         this.roles = roles;
+     }
+     public Long getSortNo() {
 Index: src/main/java/ro/teamnet/bootstrap/security/UserNotActivatedException.java
 ===================================================================
 --- src/main/java/ro/teamnet/bootstrap/security/UserNotActivatedException.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
@@ -475,6 +629,158 @@ Index: src/main/java/ro/teamnet/bootstrap/repository/UserRepository.java
 -
 -    User findOneByEmail(String email);
 -}
+Index: src/main/resources/config/liquibase/changelog/20150101000001_changelog.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/config/liquibase/changelog/20150101000001_changelog.xml	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/resources/config/liquibase/changelog/20150101000001_changelog.xml	(revision )
+@@ -25,144 +25,6 @@
+         The initial schema has the '00000000000001' id, so that it is over-written if we re-generate it.
+     -->
+     <changeSet id="00000000000001" author="bootstrap" failOnError="true">
+-        <createTable tableName="T_USER">
+-            <column name="login" type="varchar(50)">
+-                <constraints primaryKey="true" nullable="false"/>
+-            </column>
+-            <column name="passw" type="varchar(100)"/>
+-            <column name="first_name" type="varchar(50)"/>
+-            <column name="last_name" type="varchar(50)"/>
+-            <column name="email" type="varchar(100)">
+-                <constraints unique="true"/>
+-            </column>
+-            <column name="activated" type="boolean" defaultValueBoolean="false" valueBoolean="false">
+-                <constraints nullable="false" />
+-            </column>
+-            <column name="lang_key" type="varchar(5)"/>
+-            <column name="activation_key" type="varchar(20)"/>
+-            <column name="created_by" type="varchar(50)" defaultValue="system">
+-                <constraints nullable="false"/>
+-            </column>
+-            <column name="created_date" type="timestamp" defaultValueDate="${now}">
+-                <constraints nullable="false"/>
+-            </column>
+-            <column name="last_modified_by" type="varchar(50)"/>
+-            <column name="last_modified_date" type="timestamp"/>
+-        </createTable>
+-
+-        <createTable tableName="T_AUTHORITY">
+-            <column name="name" type="varchar(50)">
+-                <constraints primaryKey="true" nullable="false"/>
+-            </column>
+-        </createTable>
+-
+-        <createTable tableName="T_USER_AUTHORITY">
+-            <column name="login" type="varchar(50)">
+-                <constraints nullable="false"/>
+-            </column>
+-            <column name="name" type="varchar(50)">
+-                <constraints nullable="false"/>
+-            </column>
+-        </createTable>
+-        <addPrimaryKey columnNames="login, name" tableName="T_USER_AUTHORITY"/>
+-
+-        <createTable tableName="T_PERSISTENT_TOKEN">
+-            <column name="series" type="varchar(255)">
+-                <constraints primaryKey="true" nullable="false"/>
+-            </column>
+-            <column name="user_login" type="varchar(50)"/>
+-            <column name="token_value" type="varchar(255)">
+-                <constraints nullable="false" />
+-            </column>
+-            <column name="token_date" type="date"/>
+-            <column name="ip_address" type="varchar(39)"/>
+-            <column name="user_agent" type="varchar(255)"/>
+-        </createTable>
+-
+-        <!--<createIndex indexName="idx_user_authority"
+-                     tableName="T_USER_AUTHORITY"
+-                     unique="true">
+-            <column name="login" type="varchar(50)"/>
+-            <column name="name" type="varchar(50)"/>
+-        </createIndex>-->
+-
+-        <addForeignKeyConstraint baseColumnNames="name"
+-                                 baseTableName="T_USER_AUTHORITY"
+-                                 constraintName="fk_authority_name"
+-                                 referencedColumnNames="name"
+-                                 referencedTableName="T_AUTHORITY"/>
+-
+-        <addForeignKeyConstraint baseColumnNames="login"
+-                                 baseTableName="T_USER_AUTHORITY"
+-                                 constraintName="fk_user_login"
+-                                 referencedColumnNames="login"
+-                                 referencedTableName="T_USER"/>
+-
+-        <addForeignKeyConstraint baseColumnNames="user_login"
+-                                 baseTableName="T_PERSISTENT_TOKEN"
+-                                 constraintName="fk_user_persistent_token"
+-                                 referencedColumnNames="login"
+-                                 referencedTableName="T_USER"/>
+-
+-        <insert tableName="T_USER">
+-            <column name="login" value="system"/>
+-            <column name="passw" value="$2a$10$mE.qmcV0mFU5NcKh73TZx.z4ueI/.bDWbj0T1BYyqP481kGGarKLG"/>
+-            <column name="first_name" value="System"/>
+-            <column name="last_name" value="System"/>
+-            <column name="email" value="system.system@teamnet.ro"/>
+-            <column name="activated" value="${activated}"/>
+-            <column name="lang_key" value="en"/>
+-            <column name="created_by" value="system"/>
+-        </insert>
+-        <insert tableName="T_USER">
+-            <column name="login" value="admin"/>
+-            <column name="passw" value="$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC"/>
+-            <column name="first_name" value="Admin"/>
+-            <column name="last_name" value="Admin"/>
+-            <column name="email" value="admin.admin@teamnet.ro"/>
+-            <column name="activated" value="${activated}"/>
+-            <column name="lang_key" value="en"/>
+-            <column name="created_by" value="system"/>
+-        </insert>
+-        <insert tableName="T_USER">
+-            <column name="login" value="user"/>
+-            <column name="passw" value="$2a$10$VEjxo0jq2YG9Rbk2HmX9S.k1uZBGYUHdUcid3g/vfiEl7lwWgOH/K"/>
+-            <column name="first_name" value="User"/>
+-            <column name="last_name" value="User"/>
+-            <column name="email" value="user.user@teamnet.ro"/>
+-            <column name="activated" value="${activated}"/>
+-            <column name="lang_key" value="en"/>
+-            <column name="created_by" value="system"/>
+-        </insert>
+-
+-        <insert tableName="T_AUTHORITY">
+-            <column name="name" value="ROLE_ADMIN"/>
+-        </insert>
+-        <insert tableName="T_AUTHORITY">
+-            <column name="name" value="ROLE_USER"/>
+-        </insert>
+-
+-        <insert tableName="T_USER_AUTHORITY">
+-            <column name="login" value="system"/>
+-            <column name="name" value="ROLE_ADMIN"/>
+-        </insert>
+-        <insert tableName="T_USER_AUTHORITY">
+-            <column name="login" value="system"/>
+-            <column name="name" value="ROLE_USER"/>
+-        </insert>
+-        <insert tableName="T_USER_AUTHORITY">
+-            <column name="login" value="admin"/>
+-            <column name="name" value="ROLE_ADMIN"/>
+-        </insert>
+-        <insert tableName="T_USER_AUTHORITY">
+-            <column name="login" value="admin"/>
+-            <column name="name" value="ROLE_USER"/>
+-        </insert>
+-        <insert tableName="T_USER_AUTHORITY">
+-            <column name="login" value="user"/>
+-            <column name="name" value="ROLE_USER"/>
+-        </insert>
+-
+ 
+         <createTable tableName="T_PERSISTENT_AUDIT_EVENT">
+             <column name="event_id" type="bigint" autoIncrement="true">
 Index: src/main/java/ro/teamnet/bootstrap/domain/AbstractAuditingEntity.java
 ===================================================================
 --- src/main/java/ro/teamnet/bootstrap/domain/AbstractAuditingEntity.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
@@ -1093,6 +1399,34 @@ Index: src/main/java/ro/teamnet/bootstrap/web/rest/AccountResource.java
 -        return templateEngine.process("activationEmail", context);
 -    }
 -}
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- pom.xml	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ pom.xml	(revision )
+@@ -14,7 +14,7 @@
+     <packaging>jar</packaging>
+ 
+     <name>app-bootstrap</name>
+-	
++
+ 	<dependencies>
+         <dependency>
+             <groupId>ro.teamnet.bootstrap</groupId>
+@@ -31,6 +31,11 @@
+             <artifactId>postgresql</artifactId>
+             <version>${postgresql.version}</version>
+         </dependency>
++        <dependency>
++            <groupId>ro.teamnet.bootstrap</groupId>
++            <artifactId>app-bootstrap-security</artifactId>
++            <version>0.1</version>
++        </dependency>
+     </dependencies>
+ 
+ 
 Index: src/main/java/ro/teamnet/bootstrap/security/CustomPersistentRememberMeServices.java
 ===================================================================
 --- src/main/java/ro/teamnet/bootstrap/security/CustomPersistentRememberMeServices.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
@@ -1300,6 +1634,84 @@ Index: src/main/java/ro/teamnet/bootstrap/security/CustomPersistentRememberMeSer
 -                TOKEN_VALIDITY_SECONDS, request, response);
 -    }
 -}
+Index: src/main/java/ro/teamnet/bootstrap/config/WebConfigurer.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/config/WebConfigurer.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/config/WebConfigurer.java	(revision )
+@@ -17,6 +17,7 @@
+ import org.springframework.context.annotation.Configuration;
+ import org.springframework.core.env.Environment;
+ import org.springframework.util.ReflectionUtils;
++import ro.teamnet.bootstrap.security.filter.SecurityAccessFilter;
+ import ro.teamnet.bootstrap.web.filter.CachingHttpHeadersFilter;
+ import ro.teamnet.bootstrap.web.filter.StaticResourcesProductionFilter;
+ import ro.teamnet.bootstrap.web.filter.gzip.GZipServletFilter;
+@@ -57,6 +58,7 @@
+             initStaticResourcesProductionFilter(servletContext, disps);
+         }
+         initGzipFilter(servletContext, disps);
++        initSecurityAccessFilter(servletContext);
+         log.info("Web application fully configured");
+     }
+ 
+@@ -197,5 +199,11 @@
+         protected void analytics() {
+             // noop
+         }
++    }
++
++    private void initSecurityAccessFilter(ServletContext servletContext){
++        SecurityAccessFilter securityAccessFilter = new SecurityAccessFilter();
++        FilterRegistration filterRegistration = servletContext.addFilter("HttpInterceptor", securityAccessFilter);
++        filterRegistration.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+     }
+ }
+Index: src/main/resources/ehcache.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/ehcache.xml	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/resources/ehcache.xml	(revision )
+@@ -17,23 +17,31 @@
+             overflowToDisk="false"
+             />
+ 
+-    <cache name="ro.teamnet.bootstrap.domain.User"
++    <cache name="ro.teamnet.bootstrap.domain.Account"
+            timeToLiveSeconds="3600">
+     </cache>
+ 
+-    <cache name="ro.teamnet.bootstrap.domain.Authority"
++   <cache name="ro.teamnet.bootstrap.domain.Role"
+            timeToLiveSeconds="3600">
+     </cache>
+ 
+-    <cache name="ro.teamnet.bootstrap.domain.User.authorities"
++    <cache name="ro.teamnet.bootstrap.domain.ModuleRight"
+            timeToLiveSeconds="3600">
+     </cache>
+ 
++    <cache name="ro.teamnet.bootstrap.domain.Module"
++           timeToLiveSeconds="3600">
++    </cache>
++
++    <cache name="ro.teamnet.bootstrap.domain.Account.roles"
++           timeToLiveSeconds="3600">
++    </cache>
++
+     <cache name="ro.teamnet.bootstrap.domain.PersistentToken"
+            timeToLiveSeconds="3600">
+     </cache>
+ 
+-    <cache name="ro.teamnet.bootstrap.domain.User.persistentTokens"
++    <cache name="ro.teamnet.bootstrap.domain.Account.persistentTokens"
+            timeToLiveSeconds="3600">
+     </cache>
+ </ehcache>
 Index: src/main/java/ro/teamnet/bootstrap/repository/PersistentTokenRepository.java
 ===================================================================
 --- src/main/java/ro/teamnet/bootstrap/repository/PersistentTokenRepository.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
@@ -1324,3 +1736,41 @@ Index: src/main/java/ro/teamnet/bootstrap/repository/PersistentTokenRepository.j
 -    List<PersistentToken> findByTokenDateBefore(LocalDate localDate);
 -
 -}
+Index: src/main/java/ro/teamnet/bootstrap/web/rest/MenuResource.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/web/rest/MenuResource.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/web/rest/MenuResource.java	(revision )
+@@ -6,10 +6,10 @@
+ import org.springframework.http.ResponseEntity;
+ import org.springframework.transaction.annotation.Transactional;
+ import org.springframework.web.bind.annotation.*;
+-import ro.teamnet.bootstrap.domain.Authority;
+ import ro.teamnet.bootstrap.domain.Menu;
+-import ro.teamnet.bootstrap.repository.AuthorityRepository;
++import ro.teamnet.bootstrap.domain.Role;
+ import ro.teamnet.bootstrap.repository.MenuRepository;
++import ro.teamnet.bootstrap.repository.RoleRepository;
+ import ro.teamnet.bootstrap.service.MenuService;
+ import ro.teamnet.bootstrap.web.rest.dto.MenuDTO;
+ import ro.teamnet.bootstrap.web.rest.dto.MenuUpdateDTO;
+@@ -30,7 +30,7 @@
+     MenuRepository menuRepository;
+ 
+     @Inject
+-    AuthorityRepository authorityRepository;
++    RoleRepository roleRepository;
+ 
+     @RequestMapping(value = "/rest/menu", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+     @Timed
+@@ -74,7 +74,7 @@
+     @RequestMapping(value = "/rest/menu/authorities", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+     @Timed
+     public ResponseEntity getAuthorities() {
+-        List<Authority> auths = authorityRepository.findAll();
++        List<Role> auths = roleRepository.findAll();
+         return new ResponseEntity<>(auths, HttpStatus.OK);
+     }
+ }
