@@ -30,8 +30,7 @@ public class AdditionalSpringSecurityConfiguration
     }
 
     /**
-     * Create a CustomGlobalSecurityConfiguration that uses our CustomMethodSecurityExpressionHandler in order to filter
-     * AppPageImpl objects
+     * Create a CustomGlobalSecurityConfiguration that uses our CustomMethodSecurityExpressionHandler in order to filter AppPageImpl objects
      */
     @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
     private static class CustomGlobalSecurityConfiguration extends GlobalMethodSecurityConfiguration {

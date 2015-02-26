@@ -1,0 +1,1326 @@
+Index: src/main/java/ro/teamnet/bootstrap/repository/AuthorityRepository.java
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/repository/AuthorityRepository.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/repository/AuthorityRepository.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,10 +0,0 @@
+-package ro.teamnet.bootstrap.repository;
+-
+-import org.springframework.data.jpa.repository.JpaRepository;
+-import ro.teamnet.bootstrap.domain.Authority;
+-
+-/**
+- * Spring Data JPA repository for the Authority entity.
+- */
+-public interface AuthorityRepository extends JpaRepository<Authority, String> {
+-}
+Index: src/main/java/ro/teamnet/bootstrap/domain/Authority.java
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/domain/Authority.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/domain/Authority.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,64 +0,0 @@
+-package ro.teamnet.bootstrap.domain;
+-
+-import org.hibernate.annotations.Cache;
+-import org.hibernate.annotations.CacheConcurrencyStrategy;
+-import javax.persistence.Entity;
+-import javax.persistence.Id;
+-import javax.persistence.Table;
+-import javax.persistence.Column;
+-import javax.validation.constraints.NotNull;
+-import javax.validation.constraints.Size;
+-import java.io.Serializable;import java.lang.Object;import java.lang.Override;import java.lang.String;
+-
+-/**
+- * An authority (a security role) used by Spring Security.
+- */
+-@Entity
+-@Table(name = "T_AUTHORITY")
+-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+-public class Authority implements Serializable {
+-
+-    @NotNull
+-    @Size(min = 0, max = 50)
+-    @Id
+-    @Column(length = 50)
+-    private String name;
+-
+-    public String getName() {
+-        return name;
+-    }
+-
+-    public void setName(String name) {
+-        this.name = name;
+-    }
+-
+-    @Override
+-    public boolean equals(Object o) {
+-        if (this == o) {
+-            return true;
+-        }
+-        if (o == null || getClass() != o.getClass()) {
+-            return false;
+-        }
+-
+-        Authority authority = (Authority) o;
+-
+-        if (name != null ? !name.equals(authority.name) : authority.name != null) {
+-            return false;
+-        }
+-
+-        return true;
+-    }
+-
+-    @Override
+-    public int hashCode() {
+-        return name != null ? name.hashCode() : 0;
+-    }
+-
+-    @Override
+-    public String toString() {
+-        return "Authority{" +
+-                "name='" + name + '\'' +
+-                "}";
+-    }
+-}
+Index: src/main/java/ro/teamnet/bootstrap/security/UserDetailsService.java
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/security/UserDetailsService.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/security/UserDetailsService.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,52 +0,0 @@
+-package ro.teamnet.bootstrap.security;
+-
+-import org.slf4j.Logger;
+-import org.slf4j.LoggerFactory;
+-import org.springframework.security.core.GrantedAuthority;
+-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+-import org.springframework.security.core.userdetails.UserDetails;
+-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+-import org.springframework.stereotype.Component;
+-import org.springframework.transaction.annotation.Transactional;
+-import ro.teamnet.bootstrap.domain.Authority;
+-import ro.teamnet.bootstrap.domain.User;
+-import ro.teamnet.bootstrap.repository.UserRepository;
+-
+-import javax.inject.Inject;
+-import java.lang.Override;import java.lang.String;import java.util.ArrayList;
+-import java.util.Collection;
+-
+-/**
+- * Authenticate a user from the database.
+- */
+-@Component("userDetailsService")
+-public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
+-
+-    private final Logger log = LoggerFactory.getLogger(UserDetailsService.class);
+-
+-    @Inject
+-    private UserRepository userRepository;
+-
+-    @Override
+-    @Transactional
+-    public UserDetails loadUserByUsername(final String login) {
+-        log.debug("Authenticating {}", login);
+-        String lowercaseLogin = login.toLowerCase();
+-
+-        User userFromDatabase = userRepository.findOne(lowercaseLogin);
+-        if (userFromDatabase == null) {
+-            throw new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database");
+-        } else if (!userFromDatabase.getActivated()) {
+-            throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
+-        }
+-
+-        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+-        for (Authority authority : userFromDatabase.getAuthorities()) {
+-            GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(authority.getName());
+-            grantedAuthorities.add(grantedAuthority);
+-        }
+-
+-        return new org.springframework.security.core.userdetails.User(lowercaseLogin, userFromDatabase.getPassword(),
+-                grantedAuthorities);
+-    }
+-}
+Index: src/main/java/ro/teamnet/bootstrap/domain/User.java
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/domain/User.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/domain/User.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,207 +0,0 @@
+-package ro.teamnet.bootstrap.domain;
+-
+-import com.fasterxml.jackson.annotation.JsonIgnore;
+-import org.hibernate.annotations.Cache;
+-import org.hibernate.annotations.CacheConcurrencyStrategy;
+-import org.hibernate.validator.constraints.Email;
+-
+-import javax.persistence.*;
+-import javax.validation.constraints.NotNull;
+-import javax.validation.constraints.Size;
+-import java.io.Serializable;
+-import java.lang.Object;import java.lang.Override;import java.lang.String;import java.util.HashSet;
+-import java.util.Set;
+-
+-/**
+- * A user.
+- */
+-@Entity
+-@Table(name = "T_USER")
+-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+-public class User extends AbstractAuditingEntity implements Serializable {
+-
+-    @NotNull
+-    @Size(min = 0, max = 50)
+-    @Id
+-    @Column(length = 50)
+-    private String login;
+-
+-    @JsonIgnore
+-    @Size(min = 0, max = 100)
+-    @Column(name="passw", length = 100)
+-    private String password;
+-
+-    @Size(min = 0, max = 50)
+-    @Column(name = "first_name", length = 50)
+-    private String firstName;
+-
+-    @Size(min = 0, max = 50)
+-    @Column(name = "last_name", length = 50)
+-    private String lastName;
+-
+-    @Email
+-    @Size(min = 0, max = 100)
+-    @Column(length = 100)
+-    private String email;
+-
+-    private boolean activated = false;
+-
+-    @Size(min = 2, max = 5)
+-    @Column(name = "lang_key", length = 5)
+-    private String langKey;
+-
+-    @Size(min = 0, max = 20)
+-    @Column(name = "activation_key", length = 20)
+-    private String activationKey;
+-
+-
+-    @Size(min = 0, max = 20)
+-    @Column(name = "gender", length = 20)
+-    private String gender;
+-
+-
+-
+-
+-    @JsonIgnore
+-    @ManyToMany
+-    @JoinTable(
+-            name = "T_USER_AUTHORITY",
+-            joinColumns = {@JoinColumn(name = "login", referencedColumnName = "login")},
+-            inverseJoinColumns = {@JoinColumn(name = "name", referencedColumnName = "name")})
+-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+-    private Set<Authority> authorities = new HashSet<>();
+-
+-    @JsonIgnore
+-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+-    private Set<PersistentToken> persistentTokens = new HashSet<>();
+-
+-    public String getLogin() {
+-        return login;
+-    }
+-
+-    public void setLogin(String login) {
+-        this.login = login;
+-    }
+-
+-    public String getPassword() {
+-        return password;
+-    }
+-
+-    public void setPassword(String password) {
+-        this.password = password;
+-    }
+-
+-    public String getFirstName() {
+-        return firstName;
+-    }
+-
+-    public void setFirstName(String firstName) {
+-        this.firstName = firstName;
+-    }
+-
+-    public String getLastName() {
+-        return lastName;
+-    }
+-
+-    public void setLastName(String lastName) {
+-        this.lastName = lastName;
+-    }
+-
+-    public String getEmail() {
+-        return email;
+-    }
+-
+-    public void setEmail(String email) {
+-        this.email = email;
+-    }
+-
+-    public boolean getActivated() {
+-        return activated;
+-    }
+-
+-    public void setActivated(boolean activated) {
+-        this.activated = activated;
+-    }
+-
+-    public String getActivationKey() {
+-        return activationKey;
+-    }
+-
+-    public void setActivationKey(String activationKey) {
+-        this.activationKey = activationKey;
+-    }
+-
+-    public String getLangKey() {
+-        return langKey;
+-    }
+-
+-    public void setLangKey(String langKey) {
+-        this.langKey = langKey;
+-    }
+-
+-    public Set<Authority> getAuthorities() {
+-        return authorities;
+-    }
+-
+-    public void setAuthorities(Set<Authority> authorities) {
+-        this.authorities = authorities;
+-    }
+-
+-    public Set<PersistentToken> getPersistentTokens() {
+-        return persistentTokens;
+-    }
+-
+-    public void setPersistentTokens(Set<PersistentToken> persistentTokens) {
+-        this.persistentTokens = persistentTokens;
+-    }
+-
+-    public boolean isActivated() {
+-        return activated;
+-    }
+-
+-    public String getGender() {
+-        return gender;
+-    }
+-
+-    public void setGender(String gender) {
+-        this.gender = gender;
+-    }
+-
+-    @Override
+-    public boolean equals(Object o) {
+-        if (this == o) {
+-            return true;
+-        }
+-        if (o == null || getClass() != o.getClass()) {
+-            return false;
+-        }
+-
+-        User user = (User) o;
+-
+-        if (!login.equals(user.login)) {
+-            return false;
+-        }
+-
+-        return true;
+-    }
+-
+-    @Override
+-    public int hashCode() {
+-        return login.hashCode();
+-    }
+-
+-    @Override
+-    public String toString() {
+-        return "User{" +
+-                "login='" + login + '\'' +
+-                ", password='" + password + '\'' +
+-                ", firstName='" + firstName + '\'' +
+-                ", lastName='" + lastName + '\'' +
+-                ", email='" + email + '\'' +
+-                ", activated='" + activated + '\'' +
+-                ", langKey='" + langKey + '\'' +
+-                ", activationKey='" + activationKey + '\'' +
+-                "}";
+-    }
+-}
+Index: src/main/resources/config/liquibase/changelog/20150102000001_changelog.xml
+===================================================================
+--- src/main/resources/config/liquibase/changelog/20150102000001_changelog.xml	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/resources/config/liquibase/changelog/20150102000001_changelog.xml	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,17 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<databaseChangeLog
+-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+-
+-    <property name="now" value="now()" dbms="mysql,h2"/>
+-    <property name="now" value="current_timestamp" dbms="postgresql"/>
+-    <property name="now" value="sysdate" dbms="oracle"/>
+-
+-    <changeSet id="17122014" author="bootstrap">
+-        <addColumn tableName="t_user">
+-            <column name="gender" type="varchar(20)"/>
+-        </addColumn>
+-    </changeSet>
+-
+-</databaseChangeLog>
+Index: src/main/java/ro/teamnet/bootstrap/web/rest/UserResource.java
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/web/rest/UserResource.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/web/rest/UserResource.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,47 +0,0 @@
+-package ro.teamnet.bootstrap.web.rest;
+-
+-import com.codahale.metrics.annotation.Timed;
+-import ro.teamnet.bootstrap.security.AuthoritiesConstants;
+-import org.slf4j.Logger;
+-import org.slf4j.LoggerFactory;
+-import org.springframework.http.MediaType;
+-import org.springframework.web.bind.annotation.PathVariable;
+-import org.springframework.web.bind.annotation.RequestMapping;
+-import org.springframework.web.bind.annotation.RequestMethod;
+-import org.springframework.web.bind.annotation.RestController;
+-import ro.teamnet.bootstrap.domain.User;
+-import ro.teamnet.bootstrap.repository.UserRepository;
+-
+-import javax.annotation.security.RolesAllowed;
+-import javax.inject.Inject;
+-import javax.servlet.http.HttpServletResponse;
+-
+-/**
+- * REST controller for managing users.
+- */
+-@RestController
+-@RequestMapping("/app")
+-public class UserResource {
+-
+-    private final Logger log = LoggerFactory.getLogger(UserResource.class);
+-
+-    @Inject
+-    private UserRepository userRepository;
+-
+-    /**
+-     * GET  /rest/users/:login -> get the "login" user.
+-     */
+-    @RequestMapping(value = "/rest/users/{login}",
+-            method = RequestMethod.GET,
+-            produces = MediaType.APPLICATION_JSON_VALUE)
+-    @Timed
+-    @RolesAllowed(AuthoritiesConstants.ADMIN)
+-    public User getUser(@PathVariable String login, HttpServletResponse response) {
+-        log.debug("REST request to get User : {}", login);
+-        User user = userRepository.findOne(login);
+-        if (user == null) {
+-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+-        }
+-        return user;
+-    }
+-}
+Index: src/main/java/ro/teamnet/bootstrap/security/UserNotActivatedException.java
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/security/UserNotActivatedException.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/security/UserNotActivatedException.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,17 +0,0 @@
+-package ro.teamnet.bootstrap.security;
+-
+-import org.springframework.security.core.AuthenticationException;
+-
+-/**
+- * This exception is throw in case of a not activated user trying to authenticate.
+- */
+-public class UserNotActivatedException extends AuthenticationException {
+-
+-    public UserNotActivatedException(String message) {
+-        super(message);
+-    }
+-
+-    public UserNotActivatedException(String message, Throwable t) {
+-        super(message, t);
+-    }
+-}
+Index: src/main/java/ro/teamnet/bootstrap/repository/UserRepository.java
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/repository/UserRepository.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/repository/UserRepository.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,23 +0,0 @@
+-package ro.teamnet.bootstrap.repository;
+-
+-
+-import org.joda.time.DateTime;
+-import org.springframework.data.jpa.repository.JpaRepository;
+-import org.springframework.data.jpa.repository.Query;
+-import ro.teamnet.bootstrap.domain.User;
+-
+-import java.util.List;
+-
+-/**
+- * Spring Data JPA repository for the User entity.
+- */
+-public interface UserRepository extends JpaRepository<User, String> {
+-    
+-    @Query("select u from User u where u.activationKey = ?1")
+-    User getUserByActivationKey(String activationKey);
+-    
+-    @Query("select u from User u where u.activated = false and u.createdDate > ?1")
+-    List<User> findNotActivatedUsersByCreationDateBefore(DateTime dateTime);
+-
+-    User findOneByEmail(String email);
+-}
+Index: src/main/java/ro/teamnet/bootstrap/domain/AbstractAuditingEntity.java
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/domain/AbstractAuditingEntity.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/domain/AbstractAuditingEntity.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,77 +0,0 @@
+-package ro.teamnet.bootstrap.domain;
+-
+-import org.hibernate.annotations.Type;
+-import org.hibernate.envers.Audited;
+-import org.joda.time.DateTime;
+-import org.springframework.data.annotation.CreatedBy;
+-import org.springframework.data.annotation.CreatedDate;
+-import org.springframework.data.annotation.LastModifiedBy;
+-import org.springframework.data.annotation.LastModifiedDate;
+-
+-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+-import javax.persistence.Column;
+-import javax.persistence.EntityListeners;
+-import javax.persistence.MappedSuperclass;
+-import javax.validation.constraints.NotNull;
+-
+-/**
+- * Base abstract class for entities which will hold definitions for created, last modified by and created,
+- * last modified by date.
+- */
+-@MappedSuperclass
+-@Audited
+-@EntityListeners(AuditingEntityListener.class)
+-public abstract class AbstractAuditingEntity {
+-
+-    @CreatedBy
+-    @NotNull
+-    @Column(name = "created_by", nullable = false, length = 50, updatable = false)
+-    private String createdBy;
+-
+-    @CreatedDate
+-    @NotNull
+-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+-    @Column(name = "created_date", nullable = false)
+-    private DateTime createdDate = DateTime.now();
+-
+-    @LastModifiedBy
+-    @Column(name = "last_modified_by", length = 50)
+-    private String lastModifiedBy;
+-
+-    @LastModifiedDate
+-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+-    @Column(name = "last_modified_date")
+-    private DateTime lastModifiedDate = DateTime.now();
+-
+-    public String getCreatedBy() {
+-        return createdBy;
+-    }
+-
+-    public void setCreatedBy(String createdBy) {
+-        this.createdBy = createdBy;
+-    }
+-
+-    public DateTime getCreatedDate() {
+-        return createdDate;
+-    }
+-
+-    public void setCreatedDate(DateTime createdDate) {
+-        this.createdDate = createdDate;
+-    }
+-
+-    public String getLastModifiedBy() {
+-        return lastModifiedBy;
+-    }
+-
+-    public void setLastModifiedBy(String lastModifiedBy) {
+-        this.lastModifiedBy = lastModifiedBy;
+-    }
+-
+-    public DateTime getLastModifiedDate() {
+-        return lastModifiedDate;
+-    }
+-
+-    public void setLastModifiedDate(DateTime lastModifiedDate) {
+-        this.lastModifiedDate = lastModifiedDate;
+-    }
+-}
+Index: src/main/java/ro/teamnet/bootstrap/domain/PersistentToken.java
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/domain/PersistentToken.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/domain/PersistentToken.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,146 +0,0 @@
+-package ro.teamnet.bootstrap.domain;
+-
+-import com.fasterxml.jackson.annotation.JsonGetter;
+-import com.fasterxml.jackson.annotation.JsonIgnore;
+-import org.hibernate.annotations.Cache;
+-import org.hibernate.annotations.CacheConcurrencyStrategy;
+-import org.hibernate.annotations.Type;
+-import org.joda.time.LocalDate;
+-import org.joda.time.format.DateTimeFormat;
+-import org.joda.time.format.DateTimeFormatter;
+-
+-import javax.persistence.Column;import javax.persistence.Entity;import javax.persistence.Id;import javax.persistence.ManyToOne;import javax.persistence.Table;import javax.validation.constraints.NotNull;
+-import javax.validation.constraints.Size;
+-import java.io.Serializable;import java.lang.Object;import java.lang.Override;import java.lang.String;
+-
+-
+-/**
+- * Persistent tokens are used by Spring Security to automatically log in users.
+- *
+- * @see ro.teamnet.bootstrap.security.CustomPersistentRememberMeServices
+- */
+-@Entity
+-@Table(name = "T_PERSISTENT_TOKEN")
+-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+-public class PersistentToken implements Serializable {
+-
+-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("d MMMM yyyy");
+-
+-    private static final int MAX_USER_AGENT_LEN = 255;
+-
+-    @Id
+-    private String series;
+-
+-    @JsonIgnore
+-    @NotNull
+-    @Column(name = "token_value", nullable = false)
+-    private String tokenValue;
+-
+-    @JsonIgnore
+-    @Column(name = "token_date")
+-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+-    private LocalDate tokenDate;
+-
+-    //an IPV6 address max length is 39 characters
+-    @Size(min = 0, max = 39)
+-    @Column(name = "ip_address", length = 39)
+-    private String ipAddress;
+-
+-    @Column(name = "user_agent")
+-    private String userAgent;
+-
+-    @JsonIgnore
+-    @ManyToOne
+-    private User user;
+-
+-    public String getSeries() {
+-        return series;
+-    }
+-
+-    public void setSeries(String series) {
+-        this.series = series;
+-    }
+-
+-    public String getTokenValue() {
+-        return tokenValue;
+-    }
+-
+-    public void setTokenValue(String tokenValue) {
+-        this.tokenValue = tokenValue;
+-    }
+-
+-    public LocalDate getTokenDate() {
+-        return tokenDate;
+-    }
+-
+-    public void setTokenDate(LocalDate tokenDate) {
+-        this.tokenDate = tokenDate;
+-    }
+-
+-    @JsonGetter
+-    public String getFormattedTokenDate() {
+-        return DATE_TIME_FORMATTER.print(this.tokenDate);
+-    }
+-
+-    public String getIpAddress() {
+-        return ipAddress;
+-    }
+-
+-    public void setIpAddress(String ipAddress) {
+-        this.ipAddress = ipAddress;
+-    }
+-
+-    public String getUserAgent() {
+-        return userAgent;
+-    }
+-
+-    public void setUserAgent(String userAgent) {
+-        if (userAgent.length() >= MAX_USER_AGENT_LEN) {
+-            this.userAgent = userAgent.substring(0, MAX_USER_AGENT_LEN - 1);
+-        } else {
+-            this.userAgent = userAgent;
+-        }
+-    }
+-
+-    public User getUser() {
+-        return user;
+-    }
+-
+-    public void setUser(User user) {
+-        this.user = user;
+-    }
+-
+-    @Override
+-    public boolean equals(Object o) {
+-        if (this == o) {
+-            return true;
+-        }
+-        if (o == null || getClass() != o.getClass()) {
+-            return false;
+-        }
+-
+-        PersistentToken that = (PersistentToken) o;
+-
+-        if (!series.equals(that.series)) {
+-            return false;
+-        }
+-
+-        return true;
+-    }
+-
+-    @Override
+-    public int hashCode() {
+-        return series.hashCode();
+-    }
+-
+-    @Override
+-    public String toString() {
+-        return "PersistentToken{" +
+-                "series='" + series + '\'' +
+-                ", tokenValue='" + tokenValue + '\'' +
+-                ", tokenDate=" + tokenDate +
+-                ", ipAddress='" + ipAddress + '\'' +
+-                ", userAgent='" + userAgent + '\'' +
+-                "}";
+-    }
+-}
+Index: src/main/java/ro/teamnet/bootstrap/service/UserService.java
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/service/UserService.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/service/UserService.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,146 +0,0 @@
+-package ro.teamnet.bootstrap.service;
+-
+-
+-import ro.teamnet.bootstrap.security.SecurityUtils;
+-import ro.teamnet.bootstrap.service.util.RandomUtil;
+-import org.joda.time.DateTime;
+-import org.joda.time.LocalDate;
+-import org.slf4j.Logger;
+-import org.slf4j.LoggerFactory;
+-import org.springframework.scheduling.annotation.Scheduled;
+-import org.springframework.security.crypto.password.PasswordEncoder;
+-import org.springframework.stereotype.Service;
+-import org.springframework.transaction.annotation.Transactional;
+-import ro.teamnet.bootstrap.domain.Authority;
+-import ro.teamnet.bootstrap.domain.PersistentToken;
+-import ro.teamnet.bootstrap.domain.User;
+-import ro.teamnet.bootstrap.repository.AuthorityRepository;
+-import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
+-import ro.teamnet.bootstrap.repository.UserRepository;
+-
+-import javax.inject.Inject;
+-import java.lang.String;import java.util.HashSet;
+-import java.util.List;
+-import java.util.Set;
+-
+-/**
+- * Service class for managing users.
+- */
+-@Service
+-@Transactional
+-public class UserService {
+-
+-    private final Logger log = LoggerFactory.getLogger(UserService.class);
+-
+-    @Inject
+-    private PasswordEncoder passwordEncoder;
+-
+-    @Inject
+-    private UserRepository userRepository;
+-
+-    @Inject
+-    private PersistentTokenRepository persistentTokenRepository;
+-
+-    @Inject
+-    private AuthorityRepository authorityRepository;
+-
+-    public User activateRegistration(String key) {
+-        log.debug("Activating user for activation key {}", key);
+-        User user = userRepository.getUserByActivationKey(key);
+-
+-        // activate given user for the registration key.
+-        if (user != null) {
+-            user.setActivated(true);
+-            user.setActivationKey(null);
+-            userRepository.save(user);
+-            log.debug("Activated user: {}", user);
+-        }
+-        return user;
+-    }
+-
+-    public User createUserInformation(String login, String password, String firstName, String lastName, String email,
+-                                      String langKey,String gender) {
+-        User newUser = new User();
+-        Authority authority = authorityRepository.findOne("ROLE_USER");
+-        Set<Authority> authorities = new HashSet<>();
+-        String encryptedPassword = passwordEncoder.encode(password);
+-        newUser.setLogin(login);
+-        // new user gets initially a generated password
+-        newUser.setPassword(encryptedPassword);
+-        newUser.setFirstName(firstName);
+-        newUser.setLastName(lastName);
+-        newUser.setEmail(email);
+-        newUser.setLangKey(langKey);
+-        newUser.setGender(gender);
+-        // new user is not active
+-        newUser.setActivated(false);
+-        // new user gets registration key
+-        newUser.setActivationKey(RandomUtil.generateActivationKey());
+-        authorities.add(authority);
+-        newUser.setAuthorities(authorities);
+-        userRepository.save(newUser);
+-        log.debug("Created Information for User: {}", newUser);
+-        return newUser;
+-    }
+-
+-    public void updateUserInformation(String firstName, String lastName, String email) {
+-        User currentUser = userRepository.findOne(SecurityUtils.getCurrentLogin());
+-        currentUser.setFirstName(firstName);
+-        currentUser.setLastName(lastName);
+-        currentUser.setEmail(email);
+-        userRepository.save(currentUser);
+-        log.debug("Changed Information for User: {}", currentUser);
+-    }
+-
+-    public void changePassword(String password) {
+-        User currentUser = userRepository.findOne(SecurityUtils.getCurrentLogin());
+-        String encryptedPassword = passwordEncoder.encode(password);
+-        currentUser.setPassword(encryptedPassword);
+-        userRepository.save(currentUser);
+-        log.debug("Changed password for User: {}", currentUser);
+-    }
+-
+-    @Transactional(readOnly = true)
+-    public User getUserWithAuthorities() {
+-        User currentUser = userRepository.findOne(SecurityUtils.getCurrentLogin());
+-        currentUser.getAuthorities().size(); // eagerly load the association
+-        return currentUser;
+-    }
+-
+-    /**
+-     * Persistent Token are used for providing automatic authentication, they should be automatically deleted after
+-     * 30 days.
+-     * <p/>
+-     * <p>
+-     * This is scheduled to get fired everyday, at midnight.
+-     * </p>
+-     */
+-    @Scheduled(cron = "0 0 0 * * ?")
+-    public void removeOldPersistentTokens() {
+-        LocalDate now = new LocalDate();
+-        List<PersistentToken> tokens = persistentTokenRepository.findByTokenDateBefore(now.minusMonths(1));
+-        for (PersistentToken token : tokens) {
+-            log.debug("Deleting token {}", token.getSeries());
+-            User user = token.getUser();
+-            user.getPersistentTokens().remove(token);
+-            persistentTokenRepository.delete(token);
+-        }
+-    }
+-
+-    /**
+-     * Not activated users should be automatically deleted after 3 days.
+-     * <p/>
+-     * <p>
+-     * This is scheduled to get fired everyday, at 01:00 (am).
+-     * </p>
+-     */
+-    @Scheduled(cron = "0 0 1 * * ?")
+-    public void removeNotActivatedUsers() {
+-        DateTime now = new DateTime();
+-        List<User> users = userRepository.findNotActivatedUsersByCreationDateBefore(now.minusDays(3));
+-        for (User user : users) {
+-            log.debug("Deleting not activated user {}", user.getLogin());
+-            userRepository.delete(user);
+-        }
+-    }
+-}
+Index: src/main/java/ro/teamnet/bootstrap/web/rest/AccountResource.java
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/web/rest/AccountResource.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/web/rest/AccountResource.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,229 +0,0 @@
+-package ro.teamnet.bootstrap.web.rest;
+-
+-import com.codahale.metrics.annotation.Timed;
+-import org.springframework.web.bind.annotation.PathVariable;import org.springframework.web.bind.annotation.RequestBody;import org.springframework.web.bind.annotation.RequestMapping;import org.springframework.web.bind.annotation.RequestMethod;import org.springframework.web.bind.annotation.RequestParam;import org.springframework.web.bind.annotation.RestController;
+-import ro.teamnet.bootstrap.security.SecurityUtils;
+-import ro.teamnet.bootstrap.service.MailService;
+-import org.apache.commons.lang.StringUtils;
+-import org.slf4j.Logger;
+-import org.slf4j.LoggerFactory;
+-import org.springframework.context.ApplicationContext;
+-import org.springframework.http.HttpStatus;
+-import org.springframework.http.MediaType;
+-import org.springframework.http.ResponseEntity;
+-import org.thymeleaf.context.IWebContext;
+-import org.thymeleaf.spring4.SpringTemplateEngine;
+-import org.thymeleaf.spring4.context.SpringWebContext;
+-import ro.teamnet.bootstrap.domain.Authority;
+-import ro.teamnet.bootstrap.domain.PersistentToken;
+-import ro.teamnet.bootstrap.domain.User;
+-import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
+-import ro.teamnet.bootstrap.repository.UserRepository;
+-import ro.teamnet.bootstrap.service.UserService;
+-import ro.teamnet.bootstrap.web.rest.dto.UserDTO;
+-
+-import javax.inject.Inject;
+-import javax.servlet.ServletContext;
+-import javax.servlet.http.HttpServletRequest;
+-import javax.servlet.http.HttpServletResponse;
+-import javax.validation.Valid;
+-import java.io.UnsupportedEncodingException;
+-import java.lang.String;import java.net.URLDecoder;
+-import java.util.ArrayList;import java.util.HashMap;import java.util.List;import java.util.Locale;import java.util.Map;
+-
+-/**
+- * REST controller for managing the current user's account.
+- */
+-@RestController
+-@RequestMapping("/app")
+-public class AccountResource {
+-
+-    private final Logger log = LoggerFactory.getLogger(AccountResource.class);
+-
+-    @Inject
+-    private ServletContext servletContext;
+-
+-    @Inject
+-    private ApplicationContext applicationContext;
+-
+-    @Inject
+-    private SpringTemplateEngine templateEngine;
+-
+-    @Inject
+-    private UserRepository userRepository;
+-
+-    @Inject
+-    private UserService userService;
+-
+-    @Inject
+-    private PersistentTokenRepository persistentTokenRepository;
+-
+-    @Inject
+-    private MailService mailService;
+-
+-    /**
+-     * POST  /rest/register -> register the user.
+-     */
+-    @RequestMapping(value = "/rest/register",
+-            method = RequestMethod.POST,
+-            produces = MediaType.APPLICATION_JSON_VALUE)
+-    @Timed
+-    public ResponseEntity<?> registerAccount(@Valid @RequestBody UserDTO userDTO, HttpServletRequest request,
+-                                             HttpServletResponse response) {
+-        User user = userRepository.findOne(userDTO.getLogin());
+-        if (user != null) {
+-            return new ResponseEntity<String>("login already in use", HttpStatus.BAD_REQUEST);
+-        } else {
+-            if (userRepository.findOneByEmail(userDTO.getEmail()) != null) {
+-                return new ResponseEntity<String>("e-mail address already in use", HttpStatus.BAD_REQUEST);
+-            }
+-            user = userService.createUserInformation(userDTO.getLogin(), userDTO.getPassword(), userDTO.getFirstName(),
+-                    userDTO.getLastName(), userDTO.getEmail().toLowerCase(), userDTO.getLangKey(),userDTO.getGender());
+-            final Locale locale = Locale.forLanguageTag(user.getLangKey());
+-            String content = createHtmlContentFromTemplate(user, locale, request, response);
+-            mailService.sendActivationEmail(user.getEmail(), content, locale);
+-            return new ResponseEntity<>(HttpStatus.CREATED);
+-        }
+-    }
+-    /**
+-     * GET  /rest/activate -> activate the registered user.
+-     */
+-    @RequestMapping(value = "/rest/activate",
+-            method = RequestMethod.GET,
+-            produces = MediaType.APPLICATION_JSON_VALUE)
+-    @Timed
+-    public ResponseEntity<String> activateAccount(@RequestParam(value = "key") String key) {
+-        User user = userService.activateRegistration(key);
+-        if (user == null) {
+-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+-        }
+-        return new ResponseEntity<String>(user.getLogin(), HttpStatus.OK);
+-    }
+-
+-    /**
+-     * GET  /rest/authenticate -> check if the user is authenticated, and return its login.
+-     */
+-    @RequestMapping(value = "/rest/authenticate",
+-            method = RequestMethod.GET,
+-            produces = MediaType.APPLICATION_JSON_VALUE)
+-    @Timed
+-    public String isAuthenticated(HttpServletRequest request) {
+-        log.debug("REST request to check if the current user is authenticated");
+-        return request.getRemoteUser();
+-    }
+-
+-    /**
+-     * GET  /rest/account -> get the current user.
+-     */
+-    @RequestMapping(value = "/rest/account",
+-            method = RequestMethod.GET,
+-            produces = MediaType.APPLICATION_JSON_VALUE)
+-    @Timed
+-    public ResponseEntity<UserDTO> getAccount() {
+-        User user = userService.getUserWithAuthorities();
+-        if (user == null) {
+-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+-        }
+-        List<String> roles = new ArrayList<>();
+-        for (Authority authority : user.getAuthorities()) {
+-            roles.add(authority.getName());
+-        }
+-        return new ResponseEntity<>(
+-            new UserDTO(
+-                user.getLogin(),
+-                null,
+-                user.getFirstName(),
+-                user.getLastName(),
+-                user.getEmail(),
+-                user.getLangKey(),
+-                roles,user.getGender()),
+-            HttpStatus.OK);
+-    }
+-
+-    /**
+-     * POST  /rest/account -> update the current user information.
+-     */
+-    @RequestMapping(value = "/rest/account",
+-            method = RequestMethod.POST,
+-            produces = MediaType.APPLICATION_JSON_VALUE)
+-    @Timed
+-    public ResponseEntity<?> saveAccount(@RequestBody UserDTO userDTO) {
+-        User userHavingThisEmail = userRepository.findOneByEmail(userDTO.getEmail());
+-        if (userHavingThisEmail != null && !userHavingThisEmail.getLogin().equals(SecurityUtils.getCurrentLogin())) {
+-            return new ResponseEntity<String>("e-mail address already in use", HttpStatus.BAD_REQUEST);
+-        }
+-        userService.updateUserInformation(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail());
+-        return new ResponseEntity<>(HttpStatus.OK);
+-    }
+-
+-    /**
+-     * POST  /rest/change_password -> changes the current user's password
+-     */
+-    @RequestMapping(value = "/rest/account/change_password",
+-            method = RequestMethod.POST,
+-            produces = MediaType.APPLICATION_JSON_VALUE)
+-    @Timed
+-    public ResponseEntity<?> changePassword(@RequestBody String password) {
+-        if (StringUtils.isEmpty(password)) {
+-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+-        }
+-        userService.changePassword(password);
+-        return new ResponseEntity<>(HttpStatus.OK);
+-    }
+-
+-    /**
+-     * GET  /rest/account/sessions -> get the current open sessions.
+-     */
+-    @RequestMapping(value = "/rest/account/sessions",
+-            method = RequestMethod.GET,
+-            produces = MediaType.APPLICATION_JSON_VALUE)
+-    @Timed
+-    public ResponseEntity<List<PersistentToken>> getCurrentSessions() {
+-        User user = userRepository.findOne(SecurityUtils.getCurrentLogin());
+-        if (user == null) {
+-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+-        }
+-        return new ResponseEntity<>(
+-            persistentTokenRepository.findByUser(user),
+-            HttpStatus.OK);
+-    }
+-
+-    /**
+-     * DELETE  /rest/account/sessions?series={series} -> invalidate an existing session.
+-     *
+-     * - You can only delete your own sessions, not any other user's session
+-     * - If you delete one of your existing sessions, and that you are currently logged in on that session, you will
+-     *   still be able to use that session, until you quit your browser: it does not work in real time (there is
+-     *   no API for that), it only removes the "remember me" cookie
+-     * - This is also true if you invalidate your current session: you will still be able to use it until you close
+-     *   your browser or that the session times out. But automatic login (the "remember me" cookie) will not work
+-     *   anymore.
+-     *   There is an API to invalidate the current session, but there is no API to check which session uses which
+-     *   cookie.
+-     */
+-    @RequestMapping(value = "/rest/account/sessions/{series}",
+-            method = RequestMethod.DELETE)
+-    @Timed
+-    public void invalidateSession(@PathVariable String series) throws UnsupportedEncodingException {
+-        String decodedSeries = URLDecoder.decode(series, "UTF-8");
+-        User user = userRepository.findOne(SecurityUtils.getCurrentLogin());
+-        List<PersistentToken> persistentTokens = persistentTokenRepository.findByUser(user);
+-        for (PersistentToken persistentToken : persistentTokens) {
+-            if (StringUtils.equals(persistentToken.getSeries(), decodedSeries)) {
+-                persistentTokenRepository.delete(decodedSeries);
+-            }
+-        }
+-    }
+-
+-    private String createHtmlContentFromTemplate(final User user, final Locale locale, final HttpServletRequest request,
+-                                                 final HttpServletResponse response) {
+-        Map<String, Object> variables = new HashMap<>();
+-        variables.put("user", user);
+-        variables.put("baseUrl", request.getScheme() + "://" +   // "http" + "://
+-                                 request.getServerName() +       // "myhost"
+-                                 ":" + request.getServerPort());
+-        IWebContext context = new SpringWebContext(request, response, servletContext,
+-                locale, variables, applicationContext);
+-        return templateEngine.process("activationEmail", context);
+-    }
+-}
+Index: src/main/java/ro/teamnet/bootstrap/security/CustomPersistentRememberMeServices.java
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/security/CustomPersistentRememberMeServices.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/security/CustomPersistentRememberMeServices.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,202 +0,0 @@
+-package ro.teamnet.bootstrap.security;
+-
+-import org.joda.time.LocalDate;
+-import org.slf4j.Logger;
+-import org.slf4j.LoggerFactory;
+-import org.springframework.core.env.Environment;
+-import org.springframework.dao.DataAccessException;
+-import org.springframework.security.core.Authentication;
+-import org.springframework.security.core.userdetails.UserDetails;
+-import org.springframework.security.crypto.codec.Base64;
+-import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
+-import org.springframework.security.web.authentication.rememberme.CookieTheftException;
+-import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
+-import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
+-import org.springframework.stereotype.Service;
+-import org.springframework.transaction.annotation.Transactional;
+-import ro.teamnet.bootstrap.domain.PersistentToken;
+-import ro.teamnet.bootstrap.domain.User;
+-import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
+-import ro.teamnet.bootstrap.repository.UserRepository;
+-
+-import javax.inject.Inject;
+-import javax.servlet.http.HttpServletRequest;
+-import javax.servlet.http.HttpServletResponse;
+-import java.lang.Override;import java.lang.String;import java.security.SecureRandom;
+-import java.util.Arrays;
+-
+-/**
+- * Custom implementation of Spring Security's RememberMeServices.
+- * <p/>
+- * Persistent tokens are used by Spring Security to automatically log in users.
+- * <p/>
+- * This is a specific implementation of Spring Security's remember-me authentication, but it is much
+- * more powerful than the standard implementations:
+- * <ul>
+- * <li>It allows a user to see the list of his currently opened sessions, and invalidate them</li>
+- * <li>It stores more information, such as the IP address and the user agent, for audit purposes<li>
+- * <li>When a user logs out, only his current session is invalidated, and not all of his sessions</li>
+- * </ul>
+- * <p/>
+- * This is inspired by:
+- * <ul>
+- * <li><a href="http://jaspan.com/improved_persistent_login_cookie_best_practice">Improved Persistent Login Cookie
+- * Best Practice</a></li>
+- * <li><a href="https://github.com/blog/1661-modeling-your-app-s-user-session">Github's "Modeling your App's User Session"</a></li></li>
+- * </ul>
+- * <p/>
+- * The main algorithm comes from Spring Security's PersistentTokenBasedRememberMeServices, but this class
+- * couldn't be cleanly extended.
+- * <p/>
+- */
+-@Service
+-public class CustomPersistentRememberMeServices extends
+-        AbstractRememberMeServices {
+-
+-    private final Logger log = LoggerFactory.getLogger(CustomPersistentRememberMeServices.class);
+-
+-    // Token is valid for one month
+-    private static final int TOKEN_VALIDITY_DAYS = 31;
+-
+-    private static final int TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * TOKEN_VALIDITY_DAYS;
+-
+-    private static final int DEFAULT_SERIES_LENGTH = 16;
+-
+-    private static final int DEFAULT_TOKEN_LENGTH = 16;
+-
+-    private SecureRandom random;
+-
+-    @Inject
+-    private PersistentTokenRepository persistentTokenRepository;
+-
+-    @Inject
+-    private UserRepository userRepository;
+-
+-    @Inject
+-    public CustomPersistentRememberMeServices(Environment env, org.springframework.security.core.userdetails.UserDetailsService userDetailsService) {
+-
+-        super(env.getProperty("jhipster.security.rememberme.key"), userDetailsService);
+-        random = new SecureRandom();
+-    }
+-
+-    @Override
+-    @Transactional
+-    protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request, HttpServletResponse response) {
+-
+-        PersistentToken token = getPersistentToken(cookieTokens);
+-        String login = token.getUser().getLogin();
+-
+-        // Token also matches, so login is valid. Update the token value, keeping the *same* series number.
+-        log.debug("Refreshing persistent login token for user '{}', series '{}'", login, token.getSeries());
+-        token.setTokenDate(new LocalDate());
+-        token.setTokenValue(generateTokenData());
+-        token.setIpAddress(request.getRemoteAddr());
+-        token.setUserAgent(request.getHeader("User-Agent"));
+-        try {
+-            persistentTokenRepository.saveAndFlush(token);
+-            addCookie(token, request, response);
+-        } catch (DataAccessException e) {
+-            log.error("Failed to update token: ", e);
+-            throw new RememberMeAuthenticationException("Autologin failed due to data access problem", e);
+-        }
+-        return getUserDetailsService().loadUserByUsername(login);
+-    }
+-
+-    @Override
+-    protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response, Authentication successfulAuthentication) {
+-        String login = successfulAuthentication.getName();
+-
+-        log.debug("Creating new persistent login for user {}", login);
+-        User user = userRepository.findOne(login);
+-
+-        PersistentToken token = new PersistentToken();
+-        token.setSeries(generateSeriesData());
+-        token.setUser(user);
+-        token.setTokenValue(generateTokenData());
+-        token.setTokenDate(new LocalDate());
+-        token.setIpAddress(request.getRemoteAddr());
+-        token.setUserAgent(request.getHeader("User-Agent"));
+-        try {
+-            persistentTokenRepository.saveAndFlush(token);
+-            addCookie(token, request, response);
+-        } catch (DataAccessException e) {
+-            log.error("Failed to save persistent token ", e);
+-        }
+-    }
+-
+-    /**
+-     * When logout occurs, only invalidate the current token, and not all user sessions.
+-     * <p/>
+-     * The standard Spring Security implementations are too basic: they invalidate all tokens for the
+-     * current user, so when he logs out from one browser, all his other sessions are destroyed.
+-     */
+-    @Override
+-    @Transactional
+-    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+-        String rememberMeCookie = extractRememberMeCookie(request);
+-        if (rememberMeCookie != null && rememberMeCookie.length() != 0) {
+-            try {
+-                String[] cookieTokens = decodeCookie(rememberMeCookie);
+-                PersistentToken token = getPersistentToken(cookieTokens);
+-                persistentTokenRepository.delete(token);
+-            } catch (InvalidCookieException ice) {
+-                log.info("Invalid cookie, no persistent token could be deleted");
+-            } catch (RememberMeAuthenticationException rmae) {
+-                log.debug("No persistent token found, so no token could be deleted");
+-            }
+-        }
+-        super.logout(request, response, authentication);
+-    }
+-
+-    /**
+-     * Validate the token and return it.
+-     */
+-    private PersistentToken getPersistentToken(String[] cookieTokens) {
+-        if (cookieTokens.length != 2) {
+-            throw new InvalidCookieException("Cookie token did not contain " + 2 +
+-                    " tokens, but contained '" + Arrays.asList(cookieTokens) + "'");
+-        }
+-
+-        final String presentedSeries = cookieTokens[0];
+-        final String presentedToken = cookieTokens[1];
+-
+-        PersistentToken token = persistentTokenRepository.findOne(presentedSeries);
+-
+-        if (token == null) {
+-            // No series match, so we can't authenticate using this cookie
+-            throw new RememberMeAuthenticationException("No persistent token found for series id: " + presentedSeries);
+-        }
+-
+-        // We have a match for this user/series combination
+-        log.info("presentedToken={} / tokenValue={}", presentedToken, token.getTokenValue());
+-        if (!presentedToken.equals(token.getTokenValue())) {
+-            // Token doesn't match series value. Delete this session and throw an exception.
+-            persistentTokenRepository.delete(token);
+-            throw new CookieTheftException("Invalid remember-me token (Series/token) mismatch. Implies previous cookie theft attack.");
+-        }
+-
+-        if (token.getTokenDate().plusDays(TOKEN_VALIDITY_DAYS).isBefore(LocalDate.now())) {
+-            persistentTokenRepository.delete(token);
+-            throw new RememberMeAuthenticationException("Remember-me login has expired");
+-        }
+-        return token;
+-    }
+-
+-    private String generateSeriesData() {
+-        byte[] newSeries = new byte[DEFAULT_SERIES_LENGTH];
+-        random.nextBytes(newSeries);
+-        return new String(Base64.encode(newSeries));
+-    }
+-
+-    private String generateTokenData() {
+-        byte[] newToken = new byte[DEFAULT_TOKEN_LENGTH];
+-        random.nextBytes(newToken);
+-        return new String(Base64.encode(newToken));
+-    }
+-
+-    private void addCookie(PersistentToken token, HttpServletRequest request, HttpServletResponse response) {
+-        setCookie(
+-                new String[]{token.getSeries(), token.getTokenValue()},
+-                TOKEN_VALIDITY_SECONDS, request, response);
+-    }
+-}
+Index: src/main/java/ro/teamnet/bootstrap/repository/PersistentTokenRepository.java
+===================================================================
+--- src/main/java/ro/teamnet/bootstrap/repository/PersistentTokenRepository.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
++++ src/main/java/ro/teamnet/bootstrap/repository/PersistentTokenRepository.java	(revision 4295e3f812fa7a86d01acf2bc181f3dfb088c99e)
+@@ -1,19 +0,0 @@
+-package ro.teamnet.bootstrap.repository;
+-
+-import org.joda.time.LocalDate;
+-import org.springframework.data.jpa.repository.JpaRepository;
+-import ro.teamnet.bootstrap.domain.PersistentToken;
+-import ro.teamnet.bootstrap.domain.User;
+-
+-import java.lang.String;import java.util.List;
+-
+-/**
+- * Spring Data JPA repository for the PersistentToken entity.
+- */
+-public interface PersistentTokenRepository extends JpaRepository<PersistentToken, String> {
+-
+-    List<PersistentToken> findByUser(User user);
+-
+-    List<PersistentToken> findByTokenDateBefore(LocalDate localDate);
+-
+-}

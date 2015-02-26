@@ -50,7 +50,7 @@ public class SecurityAccessFilter implements Filter {
         String userName = httpRequest.getUserPrincipal() != null ? httpRequest.getUserPrincipal().getName() : "";
 
         /*
-             For all entity access and menu acces the default request mapping will be /rest/entityName or /rest/menuName;
+             For all entity access and menu access the default request mapping will be /rest/entityName or /rest/menuName;
              Only for these request mappings will the filter verify authorized access;
              If not authenticated then return unauthorised
         */
@@ -83,12 +83,12 @@ public class SecurityAccessFilter implements Filter {
         for (GrantedAuthority authority : user.getAuthorities()) {
             ModuleRight permission;
             Boolean hasPermission;
-            Boolean accessToEntity;
+            Boolean accessToResource;
             if (authority instanceof ModuleRight) {
                 permission = (ModuleRight) authority;
                 hasPermission = ModuleRightType.getConstantsMap().get(permission.getRight()).equals(accessType) ? true : false;
-                accessToEntity = (hasPermission && permission.getModule().getCode().toLowerCase().equals(resource)) ? true : false;
-                if (accessToEntity) {
+                accessToResource = (hasPermission && permission.getModule().getCode().toLowerCase().equals(resource)) ? true : false;
+                if (accessToResource) {
                     return true;
                 }
             }
