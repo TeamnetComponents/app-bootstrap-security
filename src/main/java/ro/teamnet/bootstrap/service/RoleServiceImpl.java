@@ -12,6 +12,9 @@ import ro.teamnet.bootstrap.repository.RoleRepository;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+/**
+ * Service class for managing  ModuleRights.
+ */
 @Service
 @Transactional
 public class RoleServiceImpl implements RoleService {

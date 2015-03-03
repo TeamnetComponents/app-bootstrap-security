@@ -12,6 +12,7 @@ import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
 import ro.teamnet.bootstrap.service.ModuleRightService;
+import ro.teamnet.bootstrap.web.rest.dto.ModuleRightDTO;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +57,26 @@ public class ModuleRightResource {
     public AppPage<ModuleRight> getAll(AppPageable appPageable) {
         log.debug("REST request to get all moduleright");
         return  moduleRightService.findAll(appPageable);
+    }
+
+    /**
+     * POST  /rest/modulerights -> update moduleRight
+     */
+    @RequestMapping(value = "/rest/modulerights/{id}",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> save(@PathVariable Long id,@RequestBody ModuleRightDTO moduleRightDTO) {
+        log.debug("REST request to update the moduleright : {}", id);
+        ModuleRight moduleRight = moduleRightService.getOne(id);
+        if (moduleRight == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        moduleRight.setModule(moduleRightDTO.getModule());
+        moduleRight.setRight(moduleRightDTO.getRight());
+        moduleRight.setVersion(moduleRightDTO.getVersion());
+        //TODO find a better way to update
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

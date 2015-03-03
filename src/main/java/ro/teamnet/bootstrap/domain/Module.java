@@ -1,12 +1,15 @@
 package ro.teamnet.bootstrap.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import ro.teamnet.bootstrap.domain.util.ModuleType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
+
 
 @Entity
 @Table(name = "T_MODULE")
@@ -104,6 +107,11 @@ public class Module {
 
     public void setParentModule(Module parentModule) {
         this.parentModule = parentModule;
+    }
+
+    @JsonInclude
+    public String getModuleRightCode(){
+        return ModuleType.getConstantsMap().get(getType());
     }
 
     @Override

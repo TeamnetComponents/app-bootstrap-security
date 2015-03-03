@@ -15,7 +15,9 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 
-
+/**
+ * A PersistentToken.
+ */
 @Entity
 @Table(name = "T_PERSISTENT_TOKEN")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)

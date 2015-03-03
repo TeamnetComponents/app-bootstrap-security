@@ -5,6 +5,9 @@ import org.hibernate.validator.constraints.Email;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+/**
+ *  A Employee. This class is for future case usage
+ */
 @Entity
 @Table(name = "T_EMPLOYEE")
 public class Employee {

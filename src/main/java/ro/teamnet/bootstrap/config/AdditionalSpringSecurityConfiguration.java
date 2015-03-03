@@ -12,6 +12,10 @@ import org.springframework.security.config.annotation.method.configuration.Globa
 import ro.teamnet.bootstrap.security.CustomMethodSecurityExpressionHandler;
 
 
+/**
+ * Additional setup class for Spring security configuration. This class configures a CustomMethodSecurityExpressionHandler
+ * and a CustomGlobalSecurityConfiguration bean
+ */
 @Configuration
 public class AdditionalSpringSecurityConfiguration
 {
@@ -20,7 +24,7 @@ public class AdditionalSpringSecurityConfiguration
 
     /**
      * Built-In Expression @http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-permission-evaluator
-     * @return
+     * @return {@link DefaultMethodSecurityExpressionHandler}
      */
     @Bean(name="expressionHandler")
     public DefaultMethodSecurityExpressionHandler createExpressionHandler() {
@@ -30,7 +34,13 @@ public class AdditionalSpringSecurityConfiguration
     }
 
     /**
-     * Create a CustomGlobalSecurityConfiguration that uses our CustomMethodSecurityExpressionHandler in order to filter AppPageImpl objects
+     * Create a {@link GlobalMethodSecurityConfiguration} that uses our {@link CustomMethodSecurityExpressionHandler}
+     * in order to filter {@link ro.teamnet.bootstrap.extend.AppPageImpl} objects;
+     * <p>Usage
+     * @PreAuthorize("hasRole('ROLE_ADMIN')") on the @Controller or @Service method
+     * @PostFilter("filterObject.owner == authentication.name")
+     * </p>
+     *
      */
     @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
     private static class CustomGlobalSecurityConfiguration extends GlobalMethodSecurityConfiguration {

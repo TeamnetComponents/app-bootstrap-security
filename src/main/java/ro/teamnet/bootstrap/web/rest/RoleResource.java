@@ -11,6 +11,7 @@ import ro.teamnet.bootstrap.domain.Role;
 import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
 import ro.teamnet.bootstrap.service.RoleService;
+import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +44,31 @@ public class RoleResource {
         }
         roleService.save(role);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    /**
+     * POST  /rest/role -> update role
+     */
+    @RequestMapping(value = "/rest/role/{id}",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> save(@PathVariable Long id,@RequestBody RoleDTO roleDTO) {
+        log.debug("REST request to update the role : {}", id);
+        Role role = roleService.getOne(id);
+        if(role == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        role.setCode(roleDTO.getCode());
+        role.setDescription(roleDTO.getDescription());
+        role.setOrder(roleDTO.getOrder());
+        role.setValidFrom(roleDTO.getValidFrom());
+        role.setValidTo(roleDTO.getValidTo());
+        role.setActive(roleDTO.getActive());
+        role.setLocal(roleDTO.getLocal());
+        role.setModuleRights(roleDTO.getModuleRights());
+        //TODO find a better way to update
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

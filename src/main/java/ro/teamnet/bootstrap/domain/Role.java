@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.Date;
 
 /**
- * An authority (a ro.teamnet.boostrap.security role) used by Spring Security.
+ * A Role. This entity is used as a {@link GrantedAuthority} and represents an authority.
  */
 @Entity
 @Table(name = "T_ROLE")
@@ -140,7 +140,8 @@ public class Role extends AbstractAuditingEntity implements Serializable, Grante
     }
 
     public void setModuleRights(Collection<ModuleRight> moduleRights) {
-        this.moduleRights = moduleRights;
+        this.moduleRights.clear();
+        this.moduleRights.addAll(moduleRights);
     }
 
     /* (non-Javadoc)

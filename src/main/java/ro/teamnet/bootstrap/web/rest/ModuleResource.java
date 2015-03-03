@@ -11,6 +11,7 @@ import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
 import ro.teamnet.bootstrap.service.ModuleService;
+import ro.teamnet.bootstrap.web.rest.dto.ModuleDTO;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +45,28 @@ public class ModuleResource {
         }
         moduleService.save(module);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    /**
+     * POST  /rest/module -> update module
+     */
+    @RequestMapping(value = "/rest/role/{id}",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> save(@PathVariable Long id,@RequestBody ModuleDTO moduleDTO) {
+        log.debug("REST request to update the module : {}", id);
+        Module module = moduleService.getOne(id);
+        if(module == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        module.setVersion(moduleDTO.getVersion());
+        module.setCode(moduleDTO.getCode());
+        module.setDescription(moduleDTO.getDescription());
+        module.setType(moduleDTO.getType());
+        module.setParentModule(moduleDTO.getParentModule());
+        //TODO find a better way to update
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

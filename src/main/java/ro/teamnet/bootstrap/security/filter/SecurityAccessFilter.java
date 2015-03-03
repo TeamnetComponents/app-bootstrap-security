@@ -13,6 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+
+/**
+ * This class is a {@link Filter} that intercepts all request with the root mapping "rest".  For all entity access
+ * and menu access the default request mapping will be /rest/entityName or /rest/menuName;
+ */
 public class SecurityAccessFilter implements Filter {
 
     private enum PermissionMapping {
@@ -75,6 +80,12 @@ public class SecurityAccessFilter implements Filter {
     public void destroy() {
     }
 
+    /**
+     * This metod return true if the {@link UsernamePasswordAuthenticationToken} from the {@link HttpServletRequest} parameter
+     * has the required access wrights on the menu or the entity mapping or false otherwise.
+     * @param httpRequest is an {@link HttpServletRequest} that contains all the servletRequest information
+     * @return true if the user has access rights or false otherwise.
+     */
     private Boolean verifyPermissionAccess(HttpServletRequest httpRequest) {
         String resource = httpRequest.getRequestURI().split("/")[2];
         String accessType = PermissionMapping.valueOf(httpRequest.getMethod()).getAccess();

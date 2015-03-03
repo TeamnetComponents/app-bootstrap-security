@@ -12,6 +12,10 @@ import ro.teamnet.bootstrap.repository.ModuleRightRepository;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+
+/**
+ * Service class for managing  ModuleRights.
+ */
 @Service
 @Transactional
 public class ModuleRightServiceImpl implements ModuleRightService {

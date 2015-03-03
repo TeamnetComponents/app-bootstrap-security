@@ -7,6 +7,10 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ *  A LocalCenter. This class is for future case usage
+ *  TODO conplete entity with all the needed fields
+ */
 @Entity
 @Table(name = "T_LOCAL_CENTER")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
@@ -47,8 +51,6 @@ public class LocalCenter {
     @ManyToOne()
     @JoinColumn(name = "FK_LOCAL_CENTER", nullable = true)
     private LocalCenter parentLocalCenter;
-
-    //TODO conplete entity with all the needed fields
 
     @Override
     public boolean equals(Object o) {

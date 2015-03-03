@@ -44,6 +44,11 @@ public class AccountServiceImpl implements AccountService {
     @Inject
     private RoleRepository roleRepository;
 
+    /**
+     * Method that activates a given Account for the registration key.
+     * @param key for whitch the Account is registered
+     * @return the registered Account
+     */
     @Override
     public Account activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -59,6 +64,18 @@ public class AccountServiceImpl implements AccountService {
         return account;
     }
 
+
+    /**
+     * This method saves a new Account for the input parameters
+     * @param login
+     * @param password
+     * @param firstName
+     * @param lastName
+     * @param email
+     * @param langKey
+     * @param gender
+     * @return the new saved Account
+     */
     @Override
     public Account createUserInformation(String login, String password, String firstName, String lastName, String email,
                                       String langKey,String gender) {
@@ -67,16 +84,16 @@ public class AccountServiceImpl implements AccountService {
         Set<Role> roles = new HashSet<>();
         String encryptedPassword = passwordEncoder.encode(password);
         newAccount.setLogin(login);
-        // new user gets initially a generated password
+        // new Account gets initially a generated password
         newAccount.setPassword(encryptedPassword);
         newAccount.setFirstName(firstName);
         newAccount.setLastName(lastName);
         newAccount.setEmail(email);
         newAccount.setLangKey(langKey);
         newAccount.setGender(gender);
-        // new user is not active
+        // new Account is not active
         newAccount.setActivated(false);
-        // new user gets registration key
+        // new Account gets registration key
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
         roles.add(role);
         newAccount.setRoles(roles);
@@ -85,6 +102,13 @@ public class AccountServiceImpl implements AccountService {
         return newAccount;
     }
 
+
+    /**
+     * This method updates an Account with the input parameters.
+     * @param firstName
+     * @param lastName
+     * @param email
+     */
     public void updateUserInformation(String firstName, String lastName, String email) {
         Account currentAccount = accountRepository.findByLogin(SecurityUtils.getCurrentLogin());
         currentAccount.setFirstName(firstName);
@@ -94,6 +118,10 @@ public class AccountServiceImpl implements AccountService {
         log.debug("Changed Information for User: {}", currentAccount);
     }
 
+    /**
+     * This method updates an Account password with the one given as a parameter.
+     * @param password
+     */
     @Override
     public void changePassword(String password) {
         Account currentAccount = accountRepository.findByLogin(SecurityUtils.getCurrentLogin());
@@ -103,6 +131,10 @@ public class AccountServiceImpl implements AccountService {
         log.debug("Changed password for User: {}", currentAccount);
     }
 
+    /**
+     * This method gets the current Account with all it authorities
+     * @return the Account logged in instance with all it authorities
+     */
     @Override
     @Transactional(readOnly = true)
     public Account getUserWithAuthorities() {
@@ -150,6 +182,11 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    /**
+     * This method adds a new role to the current Account.
+     * @param role
+     * @return true if the update was successful or false otherwise
+     */
     @Override
     public boolean addRole(Role role){
         Account currentAccount = accountRepository.findByLogin(SecurityUtils.getCurrentLogin());

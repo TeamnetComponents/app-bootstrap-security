@@ -1,5 +1,6 @@
 package ro.teamnet.bootstrap.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,6 +10,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
+/**
+ * A ModuleRight. This entity is used as a {@link GrantedAuthority} and represents a permission.
+ */
 @Entity
 @Table(name = "T_MODULE_RIGHT")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
@@ -60,6 +64,11 @@ public class ModuleRight implements Serializable, GrantedAuthority {
 
     public void setModule(Module module) {
         this.module = module;
+    }
+
+    @JsonInclude
+    public String getModuleRightCode(){
+        return ModuleRightType.getConstantsMap().get(getRight());
     }
 
     /* (non-Javadoc)

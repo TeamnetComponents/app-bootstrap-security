@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * A custom implementation of {@code MethodSecurityExpressionHandler}.
+ * <p>
+ * A single instance should usually be shared amongst the beans that require expression support.
+ */
 public class CustomMethodSecurityExpressionHandler extends DefaultMethodSecurityExpressionHandler {
 
     private PermissionCacheOptimizer permissionCacheOptimizer = null;
