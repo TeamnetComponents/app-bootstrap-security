@@ -12,7 +12,7 @@ This is a separate module that implements a security data model and configures a
 
 A graphic data model for the security user and authorities is the following:
 
-![model](Security_Model.jpg)
+![model](http://git-components.teamnet.ro/tree/components%2Fjava%2Fapp-security.git/Security_Model.jpg)
 
 #### Method Annotation
 
