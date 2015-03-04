@@ -38,7 +38,7 @@ public class ModuleRightServiceImpl implements ModuleRightService {
     }
 
     public ModuleRight getOne(Long id) {
-        return moduleRightRepository.getOne(id);
+        return moduleRightRepository.findOne(id);
     }
 
     public void delete(Long id) {
