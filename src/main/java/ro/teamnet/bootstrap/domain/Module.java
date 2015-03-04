@@ -3,7 +3,7 @@ package ro.teamnet.bootstrap.domain;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import ro.teamnet.bootstrap.domain.util.ModuleType;
+import ro.teamnet.bootstrap.domain.util.ModuleTypeEnum;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -111,7 +111,7 @@ public class Module {
 
     @JsonInclude
     public String getModuleRightCode(){
-        return ModuleType.getConstantsMap().get(getType());
+        return ModuleTypeEnum.getCodeByValue(getType());
     }
 
     @Override

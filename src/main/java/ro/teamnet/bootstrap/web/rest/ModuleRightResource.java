@@ -66,7 +66,7 @@ public class ModuleRightResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> save(@PathVariable Long id,@RequestBody ModuleRightDTO moduleRightDTO) {
+    public ResponseEntity<?> update(@PathVariable Long id,@RequestBody ModuleRightDTO moduleRightDTO) {
         log.debug("REST request to update the moduleright : {}", id);
         ModuleRight moduleRight = moduleRightService.getOne(id);
         if (moduleRight == null) {
@@ -75,7 +75,6 @@ public class ModuleRightResource {
         moduleRight.setModule(moduleRightDTO.getModule());
         moduleRight.setRight(moduleRightDTO.getRight());
         moduleRight.setVersion(moduleRightDTO.getVersion());
-        //TODO find a better way to update
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

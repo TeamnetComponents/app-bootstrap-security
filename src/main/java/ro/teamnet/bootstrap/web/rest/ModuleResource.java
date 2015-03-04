@@ -54,7 +54,7 @@ public class ModuleResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> save(@PathVariable Long id,@RequestBody ModuleDTO moduleDTO) {
+    public ResponseEntity<?> update(@PathVariable Long id,@RequestBody ModuleDTO moduleDTO) {
         log.debug("REST request to update the module : {}", id);
         Module module = moduleService.getOne(id);
         if(module == null){
@@ -65,7 +65,6 @@ public class ModuleResource {
         module.setDescription(moduleDTO.getDescription());
         module.setType(moduleDTO.getType());
         module.setParentModule(moduleDTO.getParentModule());
-        //TODO find a better way to update
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

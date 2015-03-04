@@ -53,7 +53,7 @@ public class RoleResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> save(@PathVariable Long id,@RequestBody RoleDTO roleDTO) {
+    public ResponseEntity<?> update(@PathVariable Long id,@RequestBody RoleDTO roleDTO) {
         log.debug("REST request to update the role : {}", id);
         Role role = roleService.getOne(id);
         if(role == null){
@@ -67,7 +67,6 @@ public class RoleResource {
         role.setActive(roleDTO.getActive());
         role.setLocal(roleDTO.getLocal());
         role.setModuleRights(roleDTO.getModuleRights());
-        //TODO find a better way to update
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.security.core.GrantedAuthority;
-import ro.teamnet.bootstrap.domain.util.ModuleRightType;
+import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -68,7 +68,7 @@ public class ModuleRight implements Serializable, GrantedAuthority {
 
     @JsonInclude
     public String getModuleRightCode(){
-        return ModuleRightType.getConstantsMap().get(getRight());
+        return ModuleRightTypeEnum.getCodeByValue(getRight());
     }
 
     /* (non-Javadoc)
@@ -76,7 +76,7 @@ public class ModuleRight implements Serializable, GrantedAuthority {
        */
     @Override
     @Transient
-    public String getAuthority() { return ModuleRightType.getConstantsMap().get(right) + '_' + module.getCode(); }
+    public String getAuthority() { return ModuleRightTypeEnum.getCodeByValue(getRight()) + '_' + module.getCode(); }
 
     @Override
     public boolean equals(Object o) {

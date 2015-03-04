@@ -6,7 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import ro.teamnet.bootstrap.domain.ModuleRight;
-import ro.teamnet.bootstrap.domain.util.ModuleRightType;
+import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -97,7 +97,7 @@ public class SecurityAccessFilter implements Filter {
             Boolean accessToResource;
             if (authority instanceof ModuleRight) {
                 permission = (ModuleRight) authority;
-                hasPermission = ModuleRightType.getConstantsMap().get(permission.getRight()).equals(accessType) ? true : false;
+                hasPermission = ModuleRightTypeEnum.getCodeByValue(permission.getRight()).equals(accessType) ? true : false;
                 accessToResource = (hasPermission && permission.getModule().getCode().toLowerCase().equals(resource)) ? true : false;
                 if (accessToResource) {
                     return true;
