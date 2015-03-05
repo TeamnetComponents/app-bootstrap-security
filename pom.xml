@@ -7,19 +7,20 @@
     <parent>
         <groupId>ro.teamnet.bootstrap</groupId>
         <artifactId>bootstrap-dependencies</artifactId>
-        <version>0.1</version>
+        <version>0.2-SNAPSHOT</version>
         <relativePath />
     </parent>
 
     <artifactId>app-bootstrap-security</artifactId>
-    <version>0.1</version>
+    <name>app-bootstrap-security</name>
+    <version>0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>ro.teamnet.bootstrap</groupId>
             <artifactId>app-bootstrap-commons</artifactId>
-            <version>0.1</version>
+            <version>0.2-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
