@@ -5,10 +5,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import ro.teamnet.bootstrap.domain.ModuleRight;
-import ro.teamnet.bootstrap.extend.AppPage;
-import ro.teamnet.bootstrap.extend.AppPageImpl;
-import ro.teamnet.bootstrap.extend.AppPageRequest;
-import ro.teamnet.bootstrap.extend.Filter;
+import ro.teamnet.bootstrap.extend.*;
 import ro.teamnet.bootstrap.repository.ModuleRightRepository;
 
 import java.util.ArrayList;
@@ -72,7 +69,7 @@ public class ModuleRightServiceImplTest {
 
         AppPage appPage = new AppPageImpl(moduleRights);
 
-        AppPageRequest appPageRequest = new AppPageRequest(0,1,new ArrayList<Filter>());
+        AppPageRequest appPageRequest = new AppPageRequest(0,1,new Filters());
 
         when(moduleRightRepository.findAll(appPageRequest)).thenReturn(appPage);
         assertEquals(appPage,service.findAll(appPageRequest) );

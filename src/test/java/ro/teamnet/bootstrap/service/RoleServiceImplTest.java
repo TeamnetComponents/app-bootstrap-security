@@ -6,10 +6,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import ro.teamnet.bootstrap.domain.Role;
-import ro.teamnet.bootstrap.extend.AppPage;
-import ro.teamnet.bootstrap.extend.AppPageImpl;
-import ro.teamnet.bootstrap.extend.AppPageRequest;
-import ro.teamnet.bootstrap.extend.Filter;
+import ro.teamnet.bootstrap.extend.*;
 import ro.teamnet.bootstrap.repository.RoleRepository;
 
 import java.util.ArrayList;
@@ -71,7 +68,7 @@ public class RoleServiceImplTest {
 
         AppPage appPage = new AppPageImpl(roles);
 
-        AppPageRequest appPageRequest = new AppPageRequest(0,1,new ArrayList<Filter>());
+        AppPageRequest appPageRequest = new AppPageRequest(0,1,new Filters());
 
         when(roleRepository.findAll(appPageRequest)).thenReturn(appPage);
         assertEquals(appPage,service.findAll(appPageRequest) );
