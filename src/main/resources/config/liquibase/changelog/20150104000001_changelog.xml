@@ -10,11 +10,14 @@
     <property name="activated" value="true" dbms="postgresql"/>
     <property name="activated" value="1" dbms="oracle"/>
 
+    <property name="pk_t_module" value="HIBERNATE_SEQUENCE.NEXTVAL" dbms="oracle"/>
+    <property name="pk_t_module" value="nextval('t_module_id_module_seq')" dbms="postgresql"/>
+    <property name="pk_t_module" value="null" dbms="!oracle,!postgresql"/>
 
     <!-- Create ID_ACCOUNT table -->
     <changeSet id="20150212" author="security-bootstrap" failOnError="true">
         <createTable tableName="T_ACCOUNT">
-            <column name="ID_ACCOUNT" type="bigint">
+            <column name="ID_ACCOUNT" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="LOGIN" type="varchar(50)">
@@ -48,7 +51,7 @@
     <!-- Create T_ROLE table -->
     <changeSet id="20150212#2" author="security-bootstrap" failOnError="true">
         <createTable tableName="T_ROLE">
-            <column name="ID_ROLE" type="bigint">
+            <column name="ID_ROLE" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="VERSION" type="bigint"/>
@@ -103,7 +106,7 @@
     <!-- Create T_MODULE table -->
     <changeSet id="20150212#7" author="security-bootstrap" failOnError="true">
         <createTable tableName="T_MODULE">
-            <column name="ID_MODULE" type="bigint">
+            <column name="ID_MODULE" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="VERSION" type="bigint"/>
@@ -121,7 +124,7 @@
     <!--Create T_MODULE_RIGHT table -->
     <changeSet id="20150212#4" author="security-bootstrap" failOnError="true">
         <createTable tableName="T_MODULE_RIGHT">
-            <column name="ID_MODULE_RIGHT" type="bigint">
+            <column name="ID_MODULE_RIGHT" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="VERSION" type="bigint"/>
@@ -386,28 +389,28 @@
     <!-- Insert Module -->
     <changeSet id="20150213#3" author="security-bootstrap" failOnError="true">
         <insert tableName="T_MODULE">
-            <column name="ID_MODULE" value="1"/>
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
             <column name="VERSION" value="1"/>
             <column name="CODE" value="Menu"/>
             <column name="TYPE" value="1"/>
             <column name="DESCRIPTION" value="Menu entry"/>
         </insert>
         <insert tableName="T_MODULE">
-            <column name="ID_MODULE" value="2"/>
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
             <column name="VERSION" value="1"/>
             <column name="CODE" value="Account"/>
             <column name="TYPE" value="2"/>
             <column name="DESCRIPTION" value="Account acces"/>
         </insert>
         <insert tableName="T_MODULE">
-            <column name="ID_MODULE" value="3"/>
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
             <column name="VERSION" value="1"/>
             <column name="CODE" value="Module"/>
             <column name="TYPE" value="2"/>
             <column name="DESCRIPTION" value="Module acces"/>
         </insert>
         <insert tableName="T_MODULE">
-            <column name="ID_MODULE" value="4"/>
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
             <column name="VERSION" value="1"/>
             <column name="CODE" value="ModuleRight"/>
             <column name="TYPE" value="2"/>
@@ -418,7 +421,6 @@
 
     <!-- Insert Module Rights -->
     <changeSet id="20150213#4" author="security-bootstrap" failOnError="true">
-
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" value="1"/>
             <column name="MODULE_RIGHT" value="1"/>
@@ -448,6 +450,40 @@
             <column name="MODULE_RIGHT" value="0"/>
             <column name="VERSION" value="1"/>
             <column name="FK_MODULE" value="2"/>
+        </insert>
+    </changeSet>
+
+    <!-- Insert Module Rights -->
+    <changeSet id="20150213#4_2" author="security-bootstrap" failOnError="true">
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" value="6"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="1"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" value="7"/>
+            <column name="MODULE_RIGHT" value="2"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="1"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" value="8"/>
+            <column name="MODULE_RIGHT" value="4"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="1"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" value="9"/>
+            <column name="MODULE_RIGHT" value="8"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="1"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" value="10"/>
+            <column name="MODULE_RIGHT" value="0"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="1"/>
         </insert>
     </changeSet>
 
