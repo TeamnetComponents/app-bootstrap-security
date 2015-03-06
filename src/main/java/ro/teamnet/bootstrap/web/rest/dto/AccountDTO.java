@@ -1,6 +1,12 @@
 package ro.teamnet.bootstrap.web.rest.dto;
 
+import ro.teamnet.bootstrap.domain.Account;
+import ro.teamnet.bootstrap.domain.ModuleRight;
+import ro.teamnet.bootstrap.domain.Role;
+
 import javax.validation.constraints.Pattern;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class AccountDTO {
@@ -9,47 +15,45 @@ public class AccountDTO {
 
     @Pattern(regexp = "^[a-z0-9]*$")
     private String login;
-
     private String password;
-
     private String firstName;
-
     private String lastName;
-
     private String email;
-
     private String langKey;
-
     private List<String> roles;
-
     private String gender;
+    private Collection<ModuleRight> moduleRights;
 
-    public AccountDTO() {
-    }
+    public AccountDTO() { }
 
-    public AccountDTO(Long id, String login, String password, String firstName, String lastName, String email, String langKey,
-                      List<String> roles, String gender) {
-        this.id = id;
-        this.login = login;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.langKey = langKey;
+    public AccountDTO(Account account) {
+        List<String> roles = new ArrayList<>();
+        for (Role role : account.getRoles()) {
+            roles.add(role.getCode());
+        }
+
+        this.id = account.getId();
+        this.login = account.getLogin();
+        this.password = account.getPassword();
+        this.firstName = account.getFirstName();
+        this.lastName = account.getLastName();
+        this.email = account.getEmail();
+        this.langKey = account.getLangKey();
         this.roles = roles;
-        this.gender=gender;
+        this.gender=account.getGender();
+        this.moduleRights = account.getModuleRights();
     }
 
     public long getId() {
         return id;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public String getLogin() {
         return login;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public String getFirstName() {
@@ -72,14 +76,20 @@ public class AccountDTO {
         return roles;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
+    public Collection<ModuleRight> getModuleRights() {
+        return moduleRights;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("AccountDTO{");
         sb.append("id='").append(id).append('\'');
         sb.append("login='").append(login).append('\'');
-        if(password != null) {
-            sb.append(", password='").append(password.length()).append('\'');
-        }
+        sb.append(", password='").append(password).append('\'');
         sb.append(", firstName='").append(firstName).append('\'');
         sb.append(", lastName='").append(lastName).append('\'');
         sb.append(", email='").append(email).append('\'');
@@ -87,9 +97,5 @@ public class AccountDTO {
         sb.append(", roles=").append(roles);
         sb.append('}');
         return sb.toString();
-    }
-
-    public String getGender() {
-        return gender;
     }
 }

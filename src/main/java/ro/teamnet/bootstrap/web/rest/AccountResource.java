@@ -120,21 +120,8 @@ public class AccountResource {
         if (account == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        List<String> roles = new ArrayList<>();
-        for (Role role : account.getRoles()) {
-            roles.add(role.getCode());
-        }
-        return new ResponseEntity<>(
-            new AccountDTO(
-                account.getId(),
-                account.getLogin(),
-                null,
-                account.getFirstName(),
-                account.getLastName(),
-                account.getEmail(),
-                account.getLangKey(),
-                roles, account.getGender()),
-            HttpStatus.OK);
+
+        return new ResponseEntity<>(new AccountDTO(account), HttpStatus.OK);
     }
 
     /**
