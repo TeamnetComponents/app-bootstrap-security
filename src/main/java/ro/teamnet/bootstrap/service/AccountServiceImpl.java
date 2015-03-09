@@ -109,6 +109,7 @@ public class AccountServiceImpl implements AccountService {
      * @param lastName
      * @param email
      */
+    @Override
     public void updateUserInformation(String firstName, String lastName, String email) {
         Account currentAccount = accountRepository.findByLogin(SecurityUtils.getCurrentLogin());
         currentAccount.setFirstName(firstName);

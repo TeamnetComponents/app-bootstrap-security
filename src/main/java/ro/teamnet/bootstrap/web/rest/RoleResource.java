@@ -39,9 +39,6 @@ public class RoleResource {
     public ResponseEntity<?> create(@RequestBody Role role, HttpServletRequest request,
                        HttpServletResponse response){
         log.debug("REST request to save Role : {}", role);
-        if(roleService.getOne(role.getId()) != null){
-            return new ResponseEntity<String>("Role allready exists", HttpStatus.BAD_REQUEST);
-        }
         roleService.save(role);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -59,14 +56,8 @@ public class RoleResource {
         if(role == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        role.setCode(roleDTO.getCode());
-        role.setDescription(roleDTO.getDescription());
-        role.setOrder(roleDTO.getOrder());
-        role.setValidFrom(roleDTO.getValidFrom());
-        role.setValidTo(roleDTO.getValidTo());
-        role.setActive(roleDTO.getActive());
-        role.setLocal(roleDTO.getLocal());
-        role.setModuleRights(roleDTO.getModuleRights());
+        roleService.update(role, roleDTO);
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

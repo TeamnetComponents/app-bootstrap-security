@@ -1,8 +1,6 @@
 package ro.teamnet.bootstrap.web.rest.dto;
 
 
-import ro.teamnet.bootstrap.domain.ModuleRight;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -18,7 +16,23 @@ public class RoleDTO {
     private Date validTo;
     private Boolean active;
     private Short local;
-    private Collection<ModuleRight> moduleRights = new ArrayList<>();
+    private Collection<ModuleRightDTO> moduleRights = new ArrayList<>();
+
+    public RoleDTO() {
+    }
+
+    public RoleDTO(Long id, Long version, String code, String description, Integer order, Date validFrom, Date validTo, Boolean active, Short local, Collection<ModuleRightDTO> moduleRights) {
+        this.id = id;
+        this.version = version;
+        this.code = code;
+        this.description = description;
+        this.order = order;
+        this.validFrom = validFrom;
+        this.validTo = validTo;
+        this.active = active;
+        this.local = local;
+        this.moduleRights = moduleRights;
+    }
 
     public Long getId() {
         return id;
@@ -92,11 +106,11 @@ public class RoleDTO {
         this.local = local;
     }
 
-    public Collection<ModuleRight> getModuleRights() {
+    public Collection<ModuleRightDTO> getModuleRights() {
         return moduleRights;
     }
 
-    public void setModuleRights(Collection<ModuleRight> moduleRights) {
+    public void setModuleRights(Collection<ModuleRightDTO> moduleRights) {
         this.moduleRights = moduleRights;
     }
 

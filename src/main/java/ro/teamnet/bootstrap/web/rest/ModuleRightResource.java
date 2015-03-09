@@ -12,7 +12,6 @@ import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
 import ro.teamnet.bootstrap.service.ModuleRightService;
-import ro.teamnet.bootstrap.web.rest.dto.ModuleRightDTO;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -40,10 +39,6 @@ public class ModuleRightResource {
     public ResponseEntity<?> create(@RequestBody ModuleRight moduleRight, HttpServletRequest request,
                        HttpServletResponse response) {
         log.debug("REST request to save moduleright : {}", moduleRight);
-        if(moduleRightService.getOne(moduleRight.getId()) != null)
-        {
-            return new ResponseEntity<String>("ModuleRight allready exists", HttpStatus.BAD_REQUEST);
-        }
         moduleRightService.save(moduleRight);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -62,7 +57,7 @@ public class ModuleRightResource {
     /**
      * POST  /rest/modulerights -> update moduleRight
      */
-    @RequestMapping(value = "/rest/modulerights/{id}",
+    /*@RequestMapping(value = "/rest/modulerights/{id}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -72,11 +67,9 @@ public class ModuleRightResource {
         if (moduleRight == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        moduleRight.setModule(moduleRightDTO.getModule());
-        moduleRight.setRight(moduleRightDTO.getRight());
-        moduleRight.setVersion(moduleRightDTO.getVersion());
+        moduleRightService.update();
         return new ResponseEntity<>(HttpStatus.OK);
-    }
+    }*/
 
     /**
      * GET  /rest/moduleright -> get the "id" moduleright.

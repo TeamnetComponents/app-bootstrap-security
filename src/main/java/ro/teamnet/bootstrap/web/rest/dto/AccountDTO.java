@@ -1,13 +1,12 @@
 package ro.teamnet.bootstrap.web.rest.dto;
 
 import ro.teamnet.bootstrap.domain.Account;
+import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.domain.Role;
 
 import javax.validation.constraints.Pattern;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class AccountDTO {
 
@@ -20,17 +19,28 @@ public class AccountDTO {
     private String lastName;
     private String email;
     private String langKey;
-    private List<String> roles;
+    private List<RoleDTO> roles;
     private String gender;
-    private Collection<ModuleRight> moduleRights;
 
-    public AccountDTO() { }
+    private Collection<ModuleRightDTO> moduleRights = new ArrayList<>();
+
+    public AccountDTO() {
+    }
 
     public AccountDTO(Account account) {
-        List<String> roles = new ArrayList<>();
+
+        List<RoleDTO> rolesDTOList = new ArrayList<>();
+        List<ModuleRightDTO> moduleRightDTOShortcutList = new ArrayList<>();
+
         for (Role role : account.getRoles()) {
-            roles.add(role.getCode());
+            List<ModuleRightDTO> moduleRightDTOList = new ArrayList<>();
+            buildModuleRightsDTO(moduleRightDTOList, role.getModuleRights());
+            rolesDTOList.add(new RoleDTO(role.getId(), role.getVersion(), role.getCode(), role.getDescription(),
+                    role.getOrder(), role.getValidFrom(), role.getValidTo(), role.getActive(), role.getLocal(),
+                    moduleRightDTOList));
         }
+
+        buildModuleRightsDTO(moduleRightDTOShortcutList, account.getModuleRights());
 
         this.id = account.getId();
         this.login = account.getLogin();
@@ -39,9 +49,17 @@ public class AccountDTO {
         this.lastName = account.getLastName();
         this.email = account.getEmail();
         this.langKey = account.getLangKey();
-        this.roles = roles;
-        this.gender=account.getGender();
-        this.moduleRights = account.getModuleRights();
+        this.roles = rolesDTOList;
+        this.gender = account.getGender();
+        this.moduleRights = moduleRightDTOShortcutList;
+    }
+
+    private void buildModuleRightsDTO(Collection<ModuleRightDTO> moduleRightDTOs, Collection<ModuleRight> moduleRights) {
+        for (ModuleRight moduleRight : moduleRights) {
+            Module module = moduleRight.getModule();
+            ModuleDTO moduleDTO = new ModuleDTO(module.getId(), module.getVersion(), module.getCode(), module.getDescription(), module.getType(), module.getParentModule(), null);
+            moduleRightDTOs.add(new ModuleRightDTO(moduleRight.getId(), moduleRight.getVersion(), moduleRight.getRight(), moduleDTO));
+        }
     }
 
     public long getId() {
@@ -72,7 +90,7 @@ public class AccountDTO {
         return langKey;
     }
 
-    public List<String> getRoles() {
+    public Collection<RoleDTO> getRoles() {
         return roles;
     }
 
@@ -80,7 +98,7 @@ public class AccountDTO {
         return gender;
     }
 
-    public Collection<ModuleRight> getModuleRights() {
+    public Collection<ModuleRightDTO> getModuleRights() {
         return moduleRights;
     }
 
@@ -95,6 +113,7 @@ public class AccountDTO {
         sb.append(", email='").append(email).append('\'');
         sb.append(", langKey='").append(langKey).append('\'');
         sb.append(", roles=").append(roles);
+        sb.append(", moduleRights=").append(moduleRights);
         sb.append('}');
         return sb.toString();
     }

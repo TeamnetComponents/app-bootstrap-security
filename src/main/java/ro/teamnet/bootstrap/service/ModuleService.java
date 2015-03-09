@@ -4,6 +4,7 @@ package ro.teamnet.bootstrap.service;
 import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
+import ro.teamnet.bootstrap.web.rest.dto.ModuleDTO;
 
 public interface ModuleService {
 
@@ -14,5 +15,7 @@ public interface ModuleService {
     public Module getOne(Long id);
 
     public void delete(Long id);
+
+    public void update(Module module, ModuleDTO moduleDTO);
 
 }

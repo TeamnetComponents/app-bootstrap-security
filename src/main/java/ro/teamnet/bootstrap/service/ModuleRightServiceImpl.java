@@ -25,18 +25,22 @@ public class ModuleRightServiceImpl implements ModuleRightService {
     @Inject
     ModuleRightRepository moduleRightRepository;
 
+    @Override
     public void save(ModuleRight moduleRight) {
         moduleRightRepository.save(moduleRight);
     }
 
+    @Override
     public AppPage<ModuleRight> findAll(AppPageable appPageable){
         return moduleRightRepository.findAll(appPageable);
     }
 
+    @Override
     public ModuleRight getOne(Long id) {
         return moduleRightRepository.getOne(id);
     }
 
+    @Override
     public void delete(Long id) {
         moduleRightRepository.delete(id);
     }

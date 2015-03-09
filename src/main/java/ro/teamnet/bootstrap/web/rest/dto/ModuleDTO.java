@@ -3,6 +3,8 @@ package ro.teamnet.bootstrap.web.rest.dto;
 
 import ro.teamnet.bootstrap.domain.Module;
 
+import java.util.Set;
+
 public class ModuleDTO {
 
     private Long id;
@@ -11,7 +13,20 @@ public class ModuleDTO {
     private String description;
     private Short type;
     private Module parentModule;
+    private Set<ModuleRightDTO> moduleRights;
 
+    public ModuleDTO() {
+    }
+
+    public ModuleDTO(Long id, Long version, String code, String description, Short type, Module parentModule, Set<ModuleRightDTO> moduleRights) {
+        this.id = id;
+        this.version = version;
+        this.code = code;
+        this.description = description;
+        this.type = type;
+        this.parentModule = parentModule;
+        this.moduleRights = moduleRights;
+    }
 
     public Long getId() {
         return id;
@@ -59,6 +74,14 @@ public class ModuleDTO {
 
     public void setParentModule(Module parentModule) {
         this.parentModule = parentModule;
+    }
+
+    public Set<ModuleRightDTO> getModuleRights() {
+        return moduleRights;
+    }
+
+    public void setModuleRights(Set<ModuleRightDTO> moduleRights) {
+        this.moduleRights = moduleRights;
     }
 
     @Override

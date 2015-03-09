@@ -39,10 +39,6 @@ public class ModuleResource {
     public ResponseEntity<?> create(@RequestBody Module module, HttpServletRequest request,
                                     HttpServletResponse response) {
         log.debug("REST request to save Module : {}", module);
-        if(moduleService.getOne(module.getId()) != null)
-        {
-            return new ResponseEntity<String>("Module allready exists", HttpStatus.BAD_REQUEST);
-        }
         moduleService.save(module);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -60,11 +56,7 @@ public class ModuleResource {
         if(module == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        module.setVersion(moduleDTO.getVersion());
-        module.setCode(moduleDTO.getCode());
-        module.setDescription(moduleDTO.getDescription());
-        module.setType(moduleDTO.getType());
-        module.setParentModule(moduleDTO.getParentModule());
+        moduleService.update(module, moduleDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -1,13 +1,21 @@
 package ro.teamnet.bootstrap.web.rest.dto;
 
-import ro.teamnet.bootstrap.domain.Module;
-
 public class ModuleRightDTO {
 
     private Long id;
     private String version;
     private Short right;
-    private Module module;
+    private ModuleDTO module;
+
+    public ModuleRightDTO() {
+    }
+
+    public ModuleRightDTO(Long id, String version, Short right, ModuleDTO module) {
+        this.id = id;
+        this.version = version;
+        this.right = right;
+        this.module = module;
+    }
 
     public Long getId() {
         return id;
@@ -33,11 +41,11 @@ public class ModuleRightDTO {
         this.right = right;
     }
 
-    public Module getModule() {
+    public ModuleDTO getModule() {
         return module;
     }
 
-    public void setModule(Module module) {
+    public void setModule(ModuleDTO module) {
         this.module = module;
     }
 
