@@ -14,7 +14,7 @@ public class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "EMPLOYEE_ID")
+    @Column(name = "ID_EMPLOYEE")
     private Long id;
 
     @Size(min = 0, max = 50)
@@ -34,13 +34,17 @@ public class Employee {
     private String email;
 
     @Column(name = "PHONE_NUMBER")
-    private Long phoneNumber;
+    private String phoneNumber;
 
     @Column(name = "IS_ACTIVE")
     private Short active;
 
     @Column(name = "TYPE")
     private String type;
+
+    @ManyToOne
+    @JoinColumn( name = "FK_EAGLE_USER")
+    private EagleAccount eagleUser;
 
     public Long getId() {
         return id;
@@ -82,11 +86,11 @@ public class Employee {
         this.email = email;
     }
 
-    public Long getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(Long phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
@@ -104,6 +108,14 @@ public class Employee {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public EagleAccount getEagleUser() {
+        return eagleUser;
+    }
+
+    public void setEagleUser(EagleAccount eagleUser) {
+        this.eagleUser = eagleUser;
     }
 
     @Override
@@ -148,6 +160,7 @@ public class Employee {
                 ", phoneNumber=" + phoneNumber +
                 ", active=" + active +
                 ", type=" + type +
+                ", eagleUser=" + eagleUser +
                 '}';
     }
 

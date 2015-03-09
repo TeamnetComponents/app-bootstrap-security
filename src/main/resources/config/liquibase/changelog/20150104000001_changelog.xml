@@ -288,6 +288,29 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="20150306" author="adriand">
+        <renameColumn columnDataType="bigint"
+                      newColumnName="ID_EMPOYEE"
+                      oldColumnName="EMPOYEE_ID"
+                      tableName="T_EMPLOYEE"/>
+    </changeSet>
+    
+    <changeSet id="20150306#2" author="adriand">
+        <addColumn tableName="T_EMPLOYEE">
+            <column name="PHONE_NUMBER" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20150306#3" author="adriand">
+        <addColumn tableName="T_EMPLOYEE">
+            <column name="FK_EAGLE_USER" type="bigint">
+                <constraints foreignKeyName="fk_employee_eagle_user"
+                             referencedColumnNames="ID_ACCOUNT"
+                             referencedTableName="T_EAGLE_USER"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
     <!-- Insert Accounts -->
     <changeSet id="20150212#8" author="security-bootstrap" failOnError="true">
         <insert tableName="T_ACCOUNT">

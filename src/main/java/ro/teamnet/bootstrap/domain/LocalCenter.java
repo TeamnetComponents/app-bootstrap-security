@@ -4,8 +4,8 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *  A LocalCenter. This class is for future case usage
@@ -40,17 +40,105 @@ public class LocalCenter {
     private String type;
 
     @OneToMany(mappedBy = "localCenter")
-    private Collection<EagleAccount> eagleUsers = new ArrayList<>();
+    private Set<EagleAccount> eagleUsers = new HashSet<>();
 
     @Column(name = "IS_ACTIVE")
     private Boolean active;
 
     @OneToMany(mappedBy = "parentLocalCenter")
-    private Collection<LocalCenter> childLocalCenter = new ArrayList<>();
+    private Set<LocalCenter> childLocalCenter = new HashSet<>();
 
     @ManyToOne()
     @JoinColumn(name = "FK_LOCAL_CENTER", nullable = true)
     private LocalCenter parentLocalCenter;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public Set<LocalCenter> getChildLocalCenter() {
+        return childLocalCenter;
+    }
+
+    public void setChildLocalCenter(Set<LocalCenter> childLocalCenter) {
+        this.childLocalCenter = childLocalCenter;
+    }
+
+    public LocalCenter getParentLocalCenter() {
+        return parentLocalCenter;
+    }
+
+    public void setParentLocalCenter(LocalCenter parentLocalCenter) {
+        this.parentLocalCenter = parentLocalCenter;
+    }
+
+    public Set<EagleAccount> getEagleUsers() {
+        return eagleUsers;
+    }
+
+    public void setEagleUsers(Set<EagleAccount> eagleUsers) {
+        this.eagleUsers = eagleUsers;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -94,9 +182,12 @@ public class LocalCenter {
                 ", address=" + address +
                 ", phone=" + phone +
                 ", type=" + type +
-                ", eagleUsers=" + email +
+                ", email=" + email +
                 ", active=" + active +
-                ", parentLocalCenter=" + parentLocalCenter;
+                ", childLocalCenter=" + childLocalCenter +
+                ", parentLocalCenter=" + parentLocalCenter +
+                ", eagleUsers=" + eagleUsers +
+                '}';
 
     }
 }
