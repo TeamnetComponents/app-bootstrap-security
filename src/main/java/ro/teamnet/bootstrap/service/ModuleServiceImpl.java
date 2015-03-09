@@ -24,12 +24,8 @@ public class ModuleServiceImpl implements ModuleService {
     ModuleRepository moduleRepository;
 
     @Override
-    public Boolean save(Module module) {
-        Module savedModule = moduleRepository.save(module);
-        if(savedModule != null){
-            return true;
-        }
-        return false;
+    public void save(Module module) {
+          moduleRepository.save(module);
     }
 
     @Override
@@ -39,7 +35,7 @@ public class ModuleServiceImpl implements ModuleService {
 
     @Override
     public Module getOne(Long id) {
-        return moduleRepository.findOne(id);
+        return moduleRepository.getOne(id);
     }
 
     @Override

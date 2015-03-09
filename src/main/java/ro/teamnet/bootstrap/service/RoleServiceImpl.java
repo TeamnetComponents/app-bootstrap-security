@@ -24,12 +24,8 @@ public class RoleServiceImpl implements RoleService {
     @Inject
     RoleRepository roleRepository;
 
-    public Boolean save(Role role) {
-        Role savedRole = roleRepository.save(role);
-        if(savedRole != null){
-            return true;
-        }
-        return false;
+    public void save(Role role) {
+         roleRepository.save(role);
     }
 
     public AppPage<Role> findAll(AppPageable appPageable){

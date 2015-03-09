@@ -25,12 +25,8 @@ public class ModuleRightServiceImpl implements ModuleRightService {
     @Inject
     ModuleRightRepository moduleRightRepository;
 
-    public Boolean save(ModuleRight moduleRight) {
-        ModuleRight savedModuleRight = moduleRightRepository.save(moduleRight);
-        if(savedModuleRight != null){
-            return true;
-        }
-        return false;
+    public void save(ModuleRight moduleRight) {
+        moduleRightRepository.save(moduleRight);
     }
 
     public AppPage<ModuleRight> findAll(AppPageable appPageable){
@@ -38,7 +34,7 @@ public class ModuleRightServiceImpl implements ModuleRightService {
     }
 
     public ModuleRight getOne(Long id) {
-        return moduleRightRepository.findOne(id);
+        return moduleRightRepository.getOne(id);
     }
 
     public void delete(Long id) {

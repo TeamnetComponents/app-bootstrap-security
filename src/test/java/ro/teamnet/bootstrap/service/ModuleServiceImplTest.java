@@ -91,13 +91,13 @@ public class ModuleServiceImplTest {
         module.setId(id);
         module.setType(type);
 
-        when(moduletRepository.findOne(anyLong())).thenReturn(module);
+        when(moduletRepository.getOne(anyLong())).thenReturn(module);
         assertEquals(module,service.getOne(id));
 
     }
 
     /**
-     * Method: {@link ModuleServiceImpl#getOne(Long)} .
+     * Method: {@link ModuleServiceImpl#delete(Long)} .
      * When: Delete one Role
      * Then: Id Role is not found throws {@Link EmptyResultDataAccessException}
      */
@@ -110,7 +110,6 @@ public class ModuleServiceImplTest {
         module.setId(id);
         module.setType(type);
 
-        when(moduletRepository.findOne(id)).thenReturn(module);
         service.delete(id);
         verify(moduletRepository, times(1)).delete(id);
 

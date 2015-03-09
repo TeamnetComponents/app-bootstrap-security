@@ -94,7 +94,7 @@ public class RoleServiceImplTest {
     }
 
     /**
-     * Method: {@link RoleServiceImpl#getOne(Long)} .
+     * Method: {@link RoleServiceImpl#delete(Long)} .
      * When: Delete one Role
      * Then: Id Role is not found throws {@Link EmptyResultDataAccessException}
      */
@@ -106,7 +106,6 @@ public class RoleServiceImplTest {
         role.setId(id);
         role.setCode("ROLE_USER");
 
-        when(roleRepository.findOne(id)).thenReturn(role);
         service.delete(id);
         verify(roleRepository, times(1)).delete(id);
 

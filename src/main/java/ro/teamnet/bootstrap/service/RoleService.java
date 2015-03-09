@@ -7,7 +7,7 @@ import ro.teamnet.bootstrap.extend.AppPageable;
 
 public interface RoleService {
 
-    public Boolean save(Role role);
+    public void save(Role role);
 
     public AppPage<Role> findAll(AppPageable appPageable);
 
