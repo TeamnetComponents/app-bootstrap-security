@@ -1,20 +1,25 @@
 package ro.teamnet.bootstrap.web.rest.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
+
 public class ModuleRightDTO {
 
     private Long id;
     private String version;
     private Short right;
     private ModuleDTO module;
+    private String source;
 
     public ModuleRightDTO() {
     }
 
-    public ModuleRightDTO(Long id, String version, Short right, ModuleDTO module) {
+    public ModuleRightDTO(Long id, String version, Short right, ModuleDTO module, String source) {
         this.id = id;
         this.version = version;
         this.right = right;
         this.module = module;
+        this.source = source;
     }
 
     public Long getId() {
@@ -47,6 +52,19 @@ public class ModuleRightDTO {
 
     public void setModule(ModuleDTO module) {
         this.module = module;
+    }
+
+    @JsonInclude
+    public String getModuleRightCode(){
+        return ModuleRightTypeEnum.getCodeByValue(getRight());
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     @Override

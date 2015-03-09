@@ -4,6 +4,7 @@ import ro.teamnet.bootstrap.domain.Account;
 import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.domain.Role;
+import ro.teamnet.bootstrap.domain.util.ModuleRightSource;
 
 import javax.validation.constraints.Pattern;
 import java.util.*;
@@ -19,29 +20,11 @@ public class AccountDTO {
     private String lastName;
     private String email;
     private String langKey;
-    private List<RoleDTO> roles;
     private String gender;
-
-    private Collection<ModuleRightDTO> moduleRights = new ArrayList<>();
-
-    public AccountDTO() {
-    }
+    private List<RoleDTO> roles = new ArrayList<>();
+    private HashMap<String, ModuleRightDTO> moduleRights = new HashMap<>();
 
     public AccountDTO(Account account) {
-
-        List<RoleDTO> rolesDTOList = new ArrayList<>();
-        List<ModuleRightDTO> moduleRightDTOShortcutList = new ArrayList<>();
-
-        for (Role role : account.getRoles()) {
-            List<ModuleRightDTO> moduleRightDTOList = new ArrayList<>();
-            buildModuleRightsDTO(moduleRightDTOList, role.getModuleRights());
-            rolesDTOList.add(new RoleDTO(role.getId(), role.getVersion(), role.getCode(), role.getDescription(),
-                    role.getOrder(), role.getValidFrom(), role.getValidTo(), role.getActive(), role.getLocal(),
-                    moduleRightDTOList));
-        }
-
-        buildModuleRightsDTO(moduleRightDTOShortcutList, account.getModuleRights());
-
         this.id = account.getId();
         this.login = account.getLogin();
         this.password = account.getPassword();
@@ -49,17 +32,38 @@ public class AccountDTO {
         this.lastName = account.getLastName();
         this.email = account.getEmail();
         this.langKey = account.getLangKey();
-        this.roles = rolesDTOList;
         this.gender = account.getGender();
-        this.moduleRights = moduleRightDTOShortcutList;
+
+        // load account module rights
+        for(ModuleRight mr: account.getModuleRights()) {
+            moduleRights.put(
+                mr.getModule().getCode()+"_"+mr.getModuleRightCode(),
+                loadModuleRightDTO(mr, ModuleRightSource.ACCOUNT.name())
+            );
+        }
+
+        // load roles
+        for (Role role : account.getRoles()) {
+            // load role module rights
+            for(ModuleRight mr: role.getModuleRights()) {
+                moduleRights.put(
+                    mr.getModule().getCode() + "_" + mr.getModuleRightCode(),
+                    loadModuleRightDTO(mr, ModuleRightSource.ROLE.name())
+                );
+            }
+
+            roles.add(new RoleDTO(role.getId(), role.getVersion(), role.getCode(), role.getDescription(),
+                    role.getOrder(), role.getValidFrom(), role.getValidTo(), role.getActive(), role.getLocal(), null));
+        }
     }
 
-    private void buildModuleRightsDTO(Collection<ModuleRightDTO> moduleRightDTOs, Collection<ModuleRight> moduleRights) {
-        for (ModuleRight moduleRight : moduleRights) {
-            Module module = moduleRight.getModule();
-            ModuleDTO moduleDTO = new ModuleDTO(module.getId(), module.getVersion(), module.getCode(), module.getDescription(), module.getType(), module.getParentModule(), null);
-            moduleRightDTOs.add(new ModuleRightDTO(moduleRight.getId(), moduleRight.getVersion(), moduleRight.getRight(), moduleDTO));
-        }
+    private ModuleRightDTO loadModuleRightDTO(ModuleRight mr, String source) {
+        Module module = mr.getModule();
+
+        ModuleDTO moduleDTO = new ModuleDTO(module.getId(), module.getVersion(), module.getCode(),
+                module.getDescription(), module.getType(), module.getParentModule(), null);
+
+        return new ModuleRightDTO(mr.getId(), mr.getVersion(), mr.getRight(), moduleDTO, source);
     }
 
     public long getId() {
@@ -98,7 +102,7 @@ public class AccountDTO {
         return gender;
     }
 
-    public Collection<ModuleRightDTO> getModuleRights() {
+    public HashMap<String, ModuleRightDTO> getModuleRights() {
         return moduleRights;
     }
 

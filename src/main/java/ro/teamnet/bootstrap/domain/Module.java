@@ -110,7 +110,7 @@ public class Module {
     }
 
     @JsonInclude
-    public String getModuleRightCode(){
+    public String getModuleType(){
         return ModuleTypeEnum.getCodeByValue(getType());
     }
 

@@ -55,7 +55,7 @@ public class Role extends AbstractAuditingEntity implements Serializable, Grante
     @Column(name = "LOCAL")
     private Short local;
 
-    @ManyToMany (fetch=FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
         name = "T_ROLE_MODULE_RIGHTS",
         joinColumns = {@JoinColumn(name = "fk_role", referencedColumnName = "id_role")},
