@@ -6,7 +6,7 @@ import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
 public class ModuleRightDTO {
 
     private Long id;
-    private String version;
+    private Long version;
     private Short right;
     private ModuleDTO module;
     private String source;
@@ -14,7 +14,7 @@ public class ModuleRightDTO {
     public ModuleRightDTO() {
     }
 
-    public ModuleRightDTO(Long id, String version, Short right, ModuleDTO module, String source) {
+    public ModuleRightDTO(Long id, Long version, Short right, ModuleDTO module, String source) {
         this.id = id;
         this.version = version;
         this.right = right;
@@ -30,11 +30,11 @@ public class ModuleRightDTO {
         this.id = id;
     }
 
-    public String getVersion() {
+    public Long getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(Long version) {
         this.version = version;
     }
 
