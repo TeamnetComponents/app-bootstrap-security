@@ -7,7 +7,7 @@ import ro.teamnet.bootstrap.extend.AppPageable;
 
 public interface ModuleRightService {
 
-    public void save(ModuleRight moduleRight);
+    public ModuleRight save(ModuleRight moduleRight);
 
     public AppPage<ModuleRight> findAll(AppPageable appPageable);
 

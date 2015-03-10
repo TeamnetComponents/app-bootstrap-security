@@ -26,8 +26,8 @@ public class ModuleRightServiceImpl implements ModuleRightService {
     ModuleRightRepository moduleRightRepository;
 
     @Override
-    public void save(ModuleRight moduleRight) {
-        moduleRightRepository.save(moduleRight);
+    public ModuleRight save(ModuleRight moduleRight) {
+        return moduleRightRepository.save(moduleRight);
     }
 
     @Override
