@@ -25,7 +25,7 @@ public class ModuleRight implements Serializable, GrantedAuthority {
 
     @NotNull
     @Column(name = "VERSION")
-    private String version;
+    private Long version;
 
     @Column( name = "MODULE_RIGHT" )
     private Short right;
@@ -42,11 +42,11 @@ public class ModuleRight implements Serializable, GrantedAuthority {
         this.id = id;
     }
 
-    public String getVersion() {
+    public Long getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(Long version) {
         this.version = version;
     }
 
