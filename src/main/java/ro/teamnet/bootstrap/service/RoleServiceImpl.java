@@ -53,7 +53,16 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public void update(Role role, RoleDTO roleDTO){
+    public Role update(Role role) {
+        for(ModuleRight mr: role.getModuleRights()) {
+            moduleRightService.save(mr);
+        }
+
+        return roleRepository.save(role);
+    }
+
+    @Override
+    public void update(Role role, RoleDTO roleDTO) {
 
         role.setCode(roleDTO.getCode());
         role.setDescription(roleDTO.getDescription());
@@ -66,8 +75,8 @@ public class RoleServiceImpl implements RoleService {
         //update moduleRights for Role
         List<ModuleRight> moduleRights = new ArrayList<>();
         for(ModuleRightDTO moduleRightDTO : roleDTO.getModuleRights()){
-            moduleRights.add(moduleRightService.getOne(moduleRightDTO.getId()));
-        }
+                moduleRights.add(moduleRightService.getOne(moduleRightDTO.getId()));
+            }
 
         role.setModuleRights(moduleRights);
     }
