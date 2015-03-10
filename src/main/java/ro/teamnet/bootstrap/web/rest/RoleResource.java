@@ -46,6 +46,18 @@ public class RoleResource {
     /**
      * POST  /rest/role -> update role
      */
+    @RequestMapping(value = "/rest/roles",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> update(@RequestBody Role role) {
+        log.debug("REST request to update the role : {}", role.getId());
+        return new ResponseEntity<>(roleService.update(role), HttpStatus.OK);
+    }
+
+    /**
+     * POST  /rest/role -> update role
+     */
     @RequestMapping(value = "/rest/role/{id}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
