@@ -16,6 +16,7 @@ import ro.teamnet.bootstrap.web.rest.dto.ModuleDTO;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * REST controller for managing modules.
@@ -69,6 +70,14 @@ public class ModuleResource {
     public AppPage<Module> getAll(AppPageable appPageable) {
         log.debug("REST request to get all modules");
         return  moduleService.findAll(appPageable);
+    }
+
+    @RequestMapping(value = "/rest/modulesWithModuleRights",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Module> getAllModulesWithModuleRights() {
+        log.debug("REST request to get all modules");
+        return  moduleService.getAllModulesWithModuleRights();
     }
 
     /**

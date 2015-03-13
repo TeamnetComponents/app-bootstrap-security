@@ -6,6 +6,8 @@ import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleDTO;
 
+import java.util.List;
+
 public interface ModuleService {
 
     public void save(Module module);
@@ -17,5 +19,7 @@ public interface ModuleService {
     public void delete(Long id);
 
     public void update(Module module, ModuleDTO moduleDTO);
+
+    public List<Module> getAllModulesWithModuleRights();
 
 }

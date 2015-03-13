@@ -9,13 +9,19 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ro.teamnet.bootstrap.domain.ModuleRight;
+import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
 import ro.teamnet.bootstrap.extend.AppPage;
+import ro.teamnet.bootstrap.extend.AppPageImpl;
 import ro.teamnet.bootstrap.extend.AppPageable;
 import ro.teamnet.bootstrap.service.ModuleRightService;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * REST controller for managing moduleright.
@@ -97,4 +103,13 @@ public class ModuleRightResource {
         log.debug("REST request to delete ModuleRight : {}", id);
         moduleRightService.delete(id);
     }
+
+    @RequestMapping(value = "/rest/modulerightscodes",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List> getAllCodes(AppPageable appPageable) {
+        log.debug("REST request to get all moduleright");
+        return new ResponseEntity<>(moduleRightService.getModuleRightCodes(), HttpStatus.OK);
+    }
+
 }

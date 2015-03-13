@@ -13,7 +13,7 @@ import ro.teamnet.bootstrap.web.rest.dto.ModuleRightDTO;
 import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 

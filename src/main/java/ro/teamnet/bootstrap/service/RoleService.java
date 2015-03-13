@@ -6,6 +6,8 @@ import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
 import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
 
+import java.util.List;
+
 public interface RoleService {
 
     public void save(Role role);

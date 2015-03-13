@@ -1,5 +1,7 @@
 package ro.teamnet.bootstrap.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -20,18 +22,18 @@ public class ModuleRight implements Serializable, GrantedAuthority {
 
     @Id
     @Column(name = "ID_MODULE_RIGHT")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+//    @NotNull
     @Column(name = "VERSION")
     private Long version;
 
     @Column( name = "MODULE_RIGHT" )
     private Short right;
 
-    @ManyToOne
-    @JoinColumn(name = "FK_MODULE")
+    @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
+    @JoinColumn(name = "FK_MODULE", updatable = true, insertable = true)
     private Module module;
 
     public Long getId() {
@@ -80,38 +82,18 @@ public class ModuleRight implements Serializable, GrantedAuthority {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        ModuleRight moduleRight = (ModuleRight) o;
+        ModuleRight that = (ModuleRight) o;
 
-        if (version != null ? !version.equals(moduleRight.version) : moduleRight.version != null) return false;
-        if (right != null ? !right.equals(moduleRight.right) : moduleRight.right != null) return false;
-        if (module != null ? !module.equals(moduleRight.module) : moduleRight.module != null) return false;
+        if (right != null ? !right.equals(that.right) : that.right != null) return false;
+
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (right != null ? right.hashCode() : 0);
-        result = 31 * result + (module != null ? module.hashCode() : 0);
-        return result;
+        return right != null ? right.hashCode() : 0;
     }
-
-    @Override
-    public String toString(){
-        return "ModuleRight{" +
-                "id='" + id + '\'' +
-                ", version='" + version + '\'' +
-                ", right='" + right + '\'' +
-                ", module='" + module + '\'' +
-                "}";
-    }
-
 }

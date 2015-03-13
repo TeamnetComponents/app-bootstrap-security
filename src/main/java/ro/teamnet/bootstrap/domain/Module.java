@@ -1,11 +1,16 @@
 package ro.teamnet.bootstrap.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.*;
 import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import ro.teamnet.bootstrap.domain.util.ModuleTypeEnum;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,7 +23,7 @@ public class Module {
 
     @Id
     @Column(name = "ID_MODULE")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
@@ -35,7 +40,7 @@ public class Module {
     @Column(name = "TYPE")
     private Short type;
 
-    @OneToMany(mappedBy = "module", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "module", cascade = {CascadeType.PERSIST,CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
     private Collection<ModuleRight> moduleRights = new ArrayList<>();
 
     @OneToMany(mappedBy = "parentModule")
@@ -116,43 +121,21 @@ public class Module {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         Module module = (Module) o;
 
-        if (code != null ? !code.equals(module.code) : module.code != null) return false;
-        if (type != null ? !type.equals(module.type) : module.type != null) return false;
-        if (description != null ? !description.equals(module.description) : module.description != null) return false;
-        if (parentModule != null ? !parentModule.equals(module.parentModule) : module.parentModule != null) return false;
+        if (!code.equals(module.code)) return false;
+        if (!type.equals(module.type)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (code != null ? code.hashCode() : 0);
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (parentModule != null ? parentModule.hashCode() : 0);
+        int result = code.hashCode();
+        result = 31 * result + type.hashCode();
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Module{" +
-                "id='" + id + '\'' +
-                ", version='" + version + '\'' +
-                ", code='" + code + '\'' +
-                ", type='" + type + '\'' +
-                ", description='" + description + '\'' +
-                ", parentModule='" + parentModule + '\'' +
-                "}";
     }
 }
