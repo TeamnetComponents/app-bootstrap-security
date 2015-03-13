@@ -18,7 +18,7 @@ public class LocalCenter {
 
     @Id
     @Column(name = "ID_LOCAL_CENTER")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(name = "CODE")

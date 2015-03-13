@@ -18,7 +18,7 @@ public class Module {
 
     @Id
     @Column(name = "ID_MODULE")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @NotNull

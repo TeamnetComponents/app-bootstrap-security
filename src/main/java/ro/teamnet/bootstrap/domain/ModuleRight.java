@@ -20,7 +20,7 @@ public class ModuleRight implements Serializable, GrantedAuthority {
 
     @Id
     @Column(name = "ID_MODULE_RIGHT")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @NotNull

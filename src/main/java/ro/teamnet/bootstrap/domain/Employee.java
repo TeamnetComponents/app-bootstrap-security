@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 public class Employee {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "ID_EMPLOYEE")
     private Long id;
 
