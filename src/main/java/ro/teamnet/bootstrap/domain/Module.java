@@ -23,7 +23,7 @@ public class Module {
 
     @Id
     @Column(name = "ID_MODULE")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @NotNull

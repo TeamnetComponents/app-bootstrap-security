@@ -549,6 +549,13 @@
             <column name="TYPE" value="1"/>
             <column name="DESCRIPTION" value="Messages menu access"/>
         </insert>
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="ADMINISTRATION"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Administration menu access"/>
+        </insert>
     </changeSet>
 
     <!-- Insert Module Rights -->
@@ -557,31 +564,31 @@
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="2"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'Account')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="2"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="2"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'Account')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="4"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="2"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'Account')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="8"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="2"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'Account')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="0"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="2"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'Account')"/>
         </insert>
     </changeSet>
 
@@ -591,31 +598,31 @@
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="1"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'Menu')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="2"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="1"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'Menu')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="4"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="1"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'Menu')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="8"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="1"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'Menu')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="0"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="1"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'Menu')"/>
         </insert>
     </changeSet>
 
@@ -625,79 +632,85 @@
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="5"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'SETTINGS')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="6"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'PASSWORD')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="7"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'SESSION')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="8"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'TRACKER')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="9"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'METRICS')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="10"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'HEALTH')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="11"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'CONFIGURATION')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="12"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'LOGS')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="13"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'AUDITS')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="14"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'DOCS')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="15"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'MENUS')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="16"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'AJAX')"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
             <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
-            <column name="FK_MODULE" value="17"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'MESSAGES')"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" valueComputed="(SELECT ID_MODULE from T_MODULE where CODE = 'ADMINISTRATION')"/>
         </insert>
     </changeSet>
 
@@ -843,6 +856,13 @@
             <column name="fk_module_right"
                     valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
                                     AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'MESSAGES'))"/>
+        </insert>
+
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'ADMINISTRATION'))"/>
         </insert>
 
     </changeSet>

@@ -24,7 +24,7 @@ public class Account extends AbstractAuditingEntity implements UserDetails, Seri
 
     @Id
     @Column(name = "ID_ACCOUNT")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @NotNull

@@ -22,7 +22,7 @@ public class Role extends AbstractAuditingEntity implements Serializable, Grante
 
     @Id
     @Column(name = "ID_ROLE")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @NotNull
