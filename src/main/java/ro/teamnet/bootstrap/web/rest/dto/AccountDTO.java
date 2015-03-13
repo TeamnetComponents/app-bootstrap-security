@@ -24,6 +24,9 @@ public class AccountDTO {
     private List<RoleDTO> roles = new ArrayList<>();
     private HashMap<String, ModuleRightDTO> moduleRights = new HashMap<>();
 
+    public AccountDTO() {
+    }
+
     public AccountDTO(Account account) {
         this.id = account.getId();
         this.login = account.getLogin();

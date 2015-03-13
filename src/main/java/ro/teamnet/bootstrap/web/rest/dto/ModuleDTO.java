@@ -1,7 +1,9 @@
 package ro.teamnet.bootstrap.web.rest.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import ro.teamnet.bootstrap.domain.Module;
+import ro.teamnet.bootstrap.domain.util.ModuleTypeEnum;
 
 import java.util.Set;
 
@@ -82,6 +84,11 @@ public class ModuleDTO {
 
     public void setModuleRights(Set<ModuleRightDTO> moduleRights) {
         this.moduleRights = moduleRights;
+    }
+
+    @JsonInclude
+    public String getModuleType(){
+        return ModuleTypeEnum.getCodeByValue(getType());
     }
 
     @Override

@@ -14,6 +14,19 @@
     <property name="pk_t_module" value="nextval('t_module_id_module_seq')" dbms="postgresql"/>
     <property name="pk_t_module" value="null" dbms="!oracle,!postgresql"/>
 
+    <property name="pk_t_module_right" value="HIBERNATE_SEQUENCE.NEXTVAL" dbms="oracle"/>
+    <property name="pk_t_module_right" value="nextval('t_module_right_id_module_right_seq')" dbms="postgresql"/>
+    <property name="pk_t_module_right" value="null" dbms="!oracle,!postgresql"/>
+
+    <property name="pk_t_role" value="HIBERNATE_SEQUENCE.NEXTVAL" dbms="oracle"/>
+    <property name="pk_t_role" value="nextval('t_role_id_role_seq')" dbms="postgresql"/>
+    <property name="pk_t_role" value="null" dbms="!oracle,!postgresql"/>
+
+    <property name="pk_t_account" value="HIBERNATE_SEQUENCE.NEXTVAL" dbms="oracle"/>
+    <property name="pk_t_account" value="nextval('t_account_id_account_seq')" dbms="postgresql"/>
+    <property name="pk_t_account" value="null" dbms="!oracle,!postgresql"/>
+
+
     <!-- Create ID_ACCOUNT table -->
     <changeSet id="20150212" author="security-bootstrap" failOnError="true">
         <createTable tableName="T_ACCOUNT">
@@ -49,12 +62,12 @@
 
 
     <!-- Create T_ROLE table -->
-    <changeSet id="20150212#2" author="security-bootstrap" failOnError="true">
+    <changeSet id="20150212#2" author="security-bootstrapsecurity-bootstrap" failOnError="true">
         <createTable tableName="T_ROLE">
             <column name="ID_ROLE" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="VERSION" type="bigint"/>
+            <column name="VERSION" type="bigint" defaultValue="1"/>
             <column name="CODE" type="varchar(100)">
                 <constraints unique="true"/>
             </column>
@@ -109,7 +122,7 @@
             <column name="ID_MODULE" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="VERSION" type="bigint"/>
+            <column name="VERSION" type="bigint" defaultValue="1"/>
             <column name="CODE" type="varchar(100)"/>
             <column name="TYPE" type="NUMBER(5,0)"/>
             <column name="DESCRIPTION" type="varchar(255)"/>
@@ -127,7 +140,7 @@
             <column name="ID_MODULE_RIGHT" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="VERSION" type="bigint"/>
+            <column name="VERSION" type="bigint" defaultValue="1"/>
             <column name="MODULE_RIGHT" type="NUMBER(5,0)"/>
             <column name="FK_MODULE" type="bigint">
                 <constraints foreignKeyName="fk_module_right_module"
@@ -189,7 +202,7 @@
                                  referencedTableName="T_ROLE"/>
     </changeSet>
 
-     <changeSet id="20150224" author="adriand">
+     <changeSet id="20150224" author="security-bootstrap" failOnError="true">
          <createTable tableName="T_PERSISTENT_TOKEN">
              <column name="series" type="varchar(255)">
                  <constraints primaryKey="true" nullable="false"/>
@@ -211,7 +224,7 @@
 
     </changeSet>
 
-    <changeSet id="20150224#4" author="adriand">
+    <changeSet id="20150224#4" author="security-bootstrap" failOnError="true">
         <createTable tableName="T_LOCAL_CENTER">
             <column name="ID_LOCAL_CENTER" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
@@ -234,7 +247,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="20150224#2" author="adriand">
+    <changeSet id="20150224#2" author="security-bootstrap" failOnError="true">
         <createTable tableName="T_EAGLE_USER">
             <column name="ID_ACCOUNT" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
@@ -272,7 +285,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="20150224#3" author="adriand">
+    <changeSet id="20150224#3" author="security-bootstrap" failOnError="true">
         <createTable tableName="T_EMPLOYEE">
             <column name="EMPOYEE_ID" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
@@ -288,20 +301,20 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="20150306" author="adriand">
+    <changeSet id="20150306" author="security-bootstrap" failOnError="true">
         <renameColumn columnDataType="bigint"
                       newColumnName="ID_EMPOYEE"
                       oldColumnName="EMPOYEE_ID"
                       tableName="T_EMPLOYEE"/>
     </changeSet>
     
-    <changeSet id="20150306#2" author="adriand">
+    <changeSet id="20150306#2" author="security-bootstrap" failOnError="true">
         <addColumn tableName="T_EMPLOYEE">
             <column name="PHONE_NUMBER" type="varchar(50)"/>
         </addColumn>
     </changeSet>
 
-    <changeSet id="20150306#3" author="adriand">
+    <changeSet id="20150306#3" author="security-bootstrap" failOnError="true">
         <addColumn tableName="T_EMPLOYEE">
             <column name="FK_EAGLE_USER" type="bigint">
                 <constraints foreignKeyName="fk_employee_eagle_user"
@@ -314,7 +327,7 @@
     <!-- Insert Accounts -->
     <changeSet id="20150212#8" author="security-bootstrap" failOnError="true">
         <insert tableName="T_ACCOUNT">
-            <column name="id_account" value="1"/>
+            <column name="id_account" valueComputed="${pk_t_account}"/>
             <column name="login" value="system"/>
             <column name="password" value="$2a$10$mE.qmcV0mFU5NcKh73TZx.z4ueI/.bDWbj0T1BYyqP481kGGarKLG"/>
             <column name="first_name" value="System"/>
@@ -325,7 +338,7 @@
             <column name="created_by" value="system"/>
         </insert>
         <insert tableName="T_ACCOUNT">
-            <column name="id_account" value="2"/>
+            <column name="id_account" valueComputed="${pk_t_account}"/>
             <column name="login" value="admin"/>
             <column name="password" value="$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC"/>
             <column name="first_name" value="Admin"/>
@@ -336,7 +349,7 @@
             <column name="created_by" value="system"/>
         </insert>
         <insert tableName="T_ACCOUNT">
-            <column name="id_account" value="3"/>
+            <column name="id_account" valueComputed="${pk_t_account}"/>
             <column name="login" value="user"/>
             <column name="password" value="$2a$10$VEjxo0jq2YG9Rbk2HmX9S.k1uZBGYUHdUcid3g/vfiEl7lwWgOH/K"/>
             <column name="first_name" value="User"/>
@@ -351,7 +364,7 @@
     <!-- Insert Roles -->
     <changeSet id="20150213#1" author="security-bootstrap" failOnError="true">
         <insert tableName="T_ROLE">
-            <column name="id_role" value="1"/>
+            <column name="id_role" valueComputed="${pk_t_role}"/>
             <column name="version" value="1"/>
             <column name="code" value="ROLE_SYSTEM"/>
             <column name="description" value="System Role"/>
@@ -360,7 +373,7 @@
             <column name="is_active" value="${activated}"/>
         </insert>
         <insert tableName="T_ROLE">
-            <column name="id_role" value="2"/>
+            <column name="id_role" valueComputed="${pk_t_role}"/>
             <column name="version" value="1"/>
             <column name="code" value="ROLE_ADMIN"/>
             <column name="description" value="Admin role"/>
@@ -369,7 +382,7 @@
             <column name="is_active" value="${activated}"/>
         </insert>
         <insert tableName="T_ROLE">
-            <column name="id_role" value="3"/>
+            <column name="id_role" valueComputed="${pk_t_role}"/>
             <column name="version" value="1"/>
             <column name="code" value="ROLE_USER"/>
             <column name="description" value="user role"/>
@@ -382,30 +395,30 @@
     <!-- Insert id accounts and roles -->
     <changeSet id="20150213#2" author="security-bootstrap" failOnError="true">
         <insert tableName="T_ACCOUNT_ROLES">
-            <column name="fk_account" value="1"/>
-            <column name="fk_role" value="1"/>
+            <column name="fk_account" valueComputed="(SELECT ID_ACCOUNT from T_ACCOUNT where login = 'system' )"/>
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_SYSTEM' )"/>
         </insert>
         <insert tableName="T_ACCOUNT_ROLES">
-            <column name="fk_account" value="1"/>
-            <column name="fk_role" value="2"/>
+            <column name="fk_account" valueComputed="(SELECT ID_ACCOUNT from T_ACCOUNT where login = 'system' )"/>
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
         </insert>
         <insert tableName="T_ACCOUNT_ROLES">
-            <column name="fk_account" value="1"/>
-            <column name="fk_role" value="3"/>
-        </insert>
-
-        <insert tableName="T_ACCOUNT_ROLES">
-            <column name="fk_account" value="2"/>
-            <column name="fk_role" value="2"/>
-        </insert>
-        <insert tableName="T_ACCOUNT_ROLES">
-            <column name="fk_account" value="2"/>
-            <column name="fk_role" value="3"/>
+            <column name="fk_account" valueComputed="(SELECT ID_ACCOUNT from T_ACCOUNT where login = 'system' )"/>
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_USER' )"/>
         </insert>
 
         <insert tableName="T_ACCOUNT_ROLES">
-            <column name="fk_account" value="3"/>
-            <column name="fk_role" value="3"/>
+            <column name="fk_account" valueComputed="(SELECT ID_ACCOUNT from T_ACCOUNT where login = 'admin' )"/>
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+        </insert>
+        <insert tableName="T_ACCOUNT_ROLES">
+            <column name="fk_account" valueComputed="(SELECT ID_ACCOUNT from T_ACCOUNT where login = 'admin' )"/>
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_USER' )"/>
+        </insert>
+
+        <insert tableName="T_ACCOUNT_ROLES">
+            <column name="fk_account" valueComputed="(SELECT ID_ACCOUNT from T_ACCOUNT where login = 'user' )"/>
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_USER' )"/>
         </insert>
     </changeSet>
 
@@ -442,34 +455,130 @@
 
     </changeSet>
 
+    <!--Default menu entries-->
+    <changeSet id="20150213#3_2" author="security-bootstrap" failOnError="true">
+
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="SETTINGS"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Settings menu access"/>
+        </insert>
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="PASSWORD"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Password menu access"/>
+        </insert>
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="SESSION"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Sessions menu access"/>
+        </insert>
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="TRACKER"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Tracker menu access"/>
+        </insert>
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="METRICS"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Metrics menu access"/>
+        </insert>
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="HEALTH"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Health menu access"/>
+        </insert>
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="CONFIGURATION"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Configuration menu access"/>
+        </insert>
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="LOGS"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Logs menu access"/>
+        </insert>
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="AUDITS"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Audits menu access"/>
+        </insert>
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="DOCS"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Docs menu access"/>
+        </insert>
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="MENUS"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Menus menu access"/>
+        </insert>
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="AJAX"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Ajax menu access"/>
+        </insert>
+        <insert tableName="T_MODULE">
+            <column name="ID_MODULE" valueComputed="${pk_t_module}"/>
+            <column name="VERSION" value="1"/>
+            <column name="CODE" value="MESSAGES"/>
+            <column name="TYPE" value="1"/>
+            <column name="DESCRIPTION" value="Messages menu access"/>
+        </insert>
+    </changeSet>
+
     <!-- Insert Module Rights -->
     <changeSet id="20150213#4" author="security-bootstrap" failOnError="true">
         <insert tableName="T_MODULE_RIGHT">
-            <column name="ID_MODULE_RIGHT" value="1"/>
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
             <column name="FK_MODULE" value="2"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
-            <column name="ID_MODULE_RIGHT" value="2"/>
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="2"/>
             <column name="VERSION" value="1"/>
             <column name="FK_MODULE" value="2"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
-            <column name="ID_MODULE_RIGHT" value="3"/>
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="4"/>
             <column name="VERSION" value="1"/>
             <column name="FK_MODULE" value="2"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
-            <column name="ID_MODULE_RIGHT" value="4"/>
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="8"/>
             <column name="VERSION" value="1"/>
             <column name="FK_MODULE" value="2"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
-            <column name="ID_MODULE_RIGHT" value="5"/>
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="0"/>
             <column name="VERSION" value="1"/>
             <column name="FK_MODULE" value="2"/>
@@ -479,66 +588,272 @@
     <!-- Insert Module Rights -->
     <changeSet id="20150213#4_2" author="security-bootstrap" failOnError="true">
         <insert tableName="T_MODULE_RIGHT">
-            <column name="ID_MODULE_RIGHT" value="6"/>
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="1"/>
             <column name="VERSION" value="1"/>
             <column name="FK_MODULE" value="1"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
-            <column name="ID_MODULE_RIGHT" value="7"/>
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="2"/>
             <column name="VERSION" value="1"/>
             <column name="FK_MODULE" value="1"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
-            <column name="ID_MODULE_RIGHT" value="8"/>
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="4"/>
             <column name="VERSION" value="1"/>
             <column name="FK_MODULE" value="1"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
-            <column name="ID_MODULE_RIGHT" value="9"/>
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="8"/>
             <column name="VERSION" value="1"/>
             <column name="FK_MODULE" value="1"/>
         </insert>
         <insert tableName="T_MODULE_RIGHT">
-            <column name="ID_MODULE_RIGHT" value="10"/>
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
             <column name="MODULE_RIGHT" value="0"/>
             <column name="VERSION" value="1"/>
             <column name="FK_MODULE" value="1"/>
         </insert>
     </changeSet>
 
+    <!-- Insert Module Rights -->
+    <changeSet id="20150213#4_3" author="security-bootstrap" failOnError="true">
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="5"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="6"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="7"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="8"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="9"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="10"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="11"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="12"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="13"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="14"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="15"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="16"/>
+        </insert>
+        <insert tableName="T_MODULE_RIGHT">
+            <column name="ID_MODULE_RIGHT" valueComputed="${pk_t_module_right}"/>
+            <column name="MODULE_RIGHT" value="1"/>
+            <column name="VERSION" value="1"/>
+            <column name="FK_MODULE" value="17"/>
+        </insert>
+    </changeSet>
+
     <!-- Insert Role Module Rights -->
     <changeSet id="20150213#5" author="security-bootstrap" failOnError="true">
         <insert tableName="T_ROLE_MODULE_RIGHTS">
-            <column name="fk_role" value="2"/>
-            <column name="fk_module_right" value="1"/>
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'Account'))"/>
         </insert>
         <insert tableName="T_ROLE_MODULE_RIGHTS">
-            <column name="fk_role" value="2"/>
-            <column name="fk_module_right" value="2"/>
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 2
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'Account'))"/>
         </insert>
         <insert tableName="T_ROLE_MODULE_RIGHTS">
-            <column name="fk_role" value="2"/>
-            <column name="fk_module_right" value="3"/>
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 4
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'Account'))"/>
         </insert>
         <insert tableName="T_ROLE_MODULE_RIGHTS">
-            <column name="fk_role" value="2"/>
-            <column name="fk_module_right" value="4"/>
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 8
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'Account'))"/>
+        </insert>
+    </changeSet>
+
+    <!-- Insert Role Module Rights -->
+    <changeSet id="20150213#5_2" author="security-bootstrap" failOnError="true">
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'SETTINGS'))"/>
         </insert>
         <insert tableName="T_ROLE_MODULE_RIGHTS">
-            <column name="fk_role" value="2"/>
-            <column name="fk_module_right" value="5"/>
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_USER' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'SETTINGS'))"/>
         </insert>
+
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'PASSWORD'))"/>
+        </insert>
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_USER' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'PASSWORD'))"/>
+        </insert>
+
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'SESSION'))"/>
+        </insert>
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_USER' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'SESSION'))"/>
+        </insert>
+
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'TRACKER'))"/>
+        </insert>
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_USER' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'TRACKER'))"/>
+        </insert>
+
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'METRICS'))"/>
+        </insert>
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_USER' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'METRICS'))"/>
+        </insert>
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'CONFIGURATION'))"/>
+        </insert>
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'LOGS'))"/>
+        </insert>
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'AUDITS'))"/>
+        </insert>
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'DOCS'))"/>
+        </insert>
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'MENUS'))"/>
+        </insert>
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'AJAX'))"/>
+        </insert>
+
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_ADMIN' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'MESSAGES'))"/>
+        </insert>
+        <insert tableName="T_ROLE_MODULE_RIGHTS">
+            <column name="fk_role" valueComputed="(SELECT ID_ROLE from T_ROLE where CODE = 'ROLE_USER' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'MESSAGES'))"/>
+        </insert>
+
     </changeSet>
 
     <!-- Insert Account Module Rights -->
     <changeSet id="20150213#6" author="security-bootstrap" failOnError="true">
         <insert tableName="T_ACCOUNT_MODULE_RIGHTS">
-            <column name="fk_account" value="2"/>
-            <column name="fk_module_right" value="1"/>
+            <column name="fk_account" valueComputed="(SELECT ID_ACCOUNT from T_ACCOUNT where login = 'admin' )"/>
+            <column name="fk_module_right"
+                    valueComputed="(SELECT ID_MODULE_RIGHT from T_MODULE_RIGHT where  MODULE_RIGHT = 1
+                                    AND FK_MODULE = (SELECT ID_MODULE from T_MODULE where CODE = 'Account'))"/>
         </insert>
     </changeSet>
 

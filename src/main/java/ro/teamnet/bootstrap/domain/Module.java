@@ -35,7 +35,7 @@ public class Module {
     @Column(name = "TYPE")
     private Short type;
 
-    @OneToMany(mappedBy = "module")
+    @OneToMany(mappedBy = "module", cascade = CascadeType.PERSIST)
     private Collection<ModuleRight> moduleRights = new ArrayList<>();
 
     @OneToMany(mappedBy = "parentModule")
