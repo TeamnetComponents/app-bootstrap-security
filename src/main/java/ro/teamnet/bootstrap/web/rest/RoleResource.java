@@ -14,39 +14,41 @@ import ro.teamnet.bootstrap.service.RoleService;
 import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
  * REST controller for managing role.
  */
 @RestController
-@RequestMapping("/role")
-public class RoleResource {
+@RequestMapping("/app/rest")
+public class RoleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource<Role,Long>{
 
     private final Logger log = LoggerFactory.getLogger(RoleResource.class);
 
+
+    private RoleService roleService;
+
     @Inject
-    RoleService roleService;
+    public RoleResource(RoleService roleService) {
+        super(roleService);
+        this.roleService=roleService;
+    }
 
     /**
      * POST  /rest/roles/:id -> create a new role.
      */
-    @RequestMapping(value = "/rest/roles",
+    @RequestMapping(value = "/role",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> create(@RequestBody Role role, HttpServletRequest request,
-                       HttpServletResponse response){
-        log.debug("REST request to save Role : {}", role);
-        roleService.save(role);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public void create(@RequestBody Role role){
+        super.create(role);
     }
 
     /**
      * POST  /rest/role -> update role
      */
-    @RequestMapping(value = "/rest/roles",
+    @RequestMapping(value = "/role",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -58,7 +60,7 @@ public class RoleResource {
     /**
      * POST  /rest/role -> update role
      */
-    @RequestMapping(value = "/rest/role/{id}",
+    @RequestMapping(value = "/role/{id}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -76,39 +78,32 @@ public class RoleResource {
     /**
      * GET  /rest/roles/:id -> get all the roles.
      */
-    @RequestMapping(value = "/rest/roles",
+    @RequestMapping(value = "/role",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public  AppPage<Role> getAll(AppPageable appPageable){
-        log.debug("REST request to get all roles");
-        return roleService.findAll(appPageable);
+        return super.getAll(appPageable);
     }
 
     /**
      * GET  /rest/roles -> get the "name" role.
      */
-    @RequestMapping(value = "/rest/roles/{id}",
+    @RequestMapping(value = "/role/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Role> get(@PathVariable Long id, HttpServletResponse response){
-        log.debug("REST request to get the role : {}", id);
-        Role role = roleService.getOne(id);
-        if(role == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(role, HttpStatus.OK);
+       return super.get(id, response);
     }
 
     /**
      * DELETE   /rest/roles/:id -> delete the "name" role
      */
-    @RequestMapping(value = "/rest/roles/{id}",
+    @RequestMapping(value = "/role/{id}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void delete(@PathVariable Long id){
-        log.debug("REST request to delete Role : {}",id);
-        roleService.delete(id);
+        super.delete(id);
     }
 
 }

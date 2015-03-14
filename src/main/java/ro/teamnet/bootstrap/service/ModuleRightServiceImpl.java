@@ -9,6 +9,7 @@ import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
 import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
+import ro.teamnet.bootstrap.extend.AppRepository;
 import ro.teamnet.bootstrap.repository.ModuleRightRepository;
 
 import javax.inject.Inject;
@@ -22,34 +23,19 @@ import java.util.List;
  */
 @Service
 @Transactional(readOnly = true)
-public class ModuleRightServiceImpl implements ModuleRightService {
+public class ModuleRightServiceImpl extends AbstractServiceImpl<ModuleRight,Long> implements ModuleRightService {
 
     private final Logger log = LoggerFactory.getLogger(ModuleRightServiceImpl.class);
 
+
+    private final ModuleRightRepository moduleRightRepository;
+
     @Inject
-    ModuleRightRepository moduleRightRepository;
-
-    @Override
-    @Transactional
-    public ModuleRight save(ModuleRight moduleRight) {
-        return moduleRightRepository.save(moduleRight);
+    public ModuleRightServiceImpl(ModuleRightRepository repository) {
+        super(repository);
+        this.moduleRightRepository=repository;
     }
 
-    @Override
-    public AppPage<ModuleRight> findAll(AppPageable appPageable){
-        return moduleRightRepository.findAll(appPageable);
-    }
-
-    @Override
-    public ModuleRight getOne(Long id) {
-        return moduleRightRepository.getOne(id);
-    }
-
-    @Override
-    @Transactional
-    public void delete(Long id) {
-        moduleRightRepository.delete(id);
-    }
 
     @Override
     public List getModuleRightCodes() {

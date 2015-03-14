@@ -8,15 +8,9 @@ import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
 
 import java.util.List;
 
-public interface RoleService {
-
-    public void save(Role role);
-
-    public AppPage<Role> findAll(AppPageable appPageable);
+public interface RoleService extends AbstractService<Role,Long>{
 
     public Role getOne(Long id);
-
-    public void delete(Long id);
 
     public Role update(Role role);
 

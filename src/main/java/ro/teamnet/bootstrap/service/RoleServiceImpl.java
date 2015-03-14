@@ -8,6 +8,7 @@ import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.domain.Role;
 import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
+import ro.teamnet.bootstrap.extend.AppRepository;
 import ro.teamnet.bootstrap.repository.RoleRepository;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleRightDTO;
 import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
@@ -22,35 +23,26 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class RoleServiceImpl implements RoleService {
+public class RoleServiceImpl extends AbstractServiceImpl<Role,Long> implements RoleService {
 
-    private final Logger log = LoggerFactory.getLogger(RoleServiceImpl.class);
+
+    private final RoleRepository roleRepository;
+
+    private final ModuleRightService moduleRightService;
 
     @Inject
-    RoleRepository roleRepository;
-
-    @Inject
-    ModuleRightService moduleRightService;
-
-    @Override
-    public void save(Role role) {
-         roleRepository.save(role);
+    public RoleServiceImpl(RoleRepository roleRepository,ModuleRightService moduleRightService) {
+        super(roleRepository);
+        this.roleRepository=roleRepository;
+        this.moduleRightService=moduleRightService;
     }
 
-    @Override
-    public AppPage<Role> findAll(AppPageable appPageable){
-        return roleRepository.findAll(appPageable);
-    }
 
     @Override
     public Role getOne(Long id) {
         return roleRepository.getOne(id);
     }
 
-    @Override
-    public void delete(Long id) {
-        roleRepository.delete(id);
-    }
 
     @Override
     public Role update(Role role) {

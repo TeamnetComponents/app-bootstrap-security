@@ -12,6 +12,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -19,7 +20,7 @@ import java.util.Collection;
 @Entity
 @Table(name = "T_MODULE")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class Module {
+public class Module implements Serializable{
 
     @Id
     @Column(name = "ID_MODULE")

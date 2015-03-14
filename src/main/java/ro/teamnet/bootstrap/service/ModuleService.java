@@ -8,15 +8,9 @@ import ro.teamnet.bootstrap.web.rest.dto.ModuleDTO;
 
 import java.util.List;
 
-public interface ModuleService {
-
-    public void save(Module module);
-
-    public AppPage<Module> findAll(AppPageable appPageable);
+public interface ModuleService extends AbstractService<Module,Long>{
 
     public Module getOne(Long id);
-
-    public void delete(Long id);
 
     public void update(Module module, ModuleDTO moduleDTO);
 

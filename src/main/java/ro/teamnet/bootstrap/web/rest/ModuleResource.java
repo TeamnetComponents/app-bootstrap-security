@@ -14,7 +14,6 @@ import ro.teamnet.bootstrap.service.ModuleService;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleDTO;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -22,32 +21,35 @@ import java.util.List;
  * REST controller for managing modules.
  */
 @RestController
-@RequestMapping(value = "/module")
-public class ModuleResource {
+@RequestMapping(value = "/app/rest")
+public class ModuleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource<Module,Long>{
 
     private final Logger log = LoggerFactory.getLogger(ModuleRightResource.class);
 
+
+    private ModuleService moduleService;
+
     @Inject
-    ModuleService moduleService;
+    public ModuleResource(ModuleService moduleService) {
+        super(moduleService);
+        this.moduleService=moduleService;
+    }
 
     /**
      * POST  /rest/modules/:id -> create a new module.
      */
-    @RequestMapping(value = "/rest/modules",
+    @RequestMapping(value = "/module",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> create(@RequestBody Module module, HttpServletRequest request,
-                                    HttpServletResponse response) {
-        log.debug("REST request to save Module : {}", module);
-        moduleService.save(module);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public void create(@RequestBody Module module) {
+        super.create(module);
     }
 
     /**
      * POST  /rest/module -> update module
      */
-    @RequestMapping(value = "/rest/role/{id}",
+    @RequestMapping(value = "/role/{id}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -64,15 +66,14 @@ public class ModuleResource {
     /**
      * GET  /rest/modules -> get the all modules.
      */
-    @RequestMapping(value = "/rest/modules",
+    @RequestMapping(value = "/module",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AppPage<Module> getAll(AppPageable appPageable) {
-        log.debug("REST request to get all modules");
-        return  moduleService.findAll(appPageable);
+        return super.getAll(appPageable);
     }
 
-    @RequestMapping(value = "/rest/modulesWithModuleRights",
+    @RequestMapping(value = "/module/rights",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Module> getAllModulesWithModuleRights() {
@@ -83,28 +84,22 @@ public class ModuleResource {
     /**
      * GET  /rest/modules/:id -> get the "ïd" module
      */
-    @RequestMapping(value = "/rest/modules/{id}",
+    @RequestMapping(value = "/module/{id}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Module> get(@PathVariable Long id, HttpServletResponse response) {
-        log.debug("REST request to get the module : {}", id);
-        Module module = moduleService.getOne(id);
-        if (module == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(module, HttpStatus.OK);
+        return super.get(id, response);
     }
 
     /**
      * DELETE   /rest/modules/:id -> delete the "id" module
      */
-    @RequestMapping(value = "/rest/modules/{id}",
+    @RequestMapping(value = "/module/{id}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void delete(@PathVariable Long id) {
-        log.debug("REST request to delete Module : {}", id);
-        moduleService.delete(id);
+        super.delete(id);
     }
 
 }

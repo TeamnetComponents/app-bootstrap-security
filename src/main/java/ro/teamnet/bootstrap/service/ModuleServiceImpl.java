@@ -8,6 +8,7 @@ import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
+import ro.teamnet.bootstrap.extend.AppRepository;
 import ro.teamnet.bootstrap.repository.ModuleRepository;
 import ro.teamnet.bootstrap.repository.ModuleRightRepository;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleDTO;
@@ -23,19 +24,25 @@ import java.util.List;
  */
 @Service
 @Transactional(readOnly = true)
-public class ModuleServiceImpl implements ModuleService {
+public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implements ModuleService {
 
     private final Logger log = LoggerFactory.getLogger(ModuleServiceImpl.class);
 
-    @Inject
-    ModuleRepository moduleRepository;
+
+    private final ModuleRepository moduleRepository;
+
+    private final ModuleRightRepository moduleRightRepository;
 
     @Inject
-    ModuleRightRepository moduleRightRepository;
+    public ModuleServiceImpl(ModuleRepository moduleRepository,ModuleRightRepository moduleRightRepository) {
+        super(moduleRepository);
+        this.moduleRepository=moduleRepository;
+        this.moduleRightRepository=moduleRightRepository;
+    }
 
     @Override
     @Transactional
-    public void save(Module module) {
+    public Module save(Module module) {
         if(module.getId()!=null){
             Module moduleDb=moduleRepository.findOne(module.getId());
             Collection<ModuleRight> persistentModuleRight=new HashSet<>();
@@ -57,7 +64,7 @@ public class ModuleServiceImpl implements ModuleService {
             }
             moduleDb.getModuleRights().addAll(persistentModuleRight);
             moduleRepository.save(moduleDb);
-
+            return moduleDb;
 
         }else{
             Module savedModule = moduleRepository.save(module);
@@ -68,9 +75,8 @@ public class ModuleServiceImpl implements ModuleService {
                     moduleRightRepository.save(moduleRight);
                 }
             }
+            return savedModule;
         }
-
-
 
     }
 
