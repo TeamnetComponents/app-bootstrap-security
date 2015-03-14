@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.domain.Account;
 import ro.teamnet.bootstrap.domain.PersistentToken;
 import ro.teamnet.bootstrap.domain.Role;
+import ro.teamnet.bootstrap.extend.AppRepository;
 import ro.teamnet.bootstrap.repository.AccountRepository;
 import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
 import ro.teamnet.bootstrap.repository.RoleRepository;
@@ -28,14 +29,13 @@ import java.util.Set;
  */
 @Service
 @Transactional
-public class AccountServiceImpl implements AccountService {
+public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implements AccountService {
 
     private final Logger log = LoggerFactory.getLogger(AccountServiceImpl.class);
 
     @Inject
     private PasswordEncoder passwordEncoder;
 
-    @Inject
     private AccountRepository accountRepository;
 
     @Inject
@@ -43,6 +43,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Inject
     private RoleRepository roleRepository;
+
+    @Inject
+    public AccountServiceImpl(AccountRepository repository) {
+        super(repository);
+        this.accountRepository=repository;
+    }
 
     /**
      * Method that activates a given Account for the registration key.
@@ -196,6 +202,16 @@ public class AccountServiceImpl implements AccountService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Account findOneByEmail(String email) {
+        return accountRepository.findOneByEmail(email);
+    }
+
+    @Override
+    public Account findByLogin(String currentLogin) {
+        return accountRepository.findByLogin(currentLogin);
     }
 
 }

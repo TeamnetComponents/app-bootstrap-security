@@ -41,7 +41,7 @@ public class AccountServiceImplTest {
 
     @Before
     public void init(){
-        service = new AccountServiceImpl();
+        service = new AccountServiceImpl(accountRepository);
         initMocks(this);
     }
 

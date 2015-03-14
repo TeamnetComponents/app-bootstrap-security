@@ -15,7 +15,6 @@ import org.thymeleaf.spring4.context.SpringWebContext;
 import ro.teamnet.bootstrap.domain.Account;
 import ro.teamnet.bootstrap.domain.PersistentToken;
 import ro.teamnet.bootstrap.domain.Role;
-import ro.teamnet.bootstrap.repository.AccountRepository;
 import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
 import ro.teamnet.bootstrap.security.util.SecurityUtils;
 import ro.teamnet.bootstrap.service.AccountService;
@@ -28,14 +27,17 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
 @RequestMapping("/app")
-public class AccountResource {
+public class AccountResource extends ro.teamnet.bootstrap.web.rest.AbstractResource<Account,Long> {
 
     private final Logger log = LoggerFactory.getLogger(AccountResource.class);
 
@@ -48,14 +50,16 @@ public class AccountResource {
     @Inject
     private SpringTemplateEngine templateEngine;
 
-    @Inject
-    private AccountRepository accountRepository;
-
-    @Inject
     private AccountService accountService;
 
     @Inject
     private PersistentTokenRepository persistentTokenRepository;
+
+    @Inject
+    public AccountResource(AccountService accountService) {
+        super(accountService);
+        this.accountService=accountService;
+    }
 
 
     /**
@@ -67,12 +71,12 @@ public class AccountResource {
     @Timed
     public ResponseEntity<?> create(@Valid @RequestBody AccountDTO accountDTO, HttpServletRequest request,
                                              HttpServletResponse response) {
-        Account account = accountRepository.findOne(accountDTO.getId());
+        Account account = accountService.findOne(accountDTO.getId());
         if (account != null) {
-            return new ResponseEntity<String>("login already in use", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("login already in use", HttpStatus.BAD_REQUEST);
         } else {
-            if (accountRepository.findOneByEmail(accountDTO.getEmail()) != null) {
-                return new ResponseEntity<String>("e-mail address already in use", HttpStatus.BAD_REQUEST);
+            if (accountService.findOneByEmail(accountDTO.getEmail()) != null) {
+                return new ResponseEntity<>("e-mail address already in use", HttpStatus.BAD_REQUEST);
             }
             account = accountService.createUserInformation(accountDTO.getLogin(), accountDTO.getPassword(), accountDTO.getFirstName(),
                     accountDTO.getLastName(), accountDTO.getEmail().toLowerCase(), accountDTO.getLangKey(), accountDTO.getGender());
@@ -93,7 +97,7 @@ public class AccountResource {
         if (account == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<String>(account.getLogin(), HttpStatus.OK);
+        return new ResponseEntity<>(account.getLogin(), HttpStatus.OK);
     }
 
     /**
@@ -132,9 +136,9 @@ public class AccountResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> save(@RequestBody AccountDTO userDTO) {
-        Account accountHavingThisEmail = accountRepository.findOneByEmail(userDTO.getEmail());
+        Account accountHavingThisEmail = accountService.findOneByEmail(userDTO.getEmail());
         if (accountHavingThisEmail != null && !accountHavingThisEmail.getLogin().equals(SecurityUtils.getCurrentLogin())) {
-            return new ResponseEntity<String>("e-mail address already in use", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("e-mail address already in use", HttpStatus.BAD_REQUEST);
         }
         accountService.updateUserInformation(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
@@ -163,7 +167,7 @@ public class AccountResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<List<PersistentToken>> getCurrentSessions() {
-        Account account = accountRepository.findByLogin(SecurityUtils.getCurrentLogin());
+        Account account = accountService.findByLogin(SecurityUtils.getCurrentLogin());
         if (account == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -190,7 +194,7 @@ public class AccountResource {
     @Timed
     public void invalidateSession(@PathVariable String series) throws UnsupportedEncodingException {
         String decodedSeries = URLDecoder.decode(series, "UTF-8");
-        Account account = accountRepository.findByLogin(SecurityUtils.getCurrentLogin());
+        Account account = accountService.findByLogin(SecurityUtils.getCurrentLogin());
         List<PersistentToken> persistentTokens = persistentTokenRepository.findByAccount(account);
         for (PersistentToken persistentToken : persistentTokens) {
             if (StringUtils.equals(persistentToken.getSeries(), decodedSeries)) {
@@ -220,7 +224,7 @@ public class AccountResource {
     @Timed
     public Account getUser(@PathVariable String login, HttpServletResponse response) {
         log.debug("REST request to get User : {}", login);
-        Account Account = accountRepository.findByLogin(login);
+        Account Account = accountService.findByLogin(login);
         if (Account == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -233,9 +237,9 @@ public class AccountResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> addRole(@RequestBody Role role){
         if(accountService.addRole(role)){
-            return new ResponseEntity<String>("Role added successfully",HttpStatus.OK);
+            return new ResponseEntity<>("Role added successfully",HttpStatus.OK);
         } else {
-            return new ResponseEntity<String>("Role could not be added",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Role could not be added",HttpStatus.BAD_REQUEST);
         }
     }
 

@@ -4,7 +4,7 @@ package ro.teamnet.bootstrap.service;
 import ro.teamnet.bootstrap.domain.Account;
 import ro.teamnet.bootstrap.domain.Role;
 
-public interface AccountService {
+public interface AccountService extends AbstractService<Account,Long>{
 
     public Account activateRegistration(String key);
 
@@ -23,4 +23,7 @@ public interface AccountService {
 
     public boolean addRole(Role role);
 
+    Account findOneByEmail(String email);
+
+    Account findByLogin(String currentLogin);
 }

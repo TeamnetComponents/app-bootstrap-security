@@ -8,20 +8,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ro.teamnet.bootstrap.domain.Module;
-import ro.teamnet.bootstrap.extend.AppPage;
-import ro.teamnet.bootstrap.extend.AppPageable;
 import ro.teamnet.bootstrap.service.ModuleService;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleDTO;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
  * REST controller for managing modules.
  */
 @RestController
-@RequestMapping(value = "/app/rest")
+@RequestMapping(value = "/app/rest/module")
 public class ModuleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource<Module,Long>{
 
     private final Logger log = LoggerFactory.getLogger(ModuleRightResource.class);
@@ -36,20 +33,9 @@ public class ModuleResource extends ro.teamnet.bootstrap.web.rest.AbstractResour
     }
 
     /**
-     * POST  /rest/modules/:id -> create a new module.
-     */
-    @RequestMapping(value = "/module",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public void create(@RequestBody Module module) {
-        super.create(module);
-    }
-
-    /**
      * POST  /rest/module -> update module
      */
-    @RequestMapping(value = "/role/{id}",
+    @RequestMapping(value = "/{id}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -63,17 +49,7 @@ public class ModuleResource extends ro.teamnet.bootstrap.web.rest.AbstractResour
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    /**
-     * GET  /rest/modules -> get the all modules.
-     */
-    @RequestMapping(value = "/module",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public AppPage<Module> getAll(AppPageable appPageable) {
-        return super.getAll(appPageable);
-    }
-
-    @RequestMapping(value = "/module/rights",
+    @RequestMapping(value = "/rights",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Module> getAllModulesWithModuleRights() {
@@ -81,25 +57,6 @@ public class ModuleResource extends ro.teamnet.bootstrap.web.rest.AbstractResour
         return  moduleService.getAllModulesWithModuleRights();
     }
 
-    /**
-     * GET  /rest/modules/:id -> get the "ïd" module
-     */
-    @RequestMapping(value = "/module/{id}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<Module> get(@PathVariable Long id, HttpServletResponse response) {
-        return super.get(id, response);
-    }
 
-    /**
-     * DELETE   /rest/modules/:id -> delete the "id" module
-     */
-    @RequestMapping(value = "/module/{id}",
-            method = RequestMethod.DELETE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public void delete(@PathVariable Long id) {
-        super.delete(id);
-    }
 
 }
