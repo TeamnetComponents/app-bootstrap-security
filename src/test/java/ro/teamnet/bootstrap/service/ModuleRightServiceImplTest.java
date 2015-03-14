@@ -28,12 +28,12 @@ public class ModuleRightServiceImplTest {
 
     @Before
     public void init(){
-        service = new ModuleRightServiceImpl();
+        service = new ModuleRightServiceImpl(moduleRightRepository);
         initMocks(this);
     }
 
     /**
-     * Method: {@link ModuleRightServiceImpl#save(ro.teamnet.bootstrap.domain.ModuleRight)} .
+     * Method: {@link ModuleRightServiceImpl
      * When: A Role is saved
      * Then:
      */
@@ -77,7 +77,7 @@ public class ModuleRightServiceImplTest {
     }
 
     /**
-     * Method: {@link ModuleRightServiceImpl#getOne(Long)} .
+     * Method: {@link ModuleRightServiceImpl#findOne(java.io.Serializable)} (Long)} .
      * When: find one Role
      * Then:
      */
@@ -91,12 +91,12 @@ public class ModuleRightServiceImplTest {
         moduleRight.setRight(right);
 
         when(moduleRightRepository.getOne(anyLong())).thenReturn(moduleRight);
-        assertEquals(moduleRight,service.getOne(id));
+        assertEquals(moduleRight,service.findOne(id));
 
     }
 
     /**
-     * Method: {@link ModuleRightServiceImpl#delete(Long)} .
+     * Method: {@link ModuleRightServiceImpl#delete(java.io.Serializable)} (Long)} .
      * When: Delete one Role
      * Then: Id Role is not found throws {@Link EmptyResultDataAccessException}
      */
