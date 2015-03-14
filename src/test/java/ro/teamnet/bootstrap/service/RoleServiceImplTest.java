@@ -29,12 +29,12 @@ public class RoleServiceImplTest {
 
     @Before
     public void init(){
-        service = new RoleServiceImpl();
+        service = new RoleServiceImpl(roleRepository, null);
         initMocks(this);
     }
 
     /**
-    * Method: {@link RoleServiceImpl#save(ro.teamnet.bootstrap.domain.Role)} .
+    * Method: {@link RoleServiceImpl#save(java.io.Serializable)} (ro.teamnet.bootstrap.domain.Role)} .
     * When: A Role is saved
     * Then:
     */
@@ -94,7 +94,7 @@ public class RoleServiceImplTest {
     }
 
     /**
-     * Method: {@link RoleServiceImpl#delete(Long)} .
+     * Method: {@link RoleServiceImpl#delete(java.io.Serializable)}(Long)} .
      * When: Delete one Role
      * Then: Id Role is not found throws {@Link EmptyResultDataAccessException}
      */
