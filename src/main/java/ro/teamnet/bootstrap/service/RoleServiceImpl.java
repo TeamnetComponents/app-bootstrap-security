@@ -67,7 +67,7 @@ public class RoleServiceImpl extends AbstractServiceImpl<Role,Long> implements R
         //update moduleRights for Role
         List<ModuleRight> moduleRights = new ArrayList<>();
         for(ModuleRightDTO moduleRightDTO : roleDTO.getModuleRights()){
-                moduleRights.add(moduleRightService.getOne(moduleRightDTO.getId()));
+                moduleRights.add(moduleRightService.findOne(moduleRightDTO.getId()));
             }
 
         role.setModuleRights(moduleRights);
