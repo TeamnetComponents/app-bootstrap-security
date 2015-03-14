@@ -29,7 +29,7 @@ public class ModuleServiceImplTest {
 
     @Before
     public void init(){
-        service = new ModuleServiceImpl();
+        service = new ModuleServiceImpl(moduletRepository, null);
         initMocks(this);
     }
 
