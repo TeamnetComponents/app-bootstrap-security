@@ -95,7 +95,13 @@ public class ModuleServiceImpl implements ModuleService {
 
     @Override
     public Module getOne(Long id) {
-        return moduleRepository.getOne(id);
+        Module module = moduleRepository.getOne(id);
+        List<ModuleRight> moduleRights = moduleRightRepository.findByModule(module);
+        for (ModuleRight moduleRight : moduleRights) {
+            moduleRight.setModule(null);
+        }
+        module.setModuleRights(moduleRights);
+        return module;
     }
 
     @Override
