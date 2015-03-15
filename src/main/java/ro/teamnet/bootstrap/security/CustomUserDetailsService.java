@@ -25,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     private AccountRepository accountRepository;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(final String login) {
         log.debug("Authenticating {}", login);
         String lowercaseLogin = login.toLowerCase();

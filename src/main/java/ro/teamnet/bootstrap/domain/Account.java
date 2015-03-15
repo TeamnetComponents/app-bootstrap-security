@@ -245,9 +245,20 @@ public class Account extends AbstractAuditingEntity implements UserDetails, Seri
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.addAll(getRoles());
         for (Role role : getRoles()) {
-            authorities.addAll(role.getModuleRights());
             for (ModuleRight moduleRight : role.getModuleRights()) {
-                authorities.addAll(moduleRight.getModule().getModuleRights());
+                if(moduleRight.getModule()!=null&&moduleRight.getModule().getModuleRights()!=null){
+                    for (ModuleRight right : moduleRight.getModule().getModuleRights()) {
+                        if(right.getModule()!=null){
+                            right.getModule().setModuleRights(null);
+                        }
+                        authorities.add(right);
+                    }
+                }
+                if(moduleRight.getModule()!=null){
+                    moduleRight.getModule().setModuleRights(null);
+                }
+
+                authorities.add(moduleRight);
             }
         }
         authorities.addAll(getPermissions());

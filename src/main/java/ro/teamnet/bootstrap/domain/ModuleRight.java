@@ -34,7 +34,6 @@ public class ModuleRight implements Serializable, GrantedAuthority {
 
     @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
     @JoinColumn(name = "FK_MODULE", updatable = true, insertable = true)
-    @JsonIgnore
     private Module module;
 
     public Long getId() {
@@ -69,7 +68,6 @@ public class ModuleRight implements Serializable, GrantedAuthority {
         this.module = module;
     }
 
-    @JsonInclude
     public String getModuleRightCode(){
         return ModuleRightTypeEnum.getCodeByValue(getRight());
     }
