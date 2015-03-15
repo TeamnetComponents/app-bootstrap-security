@@ -4,11 +4,13 @@ package ro.teamnet.bootstrap.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.domain.Role;
 import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
 import ro.teamnet.bootstrap.extend.AppRepository;
+import ro.teamnet.bootstrap.repository.ModuleRepository;
 import ro.teamnet.bootstrap.repository.RoleRepository;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleRightDTO;
 import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
@@ -30,11 +32,14 @@ public class RoleServiceImpl extends AbstractServiceImpl<Role,Long> implements R
 
     private final ModuleRightService moduleRightService;
 
+    private final ModuleRepository moduleRepository;
+
     @Inject
-    public RoleServiceImpl(RoleRepository roleRepository,ModuleRightService moduleRightService) {
+    public RoleServiceImpl(RoleRepository roleRepository,ModuleRightService moduleRightService,ModuleRepository moduleRepository) {
         super(roleRepository);
         this.roleRepository=roleRepository;
         this.moduleRightService=moduleRightService;
+        this.moduleRepository=moduleRepository;
     }
 
 
@@ -47,7 +52,15 @@ public class RoleServiceImpl extends AbstractServiceImpl<Role,Long> implements R
     @Override
     public Role update(Role role) {
         for(ModuleRight mr: role.getModuleRights()) {
-            moduleRightService.save(mr);
+            if(mr.getId()==null){
+                Module moduleDb=moduleRepository.findOne(mr.getModule().getId());
+                mr.setModule(null);
+                moduleRightService.save(mr);
+                mr.setModule(moduleDb);
+            }else{
+                moduleRightService.save(mr);
+            }
+
         }
 
         return roleRepository.save(role);

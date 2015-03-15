@@ -2,6 +2,8 @@ package ro.teamnet.bootstrap.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.domain.Module;
@@ -112,25 +114,61 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
 
     @Override
     @Transactional
-    public void delete(Long id) {
-        moduleRepository.delete(id);
+
+    public void update(Long id, ModuleDTO moduleDTO) {
+        Module moduleDb=moduleRepository.findOne(id);
+        if(moduleDb == null){
+            return;
+        }
+        moduleDb.setVersion(moduleDTO.getVersion());
+        moduleDb.setCode(moduleDTO.getCode());
+        moduleDb.setDescription(moduleDTO.getDescription());
+        moduleDb.setType(moduleDTO.getType());
+        moduleDb.setParentModule(moduleDTO.getParentModule());
+
+
+        if(moduleDTO.getId()!=null){
+
+            Collection<ModuleRight> persistentModuleRight=new HashSet<>();
+            Collection<ModuleRight> moduleRightList=moduleDb.getModuleRights();
+            for (ModuleRight moduleRight : moduleRightList) {
+                boolean found=false;
+                for(ModuleRightDTO moduleRightDTO:moduleDTO.getModuleRights()){
+                    found=found||moduleRightDTO.getRight().equals(moduleRight.getRight());
+                }
+
+                if(!found){
+                    moduleRight.setModule(null);
+//                  moduleRightRepository.save(moduleRight);
+
+                }
+            }
+            for(ModuleRightDTO moduleRight:moduleDTO.getModuleRights()){
+                boolean found=false;
+                for(ModuleRight moduleRight1:moduleDb.getModuleRights()){
+                    found=found||moduleRight1.getRight().equals(moduleRight.getRight());
+                }
+                if(!found){
+                    ModuleRight moduleRightTr=new ModuleRight();
+                    moduleRightTr.setRight(moduleRight.getRight());
+                    moduleRightTr.setModule(moduleDb);
+                    moduleRightTr.setVersion(1L);
+                    ModuleRight moduleRightDb=moduleRightRepository.save(moduleRightTr);
+                    persistentModuleRight.add(moduleRightDb);
+                }
+            }
+            moduleDb.getModuleRights().addAll(persistentModuleRight);
+            moduleRepository.save(moduleDb);
+
+        }
+
+
     }
 
     @Override
     @Transactional
-    public void update(Module module, ModuleDTO moduleDTO){
-        module.setVersion(moduleDTO.getVersion());
-        module.setCode(moduleDTO.getCode());
-        module.setDescription(moduleDTO.getDescription());
-        module.setType(moduleDTO.getType());
-        module.setParentModule(moduleDTO.getParentModule());
-
-        //update moduleRights for module
-        List<ModuleRight> moduleRights = new ArrayList<>();
-        for(ModuleRightDTO moduleRightDTO : moduleDTO.getModuleRights()){
-            moduleRights.add(moduleRightRepository.getOne(moduleRightDTO.getId()));
-        }
-
-        module.setModuleRights(moduleRights);
+    public void delete(Long id) {
+        moduleRepository.delete(id);
     }
+
 }

@@ -41,11 +41,8 @@ public class ModuleResource extends ro.teamnet.bootstrap.web.rest.AbstractResour
     @Timed
     public ResponseEntity<?> update(@PathVariable Long id,@RequestBody ModuleDTO moduleDTO) {
         log.debug("REST request to update the module : {}", id);
-        Module module = moduleService.getOne(id);
-        if(module == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        moduleService.update(module, moduleDTO);
+
+        moduleService.update(id, moduleDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

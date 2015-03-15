@@ -14,5 +14,7 @@ public interface ModuleRightRepository extends AppRepository<ModuleRight, Long> 
 
     public List<ModuleRight> findByModule(Module module);
 
+    public ModuleRight findByRight(Short right);
+
     public List<ModuleRight> findByModuleAndRight(Module module, Short right);
 }

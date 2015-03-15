@@ -12,7 +12,7 @@ public interface ModuleService extends AbstractService<Module,Long>{
 
     public Module getOne(Long id);
 
-    public void update(Module module, ModuleDTO moduleDTO);
+    public void update(Long id, ModuleDTO moduleDTO);
 
     public List<Module> getAllModulesWithModuleRights();
 

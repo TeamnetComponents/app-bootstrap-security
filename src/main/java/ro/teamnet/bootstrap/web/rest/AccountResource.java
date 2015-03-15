@@ -120,12 +120,12 @@ public class AccountResource extends ro.teamnet.bootstrap.web.rest.AbstractResou
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<AccountDTO> getAccount() {
-        Account account = accountService.getUserWithAuthorities();
+        AccountDTO account = accountService.getUserWithAuthorities();
         if (account == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(new AccountDTO(account), HttpStatus.OK);
+        return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
     /**

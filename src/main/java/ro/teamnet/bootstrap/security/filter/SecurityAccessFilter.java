@@ -6,12 +6,15 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import ro.teamnet.bootstrap.domain.ModuleRight;
+import ro.teamnet.bootstrap.domain.Role;
 import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -91,18 +94,25 @@ public class SecurityAccessFilter implements Filter {
         String accessType = PermissionMapping.valueOf(httpRequest.getMethod()).getAccess();
         UsernamePasswordAuthenticationToken user = (UsernamePasswordAuthenticationToken) httpRequest.getUserPrincipal();
 
-        for (GrantedAuthority authority : user.getAuthorities()) {
+        List<ModuleRight> moduleRights=new ArrayList<>();
+        for (GrantedAuthority grantedAuthority : user.getAuthorities()) {
+            if(grantedAuthority instanceof ModuleRight){
+                moduleRights.add((ModuleRight) grantedAuthority);
+            }else if(grantedAuthority instanceof Role){
+                moduleRights.addAll(((Role) grantedAuthority).getModuleRights());
+            }
+        }
+
+        for (ModuleRight authority : moduleRights) {
             ModuleRight permission;
             Boolean hasPermission;
             Boolean accessToResource;
-            if (authority instanceof ModuleRight) {
-                permission = (ModuleRight) authority;
-                hasPermission = ModuleRightTypeEnum.getCodeByValue(permission.getRight()).equals(accessType) ? true : false;
-                accessToResource = (hasPermission && permission.getModule().getCode().toLowerCase().equals(resource)) ? true : false;
+                permission = authority;
+                hasPermission = ModuleRightTypeEnum.getCodeByValue(permission.getRight()).equals(accessType);
+                accessToResource = (hasPermission && permission.getModule().getCode().toLowerCase().equals(resource));
                 if (accessToResource) {
                     return true;
                 }
-            }
         }
         return false;
     }

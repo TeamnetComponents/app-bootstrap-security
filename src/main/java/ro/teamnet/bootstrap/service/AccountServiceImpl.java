@@ -18,6 +18,7 @@ import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
 import ro.teamnet.bootstrap.repository.RoleRepository;
 import ro.teamnet.bootstrap.security.util.SecurityUtils;
 import ro.teamnet.bootstrap.service.util.RandomUtil;
+import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
 
 import javax.inject.Inject;
 import java.util.HashSet;
@@ -144,10 +145,10 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
      */
     @Override
     @Transactional(readOnly = true)
-    public Account getUserWithAuthorities() {
+    public AccountDTO getUserWithAuthorities() {
         Account currentAccount = accountRepository.findByLogin(SecurityUtils.getCurrentLogin());
         currentAccount.getAuthorities().size(); // eagerly load the association
-        return currentAccount;
+        return new AccountDTO(currentAccount);
     }
 
     /**

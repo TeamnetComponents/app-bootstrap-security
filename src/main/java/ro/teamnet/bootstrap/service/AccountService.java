@@ -3,6 +3,7 @@ package ro.teamnet.bootstrap.service;
 
 import ro.teamnet.bootstrap.domain.Account;
 import ro.teamnet.bootstrap.domain.Role;
+import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
 
 public interface AccountService extends AbstractService<Account,Long>{
 
@@ -15,7 +16,7 @@ public interface AccountService extends AbstractService<Account,Long>{
 
     public void changePassword(String password);
 
-    public Account getUserWithAuthorities();
+    public AccountDTO getUserWithAuthorities();
 
     public void removeOldPersistentTokens();
 
