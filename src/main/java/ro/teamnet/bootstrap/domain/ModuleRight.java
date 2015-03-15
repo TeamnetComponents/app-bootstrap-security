@@ -34,6 +34,7 @@ public class ModuleRight implements Serializable, GrantedAuthority {
 
     @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
     @JoinColumn(name = "FK_MODULE", updatable = true, insertable = true)
+    @JsonIgnore
     private Module module;
 
     public Long getId() {
@@ -87,13 +88,16 @@ public class ModuleRight implements Serializable, GrantedAuthority {
 
         ModuleRight that = (ModuleRight) o;
 
-        if (right != null ? !right.equals(that.right) : that.right != null) return false;
+        if (module != null ? !module.equals(that.module) : that.module != null) return false;
+        if (!right.equals(that.right)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return right != null ? right.hashCode() : 0;
+        int result = right.hashCode();
+        result = 31 * result + (module != null ? module.hashCode() : 0);
+        return result;
     }
 }
