@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.extend.*;
 import ro.teamnet.bootstrap.repository.ModuleRepository;
+import ro.teamnet.bootstrap.repository.ModuleRightRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +26,15 @@ public class ModuleServiceImplTest {
     private ModuleServiceImpl service;
 
     @Mock
-    private ModuleRepository moduletRepository;
+    private ModuleRepository moduleRepository;
+
+    @Mock
+    private ModuleRightRepository moduleRightRepository;
 
     @Before
     public void init(){
-        service = new ModuleServiceImpl(moduletRepository, null);
         initMocks(this);
+        service = new ModuleServiceImpl(moduleRepository, moduleRightRepository);
     }
 
     /**
@@ -39,7 +43,7 @@ public class ModuleServiceImplTest {
      * Then:
      */
     @Test
-    public void createUserInformationTest(){
+    public void saveModuleTest(){
 
         final Long id = 1l;
         final Short type = 1;
@@ -47,8 +51,9 @@ public class ModuleServiceImplTest {
         module.setId(id);
         module.setType(type);
 
+        when(moduleRepository.findOne(module.getId())).thenReturn(module);
         service.save(module);
-        verify(moduletRepository, times(1)).save(module);
+        verify(moduleRepository, times(1)).save(module);
 
     }
 
@@ -72,7 +77,7 @@ public class ModuleServiceImplTest {
 
         AppPageRequest appPageRequest = new AppPageRequest(0,1,new Filters());
 
-        when(moduletRepository.findAll(appPageRequest)).thenReturn(appPage);
+        when(moduleRepository.findAll(appPageRequest)).thenReturn(appPage);
         assertEquals(appPage,service.findAll(appPageRequest) );
 
     }
@@ -91,7 +96,7 @@ public class ModuleServiceImplTest {
         module.setId(id);
         module.setType(type);
 
-        when(moduletRepository.getOne(anyLong())).thenReturn(module);
+        when(moduleRepository.getOne(anyLong())).thenReturn(module);
         assertEquals(module,service.getOne(id));
 
     }
@@ -111,7 +116,7 @@ public class ModuleServiceImplTest {
         module.setType(type);
 
         service.delete(id);
-        verify(moduletRepository, times(1)).delete(id);
+        verify(moduleRepository, times(1)).delete(id);
 
     }
 }

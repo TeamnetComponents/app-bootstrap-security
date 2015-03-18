@@ -28,8 +28,8 @@ public class ModuleRightServiceImplTest {
 
     @Before
     public void init(){
-        service = new ModuleRightServiceImpl(moduleRightRepository);
         initMocks(this);
+        service = new ModuleRightServiceImpl(moduleRightRepository);
     }
 
     /**
@@ -38,7 +38,7 @@ public class ModuleRightServiceImplTest {
      * Then:
      */
     @Test
-    public void createUserInformationTest(){
+    public void saveModuleRightTest(){
 
         final Long id = 1l;
         final Short right = 1;
@@ -90,7 +90,7 @@ public class ModuleRightServiceImplTest {
         moduleRight.setId(id);
         moduleRight.setRight(right);
 
-        when(moduleRightRepository.getOne(anyLong())).thenReturn(moduleRight);
+        when(moduleRightRepository.findOne(anyLong())).thenReturn(moduleRight);
         assertEquals(moduleRight,service.findOne(id));
 
     }

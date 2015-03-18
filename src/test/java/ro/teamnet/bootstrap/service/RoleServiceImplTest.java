@@ -6,7 +6,11 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import ro.teamnet.bootstrap.domain.Role;
-import ro.teamnet.bootstrap.extend.*;
+import ro.teamnet.bootstrap.extend.AppPage;
+import ro.teamnet.bootstrap.extend.AppPageImpl;
+import ro.teamnet.bootstrap.extend.AppPageRequest;
+import ro.teamnet.bootstrap.extend.Filters;
+import ro.teamnet.bootstrap.repository.ModuleRepository;
 import ro.teamnet.bootstrap.repository.RoleRepository;
 
 import java.util.ArrayList;
@@ -27,10 +31,16 @@ public class RoleServiceImplTest {
     @Mock
     private RoleRepository roleRepository;
 
+    @Mock
+    private ModuleRightService moduleRightService;
+
+    @Mock
+    private ModuleRepository moduleRepository;
+
     @Before
     public void init(){
-        service = new RoleServiceImpl(roleRepository, null);
         initMocks(this);
+        service = new RoleServiceImpl(roleRepository, moduleRightService, moduleRepository);
     }
 
     /**
@@ -39,7 +49,7 @@ public class RoleServiceImplTest {
     * Then:
     */
     @Test
-    public void createUserInformationTest(){
+    public void saveRoleTest(){
 
         final Long id = 1l;
         final Role role = new Role();
