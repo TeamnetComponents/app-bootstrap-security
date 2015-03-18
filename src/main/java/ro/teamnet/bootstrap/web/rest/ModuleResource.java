@@ -12,7 +12,6 @@ import ro.teamnet.bootstrap.service.ModuleService;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleDTO;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -62,7 +61,8 @@ public class ModuleResource extends ro.teamnet.bootstrap.web.rest.AbstractResour
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Module> get(@PathVariable Long id, HttpServletResponse response) {
+    @Override
+    public ResponseEntity<Module> get(@PathVariable Long id) {
         log.debug("REST request to get the module : {}", id);
         Module module = moduleService.getOne(id);
         if (module == null) {
