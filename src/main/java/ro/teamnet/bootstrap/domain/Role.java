@@ -16,7 +16,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "T_ROLE")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Role extends AbstractAuditingEntity implements Serializable, GrantedAuthority {
 
 
@@ -60,7 +60,6 @@ public class Role extends AbstractAuditingEntity implements Serializable, Grante
         name = "T_ROLE_MODULE_RIGHTS",
         joinColumns = {@JoinColumn(name = "fk_role", referencedColumnName = "id_role")},
         inverseJoinColumns = {@JoinColumn(name = "fk_module_right", referencedColumnName = "id_module_right")})
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Collection<ModuleRight> moduleRights = new ArrayList<>();
 
     public Long getId() {

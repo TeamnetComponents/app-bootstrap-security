@@ -39,20 +39,24 @@ public class AccountDTO {
 
         // load account module rights
         for(ModuleRight mr: account.getModuleRights()) {
-            moduleRights.put(
-                mr.getModule().getCode()+"_"+mr.getModuleRightCode(),
-                loadModuleRightDTO(mr, ModuleRightSource.ACCOUNT.name())
-            );
+            if(mr.getModule() != null){
+                moduleRights.put(
+                        mr.getModule().getCode()+"_"+mr.getModuleRightCode(),
+                        loadModuleRightDTO(mr, ModuleRightSource.ACCOUNT.name())
+                );
+            }
         }
 
         // load roles
         for (Role role : account.getRoles()) {
             // load role module rights
             for(ModuleRight mr: role.getModuleRights()) {
-                moduleRights.put(
-                    mr.getModule().getCode() + "_" + mr.getModuleRightCode(),
-                    loadModuleRightDTO(mr, ModuleRightSource.ROLE.name())
-                );
+                if(mr.getModule() != null){
+                    moduleRights.put(
+                            mr.getModule().getCode() + "_" + mr.getModuleRightCode(),
+                            loadModuleRightDTO(mr, ModuleRightSource.ROLE.name())
+                    );
+                }
             }
 
             roles.add(new RoleDTO(role.getId(), role.getVersion(), role.getCode(), role.getDescription(),

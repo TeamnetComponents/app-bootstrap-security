@@ -17,7 +17,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "T_MODULE_RIGHT")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ModuleRight implements Serializable, GrantedAuthority {
 
     @Id

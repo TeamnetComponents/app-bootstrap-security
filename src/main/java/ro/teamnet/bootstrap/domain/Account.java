@@ -18,7 +18,7 @@ import java.util.*;
  */
 @Entity
 @Table(name = "T_ACCOUNT")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class Account extends AbstractAuditingEntity implements UserDetails, Serializable {
 
@@ -71,20 +71,18 @@ public class Account extends AbstractAuditingEntity implements UserDetails, Seri
             name = "T_ACCOUNT_ROLES",
             joinColumns = {@JoinColumn(name = "fk_account", referencedColumnName = "id_account")},
             inverseJoinColumns = {@JoinColumn(name = "fk_role", referencedColumnName = "id_role")})
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private Collection<Role> roles = new ArrayList<>();
+    private Collection<Role> roles = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "T_ACCOUNT_MODULE_RIGHTS",
             joinColumns = {@JoinColumn(name = "fk_account", referencedColumnName = "id_account")},
             inverseJoinColumns = {@JoinColumn(name = "fk_module_right", referencedColumnName = "id_module_right")})
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private Collection<ModuleRight> moduleRights = new ArrayList<>();
+    private Collection<ModuleRight> moduleRights = new HashSet<>();
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "account")
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<PersistentToken> persistentTokens = new HashSet<>();
 
     public Long getId() {

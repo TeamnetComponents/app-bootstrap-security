@@ -15,6 +15,8 @@ import org.thymeleaf.spring4.context.SpringWebContext;
 import ro.teamnet.bootstrap.domain.Account;
 import ro.teamnet.bootstrap.domain.PersistentToken;
 import ro.teamnet.bootstrap.domain.Role;
+import ro.teamnet.bootstrap.extend.AppPage;
+import ro.teamnet.bootstrap.extend.AppPageable;
 import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
 import ro.teamnet.bootstrap.security.util.SecurityUtils;
 import ro.teamnet.bootstrap.service.AccountService;
@@ -126,6 +128,17 @@ public class AccountResource extends ro.teamnet.bootstrap.web.rest.AbstractResou
         }
 
         return new ResponseEntity<>(account, HttpStatus.OK);
+    }
+
+    /**
+     * GET  /rest/account -> get the current user.
+     */
+    @RequestMapping(value = "/rest/accounts",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public AppPage<Account> getAccounts(AppPageable appPageable) {
+        return accountService.findAll(appPageable);
     }
 
     /**

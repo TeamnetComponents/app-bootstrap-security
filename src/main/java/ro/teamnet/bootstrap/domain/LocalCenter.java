@@ -13,7 +13,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "T_LOCAL_CENTER")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class LocalCenter {
 
     @Id

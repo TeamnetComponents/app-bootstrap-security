@@ -19,7 +19,7 @@ import java.util.Collection;
 
 @Entity
 @Table(name = "T_MODULE")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Module implements Serializable{
 
     @Id
