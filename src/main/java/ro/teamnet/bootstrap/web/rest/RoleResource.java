@@ -43,11 +43,11 @@ public class RoleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> create(@RequestBody Role role, HttpServletRequest request,
+    public ResponseEntity<Role> create(@RequestBody Role role, HttpServletRequest request,
                                     HttpServletResponse response){
         log.debug("REST request to save Role : {}", role);
-        roleService.save(role);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        Role roleDb = roleService.save(role);
+        return new ResponseEntity<>(roleDb, HttpStatus.CREATED);
     }
 
     /**
