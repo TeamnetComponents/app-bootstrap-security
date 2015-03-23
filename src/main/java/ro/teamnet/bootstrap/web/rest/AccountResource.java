@@ -142,18 +142,21 @@ public class AccountResource extends ro.teamnet.bootstrap.web.rest.AbstractResou
     }
 
     /**
-     * POST  /rest/account -> update the current user information.
+     * POST  /rest/account -> update the user information.
      */
     @RequestMapping(value = "/rest/account",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> save(@RequestBody AccountDTO userDTO) {
-        Account accountHavingThisEmail = accountService.findOneByEmail(userDTO.getEmail());
-        if (accountHavingThisEmail != null && !accountHavingThisEmail.getLogin().equals(SecurityUtils.getCurrentLogin())) {
-            return new ResponseEntity<>("e-mail address already in use", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> save(@RequestBody Account user) {
+        Account account = accountService.findOne(user.getId());
+        if(!account.getEmail().equals(user.getEmail())){
+            Account accountHavingThisEmail = accountService.findOneByEmail(user.getEmail());
+            if (accountHavingThisEmail != null && !accountHavingThisEmail.getLogin().equals(SecurityUtils.getCurrentLogin())) {
+                return new ResponseEntity<>("e-mail address already in use", HttpStatus.BAD_REQUEST);
+            }
         }
-        accountService.updateUserInformation(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail());
+        accountService.save(user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
