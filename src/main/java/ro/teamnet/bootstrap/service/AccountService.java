@@ -14,6 +14,8 @@ public interface AccountService extends AbstractService<Account,Long>{
 
     public void updateUserInformation(String firstName, String lastName, String email);
 
+    public void updateUser(Account account);
+
     public void changePassword(String password);
 
     public AccountDTO getUserWithAuthorities();

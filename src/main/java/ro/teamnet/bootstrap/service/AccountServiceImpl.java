@@ -127,6 +127,22 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     }
 
     /**
+     * This method updates an Account with the input parameters.
+     * @param account
+     */
+    @Override
+    public void updateUser(Account account) {
+        Account accountDb = accountRepository.findByLogin(account.getLogin());
+        accountDb.setFirstName(account.getFirstName());
+        accountDb.setLastName(account.getLastName());
+        accountDb.setEmail(account.getEmail());
+        accountDb.setRoles(account.getRoles());
+        accountDb.setModuleRights(account.getModuleRights());
+        accountRepository.save(accountDb);
+        log.debug("Changed Information for User: {}", accountDb);
+    }
+
+    /**
      * This method updates an Account password with the one given as a parameter.
      * @param password
      */

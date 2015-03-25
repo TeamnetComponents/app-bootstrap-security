@@ -2,6 +2,8 @@ package ro.teamnet.bootstrap.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -142,21 +144,37 @@ public class AccountResource extends ro.teamnet.bootstrap.web.rest.AbstractResou
     }
 
     /**
-     * POST  /rest/account -> update the user information.
+    * POST  /rest/account -> update the current user information.
      */
     @RequestMapping(value = "/rest/account",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> save(@RequestBody Account user) {
+    public ResponseEntity<?> save(@RequestBody AccountDTO userDTO) {
+        Account accountHavingThisEmail = accountService.findOneByEmail(userDTO.getEmail());
+        if (accountHavingThisEmail != null && !accountHavingThisEmail.getLogin().equals(SecurityUtils.getCurrentLogin())) {
+            return new ResponseEntity<>("e-mail address already in use", HttpStatus.BAD_REQUEST);
+        }
+        accountService.updateUserInformation(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * POST  /rest/account -> update the user information.
+     */
+    @RequestMapping(value = "/rest/account/update",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> update(@RequestBody Account user) {
         Account account = accountService.findOne(user.getId());
         if(!account.getEmail().equals(user.getEmail())){
             Account accountHavingThisEmail = accountService.findOneByEmail(user.getEmail());
             if (accountHavingThisEmail != null && !accountHavingThisEmail.getLogin().equals(SecurityUtils.getCurrentLogin())) {
-                return new ResponseEntity<>("e-mail address already in use", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("{\"errMsg\":\"e-mail address already in use\"}", HttpStatus.BAD_REQUEST);
             }
         }
-        accountService.save(user);
+        accountService.updateUser(user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
