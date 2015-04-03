@@ -70,7 +70,8 @@ public class SecurityAccessFilter implements Filter {
                     + "/#/login";
             httpResponse.setHeader("Location", url);
             return;
-        } else if (httpRequest.getRequestURI().split("/")[1].equals("rest")
+        } else if (httpRequest.getRequestURI().split("/").length >0
+                && httpRequest.getRequestURI().split("/")[1].equals("rest")
                 ) {
 
             //verifying that the principal has permission to the resource
