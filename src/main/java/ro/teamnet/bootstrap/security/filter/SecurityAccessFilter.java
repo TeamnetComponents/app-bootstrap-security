@@ -54,6 +54,19 @@ public class SecurityAccessFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
         logger.debug("Authorising request for protected resource: " + httpRequest.getRequestURI());
+        String verifPath=httpRequest.getRequestURI().replace(httpRequest.getContextPath(),"");
+        if(     verifPath.isEmpty()||
+                verifPath.equals("/")||
+                verifPath.endsWith(".js")||
+                verifPath.endsWith(".css")||
+                verifPath.endsWith(".jpg")||
+                verifPath.endsWith(".jpeg")||
+                verifPath.endsWith(".gif")||
+                verifPath.endsWith(".png")||
+                verifPath.endsWith(".html")
+        ){
+            filterChain.doFilter(servletRequest, servletResponse);
+        }
 
         //get the userPrincipal
         String userName = httpRequest.getUserPrincipal() != null ? httpRequest.getUserPrincipal().getName() : "";
