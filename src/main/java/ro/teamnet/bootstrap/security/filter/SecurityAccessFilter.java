@@ -12,7 +12,6 @@ import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,55 +48,43 @@ public class SecurityAccessFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-
-        HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
-        HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
-
-        logger.debug("Authorising request for protected resource: " + httpRequest.getRequestURI());
-        String verifPath=httpRequest.getRequestURI().replace(httpRequest.getContextPath(),"");
-        if(     verifPath.isEmpty()||
-                verifPath.equals("/")||
-                verifPath.endsWith(".js")||
-                verifPath.endsWith(".css")||
-                verifPath.endsWith(".jpg")||
-                verifPath.endsWith(".jpeg")||
-                verifPath.endsWith(".gif")||
-                verifPath.endsWith(".png")||
-                verifPath.endsWith(".html")
-        ){
-            filterChain.doFilter(servletRequest, servletResponse);
-        }
-
-        //get the userPrincipal
-        String userName = httpRequest.getUserPrincipal() != null ? httpRequest.getUserPrincipal().getName() : "";
-
-        /*
-             For all entity access and menu access the default request mapping will be /rest/entityName or /rest/menuName;
-             Only for these request mappings will the filter verify authorized access;
-             If not authenticated then return unauthorised
-        */
-        if (userName == null || userName.equals("")) {
-            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            String url = "http://" + httpRequest.getServerName()
-                    + ":" + httpRequest.getServerPort()
-                    + "/#/login";
-            httpResponse.setHeader("Location", url);
-            return;
-        } else if (httpRequest.getRequestURI().split("/").length >0
-                && httpRequest.getRequestURI().split("/")[1].equals("rest")
-                ) {
-
-            //verifying that the principal has permission to the resource
-            Boolean access = verifyPermissionAccess(httpRequest);
-            if (!access) {
-                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
-                return;
-            }
-
-        }
-
-        // continue with the next filter in the chain
         filterChain.doFilter(servletRequest, servletResponse);
+
+//        HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
+//        HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
+//
+//        logger.debug("Authorising request for protected resource: " + httpRequest.getRequestURI());
+//
+//        //get the userPrincipal
+//        String userName = httpRequest.getUserPrincipal() != null ? httpRequest.getUserPrincipal().getName() : "";
+//
+//        /*
+//             For all entity access and menu access the default request mapping will be /rest/entityName or /rest/menuName;
+//             Only for these request mappings will the filter verify authorized access;
+//             If not authenticated then return unauthorised
+//        */
+//        if (userName == null || userName.equals("")) {
+//            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+//            String url = "http://" + httpRequest.getServerName()
+//                    + ":" + httpRequest.getServerPort()
+//                    + "/#/login";
+//            httpResponse.setHeader("Location", url);
+//            return;
+//        } else if (httpRequest.getRequestURI().split("/").length >0
+//                && httpRequest.getRequestURI().split("/")[1].equals("rest")
+//                ) {
+//
+//            //verifying that the principal has permission to the resource
+//            Boolean access = verifyPermissionAccess(httpRequest);
+//            if (!access) {
+//                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+//                return;
+//            }
+//
+//        }
+//
+//        // continue with the next filter in the chain
+//        filterChain.doFilter(servletRequest, servletResponse);
     }
 
     @Override
