@@ -39,7 +39,7 @@ public class ModuleResource extends ro.teamnet.bootstrap.web.rest.AbstractResour
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> update(@PathVariable Long id,@RequestBody ModuleDTO moduleDTO) {
+    public ResponseEntity<?> updateById(@PathVariable Long id,@RequestBody ModuleDTO moduleDTO) {
         log.debug("REST request to update the module : {}", id);
 
         moduleService.update(id, moduleDTO);

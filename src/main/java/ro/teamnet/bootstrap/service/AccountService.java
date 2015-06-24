@@ -14,7 +14,7 @@ public interface AccountService extends AbstractService<Account,Long>{
 
     public void updateUserInformation(String firstName, String lastName, String email);
 
-    public void updateUser(Account account);
+    public Account updateUser(Account account);
 
     public void changePassword(String password);
 
@@ -29,4 +29,6 @@ public interface AccountService extends AbstractService<Account,Long>{
     Account findOneByEmail(String email);
 
     Account findByLogin(String currentLogin);
+
+    boolean addRoleToAccount(Role role, Long accountId);
 }

@@ -131,15 +131,14 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
      * @param account
      */
     @Override
-    public void updateUser(Account account) {
+    public Account updateUser(Account account) {
         Account accountDb = accountRepository.findByLogin(account.getLogin());
         accountDb.setFirstName(account.getFirstName());
         accountDb.setLastName(account.getLastName());
         accountDb.setEmail(account.getEmail());
         accountDb.setRoles(account.getRoles());
         accountDb.setModuleRights(account.getModuleRights());
-        accountRepository.save(accountDb);
-        log.debug("Changed Information for User: {}", accountDb);
+        return accountRepository.save(accountDb);
     }
 
     /**
@@ -215,10 +214,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     public boolean addRole(Role role){
         Account currentAccount = accountRepository.findByLogin(SecurityUtils.getCurrentLogin());
         currentAccount.getRoles().add(role);
-        if( accountRepository.save(currentAccount) != null){
-            return true;
-        }
-        return false;
+        return accountRepository.save(currentAccount) != null;
     }
 
     @Override
@@ -229,6 +225,13 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     @Override
     public Account findByLogin(String currentLogin) {
         return accountRepository.findByLogin(currentLogin);
+    }
+
+    @Override
+    public boolean addRoleToAccount(Role role, Long accountId) {
+        Account account=findOne(accountId);
+        account.getRoles().add(role);
+        return accountRepository.save(account) != null;
     }
 
 }
