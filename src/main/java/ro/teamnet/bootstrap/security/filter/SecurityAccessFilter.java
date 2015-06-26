@@ -62,9 +62,6 @@ public class SecurityAccessFilter implements Filter {
 
 
         logger.debug("Authorising request for protected resource: " + httpRequest.getRequestURI());
-        String[] urlPaths = httpRequest.getRequestURI().split("/");
-        String resource = findResourceFromUrls(urlPaths);
-
 
         //get the userPrincipal
         String userName = httpRequest.getUserPrincipal() != null ? httpRequest.getUserPrincipal().getName() : EMPTY;
