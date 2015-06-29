@@ -69,7 +69,7 @@ public class CustomPersistentRememberMeServices extends
     @Inject
     private PersistentTokenRepository persistentTokenRepository;
 
-   @Inject
+    @Inject
     private AccountRepository accountRepository;
 
 

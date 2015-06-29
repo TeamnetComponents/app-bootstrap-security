@@ -5,8 +5,8 @@ import java.util.Map;
 
 @SuppressWarnings("SuspiciousMethodCalls")
 public class SessionHolder {
-    public Map<String,Object> content=new HashMap<>();
 
+    public Map<String,Object> content=new HashMap<>();
 
     public Object get(Object key) {
         return content.get(key);

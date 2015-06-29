@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -56,15 +57,12 @@ public class SecurityAccessFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-
+        Date dataStart=new Date();
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
 
         logger.debug("Authorising request for protected resource: " + httpRequest.getRequestURI());
-        String[] urlPaths = httpRequest.getRequestURI().split("/");
-        String resource = findResourceFromUrls(urlPaths);
-
 
         //get the userPrincipal
         String userName = httpRequest.getUserPrincipal() != null ? httpRequest.getUserPrincipal().getName() : EMPTY;
@@ -93,12 +91,15 @@ public class SecurityAccessFilter implements Filter {
             //verifying that the principal has permission to the resource
             Boolean access = verifyPermissionAccess(httpRequest);
             if (!access) {
+                Date dateEnd=new Date();
+                logger.debug(" Accessing resource "+httpRequest.getRequestURI()+" ("+(dateEnd.getTime()-dataStart.getTime())+"ms)");
                 httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
                 return;
             }
 
         }
-
+        Date dateEnd=new Date();
+        logger.debug(" Accessing resource "+httpRequest.getRequestURI()+" ("+(dateEnd.getTime()-dataStart.getTime())+"ms)");
         // continue with the next filter in the chain
         filterChain.doFilter(servletRequest, servletResponse);
     }
@@ -141,10 +142,14 @@ public class SecurityAccessFilter implements Filter {
                 Boolean accessToResource;
                 permission = authority;
                 hasPermission = ModuleRightTypeEnum.getCodeByValue(permission.getRight()).equals(accessType);
-                String moduleCodeToPlural=permission.getModule().getCode().toLowerCase()+"s";
+
+                String moduleCode=permission.getModule().getCode().toLowerCase();
+                String moduleCodeToPlural=moduleCode+"s";
+                String resourceToPlural=resource+"s";
                 accessToResource = hasPermission && (
-                        permission.getModule().getCode().toLowerCase().equals(resource) ||
-                                moduleCodeToPlural.toLowerCase().equals(resource)
+                        moduleCode.equals(resource) ||
+                                moduleCodeToPlural.equals(resource)||
+                                moduleCode.equals(resourceToPlural)
                 );
                 if (accessToResource) {
                     return true;
