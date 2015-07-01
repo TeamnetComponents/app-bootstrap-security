@@ -4,7 +4,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import ro.teamnet.bootstrap.constants.AuthoritiesConstants;
 
 import java.util.Collection;
 
@@ -22,7 +24,7 @@ public final class SecurityUtils {
     public static String getCurrentLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
-        UserDetails springSecurityUser = null;
+        UserDetails springSecurityUser;
         String userName = null;
 
         if(authentication != null) {
@@ -37,6 +39,20 @@ public final class SecurityUtils {
         return userName;
     }
 
+    public static User getAuthenticatedUser(){
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+        User springSecurityUser = null;
+        if(authentication != null&&authentication.getPrincipal() instanceof User) {
+            springSecurityUser = (User) authentication.getPrincipal();
+        }
+        return springSecurityUser;
+    }
+
+
+
+
+
     /**
      * Check if a user is authenticated.
      *
@@ -48,9 +64,15 @@ public final class SecurityUtils {
         final Collection<? extends GrantedAuthority> authorities = securityContext.getAuthentication().getAuthorities();
 
         if (authorities != null) {
-             return true;
+            for (GrantedAuthority authority : authorities) {
+                if (authority.getAuthority().equals(AuthoritiesConstants.ANONYMOUS)) {
+                    return false;
+                }
+            }
         }
 
-        return false;
+        return true;
     }
+
+
 }

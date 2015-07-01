@@ -21,6 +21,10 @@ public interface AccountRepository extends AppRepository<Account, Long> {
 
     public Account findOneByEmail(String email);
 
+    @Query("select u from Account u join fetch u.roles r join fetch u.moduleRights join fetch r.moduleRights where u.login=?1")
+    public Account findAllByLogin(String login);
+
+
     public Account findByLogin(String login);
 
 }

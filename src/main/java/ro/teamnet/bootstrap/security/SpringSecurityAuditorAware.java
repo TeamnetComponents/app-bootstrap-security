@@ -2,6 +2,7 @@ package ro.teamnet.bootstrap.security;
 
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
+import ro.teamnet.bootstrap.security.util.SecurityUtils;
 
 /**
  * Implementation of AuditorAware based on Spring Security.

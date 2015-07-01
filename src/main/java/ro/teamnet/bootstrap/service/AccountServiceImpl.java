@@ -6,13 +6,14 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.domain.Account;
 import ro.teamnet.bootstrap.domain.PersistentToken;
 import ro.teamnet.bootstrap.domain.Role;
-import ro.teamnet.bootstrap.extend.AppRepository;
 import ro.teamnet.bootstrap.repository.AccountRepository;
 import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
 import ro.teamnet.bootstrap.repository.RoleRepository;
@@ -21,6 +22,7 @@ import ro.teamnet.bootstrap.service.util.RandomUtil;
 import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -118,7 +120,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
      */
     @Override
     public void updateUserInformation(String firstName, String lastName, String email) {
-        Account currentAccount = accountRepository.findByLogin(SecurityUtils.getCurrentLogin());
+        Account currentAccount = accountRepository.findAllByLogin(SecurityUtils.getCurrentLogin());
         currentAccount.setFirstName(firstName);
         currentAccount.setLastName(lastName);
         currentAccount.setEmail(email);
@@ -132,7 +134,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
      */
     @Override
     public Account updateUser(Account account) {
-        Account accountDb = accountRepository.findByLogin(account.getLogin());
+        Account accountDb = accountRepository.findAllByLogin(account.getLogin());
         accountDb.setFirstName(account.getFirstName());
         accountDb.setLastName(account.getLastName());
         accountDb.setEmail(account.getEmail());
@@ -147,7 +149,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
      */
     @Override
     public void changePassword(String password) {
-        Account currentAccount = accountRepository.findByLogin(SecurityUtils.getCurrentLogin());
+        Account currentAccount = accountRepository.findAllByLogin(SecurityUtils.getCurrentLogin());
         String encryptedPassword = passwordEncoder.encode(password);
         currentAccount.setPassword(encryptedPassword);
         accountRepository.save(currentAccount);
@@ -161,9 +163,29 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     @Override
     @Transactional(readOnly = true)
     public AccountDTO getUserWithAuthorities() {
-        Account currentAccount = accountRepository.findByLogin(SecurityUtils.getCurrentLogin());
-        currentAccount.getAuthorities().size(); // eagerly load the association
-        return new AccountDTO(currentAccount);
+
+        User userDetails=SecurityUtils.getAuthenticatedUser();
+        Account account;
+        String login=SecurityUtils.getCurrentLogin();
+        Collection<GrantedAuthority> grantedAuthorities;
+        if(userDetails!=null){
+            account=accountRepository.findByLogin(login);
+            grantedAuthorities=SecurityUtils.getAuthenticatedUser().getAuthorities();
+        }else{
+            grantedAuthorities=new HashSet<>();
+            account=accountRepository.findAllByLogin(login);
+            if(account!=null){
+                grantedAuthorities.addAll(account.getModuleRights());
+                for (Role role : account.getRoles()) {
+                    grantedAuthorities.addAll(role.getModuleRights());
+                }
+                grantedAuthorities.addAll(account.getModuleRights());
+            }
+        }
+
+
+//        currentAccount.getAuthorities().size(); // eagerly load the association
+        return new AccountDTO(account,grantedAuthorities);
     }
 
     /**
@@ -212,7 +234,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
      */
     @Override
     public boolean addRole(Role role){
-        Account currentAccount = accountRepository.findByLogin(SecurityUtils.getCurrentLogin());
+        Account currentAccount = accountRepository.findAllByLogin(SecurityUtils.getCurrentLogin());
         currentAccount.getRoles().add(role);
         return accountRepository.save(currentAccount) != null;
     }
@@ -224,7 +246,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
 
     @Override
     public Account findByLogin(String currentLogin) {
-        return accountRepository.findByLogin(currentLogin);
+        return accountRepository.findAllByLogin(currentLogin);
     }
 
     @Override

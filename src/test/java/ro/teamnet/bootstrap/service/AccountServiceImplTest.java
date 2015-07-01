@@ -139,7 +139,7 @@ public class AccountServiceImplTest {
         roles.add(role);
         newAccount.setRoles(roles);
 
-        when(accountRepository.findByLogin(anyString())).thenReturn(newAccount);
+        when(accountRepository.findAllByLogin(anyString())).thenReturn(newAccount);
         service.updateUserInformation("newFirstName", "newLastName", "newEmail@email.com");
         verify(accountRepository, times(1)).save(newAccount);
     }
@@ -171,7 +171,7 @@ public class AccountServiceImplTest {
         roles.add(role);
         newAccount.setRoles(roles);
 
-        when(accountRepository.findByLogin(anyString())).thenReturn(newAccount);
+        when(accountRepository.findAllByLogin(anyString())).thenReturn(newAccount);
         when(passwordEncoder.encode("newPassword")).thenReturn("newEncryptedPassword");
         service.changePassword("newPassword");
         verify(accountRepository, times(1)).save(newAccount);
@@ -233,7 +233,7 @@ public class AccountServiceImplTest {
         newRole.setId(2l);
         newRole.setCode("ROLE_USER");
 
-        when(accountRepository.findByLogin(anyString())).thenReturn(newAccount);
+        when(accountRepository.findAllByLogin(anyString())).thenReturn(newAccount);
         service.addRole(newRole);
         verify(accountRepository, times(1)).save(newAccount);
 
