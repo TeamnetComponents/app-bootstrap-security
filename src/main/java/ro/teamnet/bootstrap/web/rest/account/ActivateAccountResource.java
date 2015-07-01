@@ -31,12 +31,12 @@ public class ActivateAccountResource{
     @RequestMapping(value = "/activate",method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<String> activate(@RequestParam(value = "key") String key) {
+    public ResponseEntity<Account> activate(@RequestParam(value = "key") String key) {
         Account account = accountService.activateRegistration(key);
         if (account == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(account.getLogin(), HttpStatus.OK);
+        return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
 }

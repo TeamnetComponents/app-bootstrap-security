@@ -128,7 +128,7 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
 
 
         if(moduleDTO.getId()!=null){
-
+            Collection<ModuleRight> removeModulesRights=new HashSet<>();
             Collection<ModuleRight> persistentModuleRight=new HashSet<>();
             Collection<ModuleRight> moduleRightList=moduleDb.getModuleRights();
             for (ModuleRight moduleRight : moduleRightList) {
@@ -138,9 +138,11 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
                 }
 
                 if(!found){
-                    moduleRight.setModule(null);
-//                  moduleRightRepository.save(moduleRight);
 
+                    removeModulesRights.add(moduleRight);
+                    moduleRightRepository.delete(moduleRight);
+                    //moduleRight.setModule(null);
+//                  moduleRightRepository.save(moduleRight);
                 }
             }
             for(ModuleRightDTO moduleRight:moduleDTO.getModuleRights()){
@@ -157,6 +159,7 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
                     persistentModuleRight.add(moduleRightDb);
                 }
             }
+            moduleDb.getModuleRights().removeAll(removeModulesRights);
             moduleDb.getModuleRights().addAll(persistentModuleRight);
             moduleRepository.save(moduleDb);
 
