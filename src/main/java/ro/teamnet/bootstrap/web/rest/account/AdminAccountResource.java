@@ -2,6 +2,7 @@ package ro.teamnet.bootstrap.web.rest.account;
 
 
 import com.codahale.metrics.annotation.Timed;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,12 +13,14 @@ import ro.teamnet.bootstrap.domain.Role;
 import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
 import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
+import ro.teamnet.bootstrap.security.util.SecurityUtils;
 import ro.teamnet.bootstrap.service.AccountService;
 import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 
 @RestController
@@ -53,7 +56,15 @@ public class AdminAccountResource extends AccountBaseResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public Account update(@RequestBody Account user) {
-        return updateAccount(user);
+        Account account = getService().findOne(user.getId());
+        if(!account.getEmail().equals(user.getEmail())){
+            Account accountHavingThisEmail = getService().findOneByEmail(user.getEmail());
+            if (accountHavingThisEmail != null && !accountHavingThisEmail.getLogin().equals(SecurityUtils.getCurrentLogin())) {
+                return accountHavingThisEmail;
+            }
+        }
+
+        return getService().updateUser(user);
     }
 
 
@@ -67,9 +78,14 @@ public class AdminAccountResource extends AccountBaseResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<List<PersistentToken>> getCurrentSessions() {
-        return getListResponseEntity();
+        Account account = getService().findByLogin(SecurityUtils.getCurrentLogin());
+        if (account == null) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(
+                persistentTokenRepository.findByAccount(account),
+                HttpStatus.OK);
     }
-
 
     /**
      * DELETE  /rest/account/sessions?series={series} -> invalidate an existing session.
@@ -90,9 +106,15 @@ public class AdminAccountResource extends AccountBaseResource {
             method = RequestMethod.DELETE)
     @Timed
     public void invalidateSession(@PathVariable String series) throws UnsupportedEncodingException {
-        deleteSession(series);
+        String decodedSeries = URLDecoder.decode(series, "UTF-8");
+        Account account = getService().findByLogin(SecurityUtils.getCurrentLogin());
+        List<PersistentToken> persistentTokens = persistentTokenRepository.findByAccount(account);
+        for (PersistentToken persistentToken : persistentTokens) {
+            if (StringUtils.equals(persistentToken.getSeries(), decodedSeries)) {
+                persistentTokenRepository.delete(decodedSeries);
+            }
+        }
     }
-
 
     /**
      * GET  /rest/users/:login -> get the "login" user.
@@ -117,7 +139,12 @@ public class AdminAccountResource extends AccountBaseResource {
     @RequestMapping(value = "/saveAccount",produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<?> saveAccount(@RequestBody AccountDTO userDTO) {
-        return verifyAndSaveAccount(userDTO);
+        Account accountHavingThisEmail = getService().findOneByEmail(userDTO.getEmail());
+        if (accountHavingThisEmail != null && !accountHavingThisEmail.getLogin().equals(SecurityUtils.getCurrentLogin())) {
+            return new ResponseEntity<>("e-mail address already in use", HttpStatus.BAD_REQUEST);
+        }
+        getService().updateUserInformation(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
