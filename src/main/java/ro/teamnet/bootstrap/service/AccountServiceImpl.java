@@ -1,6 +1,7 @@
 package ro.teamnet.bootstrap.service;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.domain.Account;
 import ro.teamnet.bootstrap.domain.PersistentToken;
 import ro.teamnet.bootstrap.domain.Role;
+import ro.teamnet.bootstrap.domain.util.AccountAndResponseBody;
 import ro.teamnet.bootstrap.repository.AccountRepository;
 import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
 import ro.teamnet.bootstrap.repository.RoleRepository;
@@ -22,10 +24,9 @@ import ro.teamnet.bootstrap.service.util.RandomUtil;
 import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
 
 import javax.inject.Inject;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.*;
 
 /**
  * Service class for managing users.
@@ -35,6 +36,12 @@ import java.util.Set;
 public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implements AccountService {
 
     private final Logger log = LoggerFactory.getLogger(AccountServiceImpl.class);
+
+    private final String EMAIL_ADDRESS_ALREADY_IN_USE = "email address already in use";
+    private final String NEW_EMAIL_ADDRESS = "it's a new email address";
+    private final String LOGIN_ALREADY_IN_USE = "login already in use";
+
+
 
     @Inject
     private PasswordEncoder passwordEncoder;
@@ -255,5 +262,75 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
         account.getRoles().add(role);
         return accountRepository.save(account) != null;
     }
+
+    @Override
+    @Transactional
+    public Account updateAccount(Account user) {
+        Account account = this.findOne(user.getId());
+        if(!account.getEmail().equals(user.getEmail())){
+            Account accountHavingThisEmail = this.findOneByEmail(user.getEmail());
+            if (accountHavingThisEmail != null && !accountHavingThisEmail.getLogin().equals(SecurityUtils.getCurrentLogin())) {
+                return accountHavingThisEmail;
+            }
+        }
+        return this.updateUser(user);
+    }
+
+    @Override
+    @Transactional
+    public List<PersistentToken> retrieveCurrentLogin() {
+        Account account = this.findByLogin(SecurityUtils.getCurrentLogin());
+        if (account == null) {
+            return new ArrayList<>();
+        }
+        return persistentTokenRepository.findByAccount(account);
+    }
+
+    @Override
+    @Transactional
+    public void deleteByDecodedSeries(String series) throws UnsupportedEncodingException {
+        String decodedSeries = URLDecoder.decode(series, "UTF-8");
+        Account account = this.findByLogin(SecurityUtils.getCurrentLogin());
+        List<PersistentToken> persistentTokens = persistentTokenRepository.findByAccount(account);
+        for (PersistentToken persistentToken : persistentTokens) {
+            if (StringUtils.equals(persistentToken.getSeries(), decodedSeries)) {
+                persistentTokenRepository.delete(decodedSeries);
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    public String updateCurrentAccount(AccountDTO userDTO) {
+        Account accountHavingThisEmail = this.findOneByEmail(userDTO.getEmail());
+        if (accountHavingThisEmail != null && !accountHavingThisEmail.getLogin().equals(SecurityUtils.getCurrentLogin())) {
+            return EMAIL_ADDRESS_ALREADY_IN_USE;
+        }
+        this.updateUserInformation(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail());
+        return NEW_EMAIL_ADDRESS;
+    }
+
+    @Override
+    @Transactional
+    public AccountAndResponseBody createAccount(AccountDTO accountDTO) {
+
+        Account account = this.findOne(accountDTO.getId());
+        AccountAndResponseBody accountAndResponseBody = new AccountAndResponseBody(null,account);
+
+        if (account != null) {
+            accountAndResponseBody.setInfoAboutAccount(LOGIN_ALREADY_IN_USE);
+            return accountAndResponseBody;
+        } else {
+            if (this.findOneByEmail(accountDTO.getEmail()) != null) {
+                accountAndResponseBody.setInfoAboutAccount(EMAIL_ADDRESS_ALREADY_IN_USE);
+                return accountAndResponseBody;
+            }
+            account = this.createUserInformation(accountDTO.getLogin(), accountDTO.getPassword(), accountDTO.getFirstName(),
+                    accountDTO.getLastName(), accountDTO.getEmail().toLowerCase(), accountDTO.getLangKey(), accountDTO.getGender());
+            accountAndResponseBody.setAccount(account);
+            return accountAndResponseBody;
+        }
+    }
+
 
 }

@@ -2,8 +2,13 @@ package ro.teamnet.bootstrap.service;
 
 
 import ro.teamnet.bootstrap.domain.Account;
+import ro.teamnet.bootstrap.domain.PersistentToken;
 import ro.teamnet.bootstrap.domain.Role;
+import ro.teamnet.bootstrap.domain.util.AccountAndResponseBody;
 import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 public interface AccountService extends AbstractService<Account,Long>{
 
@@ -31,4 +36,16 @@ public interface AccountService extends AbstractService<Account,Long>{
     Account findByLogin(String currentLogin);
 
     boolean addRoleToAccount(Role role, Long accountId);
+
+    //~~~~~~~~~~~~~~~~~~~~resolving TODO's from web.rest.account~~~~~~~~~~~~~~~~~~~~~
+    public Account updateAccount(Account user);
+
+    public List<PersistentToken> retrieveCurrentLogin();
+
+    public void deleteByDecodedSeries(String series) throws UnsupportedEncodingException;
+
+    public String updateCurrentAccount(AccountDTO accountDTO);
+
+    public AccountAndResponseBody createAccount(AccountDTO accountDTO);
+
 }

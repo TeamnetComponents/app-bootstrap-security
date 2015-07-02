@@ -1,22 +1,17 @@
 package ro.teamnet.bootstrap.service;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.domain.Role;
-import ro.teamnet.bootstrap.extend.AppPage;
-import ro.teamnet.bootstrap.extend.AppPageable;
-import ro.teamnet.bootstrap.extend.AppRepository;
 import ro.teamnet.bootstrap.repository.ModuleRepository;
 import ro.teamnet.bootstrap.repository.RoleRepository;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleRightDTO;
 import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
 
 import javax.inject.Inject;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +21,7 @@ import java.util.List;
 @Service
 @Transactional
 public class RoleServiceImpl extends AbstractServiceImpl<Role,Long> implements RoleService {
+
 
 
     private final RoleRepository roleRepository;
@@ -86,4 +82,13 @@ public class RoleServiceImpl extends AbstractServiceImpl<Role,Long> implements R
         role.setModuleRights(moduleRights);
     }
 
+    @Override
+    public Boolean updateRoleById(Long id, RoleDTO roleDTO) {
+        Role role = this.getOne(id);
+        if (role == null) {
+            return false;
+        }
+        this.update(role, roleDTO);
+        return true;
+    }
 }

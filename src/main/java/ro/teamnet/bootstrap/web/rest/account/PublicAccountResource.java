@@ -13,6 +13,7 @@ import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.context.SpringWebContext;
 import ro.teamnet.bootstrap.domain.Account;
+import ro.teamnet.bootstrap.domain.util.AccountAndResponseBody;
 import ro.teamnet.bootstrap.service.AccountService;
 import ro.teamnet.bootstrap.service.MailService;
 import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
@@ -54,26 +55,22 @@ public class PublicAccountResource{
     /**
      * POST  /rest/register -> register the user.
      *
-     * TODO refactor to execute in a single transaction
+     *
      */
     @RequestMapping(value = "/register",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> registerAccount(@Valid @RequestBody AccountDTO accountDTO, HttpServletRequest request,
-                                    HttpServletResponse response) {
-        Account account = accountService.findOne(accountDTO.getId());
-        if (account != null) {
-            return new ResponseEntity<>("login already in use", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> registerAccount(@Valid @RequestBody AccountDTO accountDTO,
+                                             HttpServletRequest request,
+                                             HttpServletResponse response) {
+        AccountAndResponseBody accountAndResponseBody = accountService.createAccount(accountDTO);
+        if (accountAndResponseBody.getInfoAboutAccount() != null) {
+            return new ResponseEntity<>(accountAndResponseBody.getInfoAboutAccount(), HttpStatus.BAD_REQUEST);
         } else {
-            if (accountService.findOneByEmail(accountDTO.getEmail()) != null) {
-                return new ResponseEntity<>("e-mail address already in use", HttpStatus.BAD_REQUEST);
-            }
-            account = accountService.createUserInformation(accountDTO.getLogin(), accountDTO.getPassword(), accountDTO.getFirstName(),
-                    accountDTO.getLastName(), accountDTO.getEmail().toLowerCase(), accountDTO.getLangKey(), accountDTO.getGender());
-            final Locale locale = Locale.forLanguageTag(account.getLangKey());
-            String content = createHtmlContentFromTemplate(account, locale, request, response);
-            mailService.sendActivationEmail(account.getEmail(), content, locale);
+            final Locale locale = Locale.forLanguageTag(accountAndResponseBody.getAccount().getLangKey());
+            String content = createHtmlContentFromTemplate(accountAndResponseBody.getAccount(), locale, request, response);
+            mailService.sendActivationEmail(accountAndResponseBody.getAccount().getEmail(), content, locale);
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
     }
