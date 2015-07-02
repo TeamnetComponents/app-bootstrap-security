@@ -48,6 +48,10 @@ public class RoleServiceImpl extends AbstractServiceImpl<Role,Long> implements R
         return roleRepository.getOne(id);
     }
 
+    public Role getOneById(Long id) {
+        return roleRepository.getOneById(id);
+    }
+
 
     @Override
     public Role update(Role role) {

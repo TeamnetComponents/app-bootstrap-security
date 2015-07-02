@@ -16,6 +16,7 @@ import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,4 +55,18 @@ public class RoleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
+    @Override
+    @RequestMapping(value = "/{id}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Role> get(@PathVariable Long id) {
+        log.debug("REST request to get  : {}", id);
+        Role role = roleService.getOneById((Long) id);
+        if (role == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(role, HttpStatus.OK);
+    }
 }
