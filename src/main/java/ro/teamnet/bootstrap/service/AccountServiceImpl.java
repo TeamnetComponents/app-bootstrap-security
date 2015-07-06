@@ -13,12 +13,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.domain.Account;
+import ro.teamnet.bootstrap.domain.ApplicationRole;
 import ro.teamnet.bootstrap.domain.PersistentToken;
-import ro.teamnet.bootstrap.domain.Role;
+import ro.teamnet.bootstrap.domain.RoleBase;
 import ro.teamnet.bootstrap.domain.util.AccountAndResponseBody;
 import ro.teamnet.bootstrap.repository.AccountRepository;
 import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
-import ro.teamnet.bootstrap.repository.RoleRepository;
+import ro.teamnet.bootstrap.repository.ApplicationRoleRepository;
 import ro.teamnet.bootstrap.security.util.SecurityUtils;
 import ro.teamnet.bootstrap.service.util.RandomUtil;
 import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
@@ -52,7 +53,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     private PersistentTokenRepository persistentTokenRepository;
 
     @Inject
-    private RoleRepository roleRepository;
+    private ApplicationRoleRepository applicationRoleRepository;
 
     @Inject
     public AccountServiceImpl(AccountRepository repository) {
@@ -96,8 +97,8 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     public Account createUserInformation(String login, String password, String firstName, String lastName, String email,
                                       String langKey,String gender) {
         Account newAccount = new Account();
-        Role role = roleRepository.findByCode("ROLE_USER");
-        Set<Role> roles = new HashSet<>();
+        ApplicationRole applicationRole = applicationRoleRepository.findByCode("ROLE_USER");
+        Set<RoleBase> applicationRoles = new HashSet<>();
         String encryptedPassword = passwordEncoder.encode(password);
         newAccount.setLogin(login);
         // new Account gets initially a generated password
@@ -111,8 +112,8 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
         newAccount.setActivated(false);
         // new Account gets registration key
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
-        roles.add(role);
-        newAccount.setRoles(roles);
+        applicationRoles.add(applicationRole);
+        newAccount.setRoleBases(applicationRoles);
         accountRepository.save(newAccount);
         log.debug("Created Information for User: {}", newAccount);
         return newAccount;
@@ -145,7 +146,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
         accountDb.setFirstName(account.getFirstName());
         accountDb.setLastName(account.getLastName());
         accountDb.setEmail(account.getEmail());
-        accountDb.setRoles(account.getRoles());
+        accountDb.setRoleBases(account.getRoleBases());
         accountDb.setModuleRights(account.getModuleRights());
         return accountRepository.save(accountDb);
     }
@@ -183,8 +184,8 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
             account=accountRepository.findAllByLogin(login);
             if(account!=null){
                 grantedAuthorities.addAll(account.getModuleRights());
-                for (Role role : account.getRoles()) {
-                    grantedAuthorities.addAll(role.getModuleRights());
+                for (RoleBase applicationRole : account.getRoleBases()) {
+                    grantedAuthorities.addAll(applicationRole.getModuleRights());
                 }
                 grantedAuthorities.addAll(account.getModuleRights());
             }
@@ -236,13 +237,13 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
 
     /**
      * This method adds a new role to the current Account.
-     * @param role
+     * @param applicationRole
      * @return true if the update was successful or false otherwise
      */
     @Override
-    public boolean addRole(Role role){
+    public boolean addRole(ApplicationRole applicationRole){
         Account currentAccount = accountRepository.findAllByLogin(SecurityUtils.getCurrentLogin());
-        currentAccount.getRoles().add(role);
+        currentAccount.getRoleBases().add(applicationRole);
         return accountRepository.save(currentAccount) != null;
     }
 
@@ -257,9 +258,9 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     }
 
     @Override
-    public boolean addRoleToAccount(Role role, Long accountId) {
+    public boolean addRoleToAccount(ApplicationRole applicationRole, Long accountId) {
         Account account=findOne(accountId);
-        account.getRoles().add(role);
+        account.getRoleBases().add(applicationRole);
         return accountRepository.save(account) != null;
     }
 

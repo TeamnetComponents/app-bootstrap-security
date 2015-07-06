@@ -6,8 +6,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import ro.teamnet.bootstrap.domain.ApplicationRole;
 import ro.teamnet.bootstrap.domain.ModuleRight;
-import ro.teamnet.bootstrap.domain.Role;
 import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
 
 import javax.servlet.*;
@@ -131,8 +131,8 @@ public class SecurityAccessFilter implements Filter {
             for (GrantedAuthority grantedAuthority : user.getAuthorities()) {
                 if (grantedAuthority instanceof ModuleRight) {
                     moduleRights.add((ModuleRight) grantedAuthority);
-                } else if (grantedAuthority instanceof Role) {
-                    moduleRights.addAll(((Role) grantedAuthority).getModuleRights());
+                } else if (grantedAuthority instanceof ApplicationRole) {
+                    moduleRights.addAll(((ApplicationRole) grantedAuthority).getModuleRights());
                 }
             }
 

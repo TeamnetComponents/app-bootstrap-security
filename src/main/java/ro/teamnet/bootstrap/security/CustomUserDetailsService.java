@@ -10,7 +10,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.domain.Account;
-import ro.teamnet.bootstrap.domain.Role;
+import ro.teamnet.bootstrap.domain.ApplicationRole;
+import ro.teamnet.bootstrap.domain.RoleBase;
 import ro.teamnet.bootstrap.repository.AccountRepository;
 
 import javax.inject.Inject;
@@ -38,8 +39,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         Set<GrantedAuthority> grantedAuthorities=new HashSet<>();
         if(accountFromDatabase!=null){
             grantedAuthorities.addAll(accountFromDatabase.getModuleRights());
-            for (Role role : accountFromDatabase.getRoles()) {
-                grantedAuthorities.addAll(role.getModuleRights());
+            for (RoleBase applicationRole : accountFromDatabase.getRoleBases()) {
+                grantedAuthorities.addAll(applicationRole.getModuleRights());
             }
             grantedAuthorities.addAll(accountFromDatabase.getModuleRights());
         }

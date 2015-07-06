@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ro.teamnet.bootstrap.domain.Role;
+import ro.teamnet.bootstrap.domain.ApplicationRole;
 import ro.teamnet.bootstrap.service.RoleService;
 import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
 
@@ -19,13 +19,13 @@ import java.util.Set;
  */
 @RestController
 @RequestMapping("/app/rest/role")
-public class RoleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource<Role,Long>{
+public class ApplicationRoleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource<ApplicationRole,Long>{
 
-    private final Logger log = LoggerFactory.getLogger(RoleResource.class);
+    private final Logger log = LoggerFactory.getLogger(ApplicationRoleResource.class);
     private RoleService roleService;
 
     @Inject
-    public RoleResource(RoleService roleService) {
+    public ApplicationRoleResource(RoleService roleService) {
         super(roleService);
         this.roleService=roleService;
     }
@@ -33,7 +33,7 @@ public class RoleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource
     @RequestMapping(value = "/allWithModuleRights", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public Set<Role> getAllWithModuleRights() {
+    public Set<ApplicationRole> getAllWithModuleRights() {
         log.debug("REST request to get all roles fetching module rights olso");
         return roleService.getAllWithModuleRights();
     }
@@ -45,7 +45,7 @@ public class RoleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Role> updateById(@PathVariable Long id,@RequestBody RoleDTO roleDTO) {
+    public ResponseEntity<ApplicationRole> updateById(@PathVariable Long id,@RequestBody RoleDTO roleDTO) {
         log.debug("REST request to update the role : {}", id);
 
 //        Boolean roleFound = roleService.updateRoleById(id, roleDTO);
@@ -54,14 +54,14 @@ public class RoleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource
 //        }
 
 //      we need role with module rights to be returned, for menu administration
-        Role role = roleService.getOneById(id);
-        if(role == null){
+        ApplicationRole applicationRole = roleService.getOneById(id);
+        if(applicationRole == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        roleService.update(role, roleDTO);
+        roleService.update(applicationRole, roleDTO);
 
-        return new ResponseEntity<>(role, HttpStatus.OK);
+        return new ResponseEntity<>(applicationRole, HttpStatus.OK);
     }
 
 
@@ -70,12 +70,12 @@ public class RoleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Role> get(@PathVariable Long id) {
+    public ResponseEntity<ApplicationRole> get(@PathVariable Long id) {
         log.debug("REST request to get  : {}", id);
-        Role role = roleService.getOneById(id);
-        if (role == null) {
+        ApplicationRole applicationRole = roleService.getOneById(id);
+        if (applicationRole == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(role, HttpStatus.OK);
+        return new ResponseEntity<>(applicationRole, HttpStatus.OK);
     }
 }
