@@ -47,19 +47,21 @@ public class RoleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource
     @Timed
     public ResponseEntity<Role> updateById(@PathVariable Long id,@RequestBody RoleDTO roleDTO) {
         log.debug("REST request to update the role : {}", id);
-        Boolean roleFound = roleService.updateRoleById(id, roleDTO);
-        if (roleFound == null) {
+
+//        Boolean roleFound = roleService.updateRoleById(id, roleDTO);
+//        if (roleFound == null) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+
+//      we need role with module rights to be returned, for menu administration
+        Role role = roleService.getOneById(id);
+        if(role == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-//        Role role = roleService.getOneById(id);
-//        if(role == null){
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-//
-//        roleService.update(role, roleDTO);
+        roleService.update(role, roleDTO);
 
-        return new ResponseEntity<Role>(role, HttpStatus.OK);
+        return new ResponseEntity<>(role, HttpStatus.OK);
     }
 
 
