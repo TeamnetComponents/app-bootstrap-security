@@ -101,4 +101,13 @@ public class RoleServiceImpl extends AbstractServiceImpl<Role,Long> implements R
         return roleRepository.getAllWithModuleRights();
     }
 
+    @Override
+    public Boolean updateRoleById(Long id, RoleDTO roleDTO) {
+        Role role = this.getOne(id);
+        if (role == null) {
+            return false;
+        }
+        this.update(role, roleDTO);
+        return true;
+    }
 }
