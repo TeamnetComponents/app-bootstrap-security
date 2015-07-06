@@ -1,6 +1,5 @@
 package ro.teamnet.bootstrap.repository;
 
-import org.springframework.data.jpa.repository.Query;
 import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.extend.AppRepository;

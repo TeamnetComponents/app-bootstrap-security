@@ -1,24 +1,21 @@
 package ro.teamnet.bootstrap.service;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.domain.Role;
-import ro.teamnet.bootstrap.extend.AppPage;
-import ro.teamnet.bootstrap.extend.AppPageable;
-import ro.teamnet.bootstrap.extend.AppRepository;
+import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
 import ro.teamnet.bootstrap.repository.ModuleRepository;
 import ro.teamnet.bootstrap.repository.RoleRepository;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleRightDTO;
 import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
 
 import javax.inject.Inject;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Service class for managing  ModuleRights.
@@ -71,7 +68,7 @@ public class RoleServiceImpl extends AbstractServiceImpl<Role,Long> implements R
     }
 
     @Override
-    public void update(Role role, RoleDTO roleDTO) {
+    public Role update(Role role, RoleDTO roleDTO) {
 
         role.setCode(roleDTO.getCode());
         role.setDescription(roleDTO.getDescription());
@@ -83,11 +80,25 @@ public class RoleServiceImpl extends AbstractServiceImpl<Role,Long> implements R
 
         //update moduleRights for Role
         List<ModuleRight> moduleRights = new ArrayList<>();
-        for(ModuleRightDTO moduleRightDTO : roleDTO.getModuleRights()){
-                moduleRights.add(moduleRightService.findOne(moduleRightDTO.getId()));
+        for(ModuleRightDTO mrDTO : roleDTO.getModuleRights()) {
+            if(mrDTO.getId() != null) {
+                moduleRights.add(moduleRightService.findOne(mrDTO.getId()));
+            } else {
+                Module module = moduleRepository.findOne(mrDTO.getModule().getId());
+                Short right = ModuleRightTypeEnum.READ_ACCESS.getRight();
+
+                moduleRights.addAll(moduleRightService.findByModuleAndRight(module, right));
             }
+        }
 
         role.setModuleRights(moduleRights);
+
+        return roleRepository.save(role);
+    }
+
+    @Override
+    public Set<Role> getAllWithModuleRights() {
+        return roleRepository.getAllWithModuleRights();
     }
 
 }

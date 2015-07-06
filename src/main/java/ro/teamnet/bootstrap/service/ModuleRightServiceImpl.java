@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
 import ro.teamnet.bootstrap.extend.AppPage;
@@ -67,6 +68,11 @@ public class ModuleRightServiceImpl extends AbstractServiceImpl<ModuleRight,Long
             moduleRightCodes.add(pair);
         }
         return moduleRightCodes;
+    }
+
+    @Override
+    public List<ModuleRight> findByModuleAndRight(Module module, Short right) {
+        return moduleRightRepository.findByModuleAndRight(module, right);
     }
 
 }
