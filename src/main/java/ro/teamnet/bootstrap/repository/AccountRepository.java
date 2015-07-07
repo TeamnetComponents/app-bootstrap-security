@@ -21,7 +21,7 @@ public interface AccountRepository extends AppRepository<Account, Long> {
 
     public Account findOneByEmail(String email);
 
-    @Query("select u from Account u join fetch u.roleBases r left join fetch u.moduleRights join fetch r.moduleRights where u.login=?1")
+    @Query("select u from Account u join fetch u.roles r left join fetch u.moduleRights join fetch r.moduleRights where u.login=?1")
     public Account findAllByLogin(String login);
 
 

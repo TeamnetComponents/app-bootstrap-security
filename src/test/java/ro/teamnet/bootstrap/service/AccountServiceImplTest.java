@@ -71,7 +71,7 @@ public class AccountServiceImplTest {
         newAccount.setActivated(false);
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
         applicationRoles.add(applicationRole);
-        newAccount.setRoleBases(applicationRoles);
+        newAccount.setRoles(applicationRoles);
 
         when(applicationRoleRepository.findByCode("ROLE_USER")).thenReturn(applicationRole);
         when(passwordEncoder.encode("password")).thenReturn("encryptedPassword");
@@ -106,7 +106,7 @@ public class AccountServiceImplTest {
         newAccount.setActivated(false);
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
         applicationRoles.add(applicationRole);
-        newAccount.setRoleBases(applicationRoles);
+        newAccount.setRoles(applicationRoles);
 
         when(accountRepository.getUserByActivationKey((String) notNull())).thenReturn(newAccount);
         service.activateRegistration("83862920541057900625");
@@ -138,7 +138,7 @@ public class AccountServiceImplTest {
         newAccount.setActivated(false);
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
         applicationRoles.add(applicationRole);
-        newAccount.setRoleBases(applicationRoles);
+        newAccount.setRoles(applicationRoles);
 
         when(accountRepository.findAllByLogin(anyString())).thenReturn(newAccount);
         service.updateUserInformation("newFirstName", "newLastName", "newEmail@email.com");
@@ -170,7 +170,7 @@ public class AccountServiceImplTest {
         newAccount.setActivated(false);
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
         applicationRoles.add(applicationRole);
-        newAccount.setRoleBases(applicationRoles);
+        newAccount.setRoles(applicationRoles);
 
         when(accountRepository.findAllByLogin(anyString())).thenReturn(newAccount);
         when(passwordEncoder.encode("newPassword")).thenReturn("newEncryptedPassword");
@@ -228,7 +228,7 @@ public class AccountServiceImplTest {
         newAccount.setActivated(false);
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
         applicationRoles.add(applicationRole);
-        newAccount.setRoleBases(applicationRoles);
+        newAccount.setRoles(applicationRoles);
 
         final ApplicationRole newApplicationRole = new ApplicationRole();
         newApplicationRole.setId(2l);

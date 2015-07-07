@@ -113,7 +113,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
         // new Account gets registration key
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
         applicationRoles.add(applicationRole);
-        newAccount.setRoleBases(applicationRoles);
+        newAccount.setRoles(applicationRoles);
         accountRepository.save(newAccount);
         log.debug("Created Information for User: {}", newAccount);
         return newAccount;
@@ -146,7 +146,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
         accountDb.setFirstName(account.getFirstName());
         accountDb.setLastName(account.getLastName());
         accountDb.setEmail(account.getEmail());
-        accountDb.setRoleBases(account.getRoleBases());
+        accountDb.setRoles(account.getRoles());
         accountDb.setModuleRights(account.getModuleRights());
         return accountRepository.save(accountDb);
     }
@@ -184,7 +184,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
             account=accountRepository.findAllByLogin(login);
             if(account!=null){
                 grantedAuthorities.addAll(account.getModuleRights());
-                for (RoleBase applicationRole : account.getRoleBases()) {
+                for (RoleBase applicationRole : account.getRoles()) {
                     grantedAuthorities.addAll(applicationRole.getModuleRights());
                 }
                 grantedAuthorities.addAll(account.getModuleRights());
@@ -243,7 +243,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     @Override
     public boolean addRole(ApplicationRole applicationRole){
         Account currentAccount = accountRepository.findAllByLogin(SecurityUtils.getCurrentLogin());
-        currentAccount.getRoleBases().add(applicationRole);
+        currentAccount.getRoles().add(applicationRole);
         return accountRepository.save(currentAccount) != null;
     }
 
@@ -260,7 +260,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     @Override
     public boolean addRoleToAccount(ApplicationRole applicationRole, Long accountId) {
         Account account=findOne(accountId);
-        account.getRoleBases().add(applicationRole);
+        account.getRoles().add(applicationRole);
         return accountRepository.save(account) != null;
     }
 
