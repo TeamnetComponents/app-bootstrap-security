@@ -2,8 +2,8 @@ package ro.teamnet.bootstrap.service;
 
 
 import ro.teamnet.bootstrap.domain.Account;
+import ro.teamnet.bootstrap.domain.ApplicationRole;
 import ro.teamnet.bootstrap.domain.PersistentToken;
-import ro.teamnet.bootstrap.domain.Role;
 import ro.teamnet.bootstrap.domain.util.AccountAndResponseBody;
 import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
 
@@ -29,13 +29,13 @@ public interface AccountService extends AbstractService<Account,Long>{
 
     public void removeNotActivatedUsers();
 
-    public boolean addRole(Role role);
+    public boolean addRole(ApplicationRole applicationRole);
 
     Account findOneByEmail(String email);
 
     Account findByLogin(String currentLogin);
 
-    boolean addRoleToAccount(Role role, Long accountId);
+    boolean addRoleToAccount(ApplicationRole applicationRole, Long accountId);
 
     //~~~~~~~~~~~~~~~~~~~~resolving TODO's from web.rest.account~~~~~~~~~~~~~~~~~~~~~
     public Account updateAccount(Account user);

@@ -3,12 +3,12 @@ package ro.teamnet.bootstrap.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ro.teamnet.bootstrap.domain.ApplicationRole;
 import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.domain.ModuleRight;
-import ro.teamnet.bootstrap.domain.Role;
 import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
 import ro.teamnet.bootstrap.repository.ModuleRepository;
-import ro.teamnet.bootstrap.repository.RoleRepository;
+import ro.teamnet.bootstrap.repository.ApplicationRoleRepository;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleRightDTO;
 import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
 
@@ -22,37 +22,37 @@ import java.util.Set;
  */
 @Service
 @Transactional
-public class RoleServiceImpl extends AbstractServiceImpl<Role,Long> implements RoleService {
+public class ApplicationRoleServiceImpl extends AbstractServiceImpl<ApplicationRole,Long> implements RoleService {
 
 
-    private final RoleRepository roleRepository;
+    private final ApplicationRoleRepository applicationRoleRepository;
 
     private final ModuleRightService moduleRightService;
 
     private final ModuleRepository moduleRepository;
 
     @Inject
-    public RoleServiceImpl(RoleRepository roleRepository,ModuleRightService moduleRightService,ModuleRepository moduleRepository) {
-        super(roleRepository);
-        this.roleRepository=roleRepository;
+    public ApplicationRoleServiceImpl(ApplicationRoleRepository applicationRoleRepository, ModuleRightService moduleRightService, ModuleRepository moduleRepository) {
+        super(applicationRoleRepository);
+        this.applicationRoleRepository = applicationRoleRepository;
         this.moduleRightService=moduleRightService;
         this.moduleRepository=moduleRepository;
     }
 
 
     @Override
-    public Role getOne(Long id) {
-        return roleRepository.getOne(id);
+    public ApplicationRole getOne(Long id) {
+        return applicationRoleRepository.getOne(id);
     }
 
-    public Role getOneById(Long id) {
-        return roleRepository.getOneById(id);
+    public ApplicationRole getOneById(Long id) {
+        return applicationRoleRepository.getOneById(id);
     }
 
 
     @Override
-    public Role update(Role role) {
-        for(ModuleRight mr: role.getModuleRights()) {
+    public ApplicationRole update(ApplicationRole applicationRole) {
+        for(ModuleRight mr: applicationRole.getModuleRights()) {
             if(mr.getId()==null){
                 Module moduleDb=moduleRepository.findOne(mr.getModule().getId());
                 mr.setModule(null);
@@ -64,19 +64,19 @@ public class RoleServiceImpl extends AbstractServiceImpl<Role,Long> implements R
 
         }
 
-        return roleRepository.save(role);
+        return applicationRoleRepository.save(applicationRole);
     }
 
     @Override
-    public Role update(Role role, RoleDTO roleDTO) {
+    public ApplicationRole update(ApplicationRole applicationRole, RoleDTO roleDTO) {
 
-        role.setCode(roleDTO.getCode());
-        role.setDescription(roleDTO.getDescription());
-        role.setOrder(roleDTO.getOrder());
-        role.setValidFrom(roleDTO.getValidFrom());
-        role.setValidTo(roleDTO.getValidTo());
-        role.setActive(roleDTO.getActive());
-        role.setLocal(roleDTO.getLocal());
+        applicationRole.setCode(roleDTO.getCode());
+        applicationRole.setDescription(roleDTO.getDescription());
+        applicationRole.setOrder(roleDTO.getOrder());
+        applicationRole.setValidFrom(roleDTO.getValidFrom());
+        applicationRole.setValidTo(roleDTO.getValidTo());
+        applicationRole.setActive(roleDTO.getActive());
+        applicationRole.setLocal(roleDTO.getLocal());
 
         //update moduleRights for Role
         List<ModuleRight> moduleRights = new ArrayList<>();
@@ -91,23 +91,23 @@ public class RoleServiceImpl extends AbstractServiceImpl<Role,Long> implements R
             }
         }
 
-        role.setModuleRights(moduleRights);
+        applicationRole.setModuleRights(moduleRights);
 
-        return roleRepository.save(role);
+        return applicationRoleRepository.save(applicationRole);
     }
 
     @Override
-    public Set<Role> getAllWithModuleRights() {
-        return roleRepository.getAllWithModuleRights();
+    public Set<ApplicationRole> getAllWithModuleRights() {
+        return applicationRoleRepository.getAllWithModuleRights();
     }
 
     @Override
     public Boolean updateRoleById(Long id, RoleDTO roleDTO) {
-        Role role = this.getOne(id);
-        if (role == null) {
+        ApplicationRole applicationRole = this.getOne(id);
+        if (applicationRole == null) {
             return false;
         }
-        this.update(role, roleDTO);
+        this.update(applicationRole, roleDTO);
         return true;
     }
 }

@@ -6,9 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ro.teamnet.bootstrap.domain.Account;
-import ro.teamnet.bootstrap.domain.Role;
+import ro.teamnet.bootstrap.domain.ApplicationRole;
+import ro.teamnet.bootstrap.domain.RoleBase;
 import ro.teamnet.bootstrap.repository.AccountRepository;
-import ro.teamnet.bootstrap.repository.RoleRepository;
+import ro.teamnet.bootstrap.repository.ApplicationRoleRepository;
 import ro.teamnet.bootstrap.service.util.RandomUtil;
 
 import java.util.HashSet;
@@ -37,7 +38,7 @@ public class AccountServiceImplTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private RoleRepository roleRepository;
+    private ApplicationRoleRepository applicationRoleRepository;
 
     @Before
     public void init(){
@@ -54,12 +55,12 @@ public class AccountServiceImplTest {
     public void createUserInformationTest(){
 
         final Account newAccount = new Account();
-        final Role role = new Role();
-        role.setId(1l);
-        role.setCode("ROLE_USER");
-        Set<Role> roles = new HashSet<>();
+        final ApplicationRole applicationRole = new ApplicationRole();
+        applicationRole.setId(1l);
+        applicationRole.setCode("ROLE_USER");
+        Set<RoleBase> applicationRoles = new HashSet<>();
 
-        roles.add(role);
+        applicationRoles.add(applicationRole);
         newAccount.setLogin("login");
         newAccount.setPassword("encryptedPassword");
         newAccount.setFirstName("firstName");
@@ -69,10 +70,10 @@ public class AccountServiceImplTest {
         newAccount.setGender("MALE");
         newAccount.setActivated(false);
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
-        roles.add(role);
-        newAccount.setRoles(roles);
+        applicationRoles.add(applicationRole);
+        newAccount.setRoles(applicationRoles);
 
-        when(roleRepository.findByCode("ROLE_USER")).thenReturn(role);
+        when(applicationRoleRepository.findByCode("ROLE_USER")).thenReturn(applicationRole);
         when(passwordEncoder.encode("password")).thenReturn("encryptedPassword");
         service.createUserInformation("login", "password", "firstName", "lastName", "email",
                 "83862920541057900625", "MALE");
@@ -89,12 +90,12 @@ public class AccountServiceImplTest {
     public void activateRegistrationTest() {
 
         final Account newAccount = new Account();
-        final Role role = new Role();
-        role.setId(1l);
-        role.setCode("ROLE_USER");
-        Set<Role> roles = new HashSet<>();
+        final ApplicationRole applicationRole = new ApplicationRole();
+        applicationRole.setId(1l);
+        applicationRole.setCode("ROLE_USER");
+        Set<RoleBase> applicationRoles = new HashSet<>();
 
-        roles.add(role);
+        applicationRoles.add(applicationRole);
         newAccount.setLogin("login");
         newAccount.setPassword("encryptedPassword");
         newAccount.setFirstName("firstName");
@@ -104,8 +105,8 @@ public class AccountServiceImplTest {
         newAccount.setGender("MALE");
         newAccount.setActivated(false);
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
-        roles.add(role);
-        newAccount.setRoles(roles);
+        applicationRoles.add(applicationRole);
+        newAccount.setRoles(applicationRoles);
 
         when(accountRepository.getUserByActivationKey((String) notNull())).thenReturn(newAccount);
         service.activateRegistration("83862920541057900625");
@@ -121,12 +122,12 @@ public class AccountServiceImplTest {
     public void updateUserInformationTest() {
 
         final Account newAccount = new Account();
-        final Role role = new Role();
-        role.setId(1l);
-        role.setCode("ROLE_USER");
-        Set<Role> roles = new HashSet<>();
+        final ApplicationRole applicationRole = new ApplicationRole();
+        applicationRole.setId(1l);
+        applicationRole.setCode("ROLE_USER");
+        Set<RoleBase> applicationRoles = new HashSet<>();
 
-        roles.add(role);
+        applicationRoles.add(applicationRole);
         newAccount.setLogin("login");
         newAccount.setPassword("encryptedPassword");
         newAccount.setFirstName("firstName");
@@ -136,8 +137,8 @@ public class AccountServiceImplTest {
         newAccount.setGender("MALE");
         newAccount.setActivated(false);
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
-        roles.add(role);
-        newAccount.setRoles(roles);
+        applicationRoles.add(applicationRole);
+        newAccount.setRoles(applicationRoles);
 
         when(accountRepository.findAllByLogin(anyString())).thenReturn(newAccount);
         service.updateUserInformation("newFirstName", "newLastName", "newEmail@email.com");
@@ -153,12 +154,12 @@ public class AccountServiceImplTest {
     public void changePasswordTest() {
 
         final Account newAccount = new Account();
-        final Role role = new Role();
-        role.setId(1l);
-        role.setCode("ROLE_USER");
-        Set<Role> roles = new HashSet<>();
+        final ApplicationRole applicationRole = new ApplicationRole();
+        applicationRole.setId(1l);
+        applicationRole.setCode("ROLE_USER");
+        Set<RoleBase> applicationRoles = new HashSet<>();
 
-        roles.add(role);
+        applicationRoles.add(applicationRole);
         newAccount.setLogin("login");
         newAccount.setPassword("encryptedPassword");
         newAccount.setFirstName("firstName");
@@ -168,8 +169,8 @@ public class AccountServiceImplTest {
         newAccount.setGender("MALE");
         newAccount.setActivated(false);
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
-        roles.add(role);
-        newAccount.setRoles(roles);
+        applicationRoles.add(applicationRole);
+        newAccount.setRoles(applicationRoles);
 
         when(accountRepository.findAllByLogin(anyString())).thenReturn(newAccount);
         when(passwordEncoder.encode("newPassword")).thenReturn("newEncryptedPassword");
@@ -203,7 +204,7 @@ public class AccountServiceImplTest {
     }
 
     /**
-     * Method: {@link AccountServiceImpl#addRole(ro.teamnet.bootstrap.domain.Role)} .
+     * Method: {@link AccountServiceImpl#addRole(ro.teamnet.bootstrap.domain.ApplicationRole)} .
      * When: Role is added to an Account
      * Then:
      */
@@ -211,12 +212,12 @@ public class AccountServiceImplTest {
     public void addRoleTest() {
 
         final Account newAccount = new Account();
-        final Role role = new Role();
-        role.setId(1l);
-        role.setCode("ROLE_USER");
-        Set<Role> roles = new HashSet<>();
+        final ApplicationRole applicationRole = new ApplicationRole();
+        applicationRole.setId(1l);
+        applicationRole.setCode("ROLE_USER");
+        Set<RoleBase> applicationRoles = new HashSet<>();
 
-        roles.add(role);
+        applicationRoles.add(applicationRole);
         newAccount.setLogin("login");
         newAccount.setPassword("encryptedPassword");
         newAccount.setFirstName("firstName");
@@ -226,15 +227,15 @@ public class AccountServiceImplTest {
         newAccount.setGender("MALE");
         newAccount.setActivated(false);
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
-        roles.add(role);
-        newAccount.setRoles(roles);
+        applicationRoles.add(applicationRole);
+        newAccount.setRoles(applicationRoles);
 
-        final Role newRole = new Role();
-        newRole.setId(2l);
-        newRole.setCode("ROLE_USER");
+        final ApplicationRole newApplicationRole = new ApplicationRole();
+        newApplicationRole.setId(2l);
+        newApplicationRole.setCode("ROLE_USER");
 
         when(accountRepository.findAllByLogin(anyString())).thenReturn(newAccount);
-        service.addRole(newRole);
+        service.addRole(newApplicationRole);
         verify(accountRepository, times(1)).save(newAccount);
 
     }

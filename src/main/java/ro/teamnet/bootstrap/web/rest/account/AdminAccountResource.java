@@ -7,8 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ro.teamnet.bootstrap.domain.Account;
+import ro.teamnet.bootstrap.domain.ApplicationRole;
 import ro.teamnet.bootstrap.domain.PersistentToken;
-import ro.teamnet.bootstrap.domain.Role;
 import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
 import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
@@ -133,14 +133,14 @@ public class AdminAccountResource extends AccountBaseResource {
 
     /**
      * Associate roles to an already register account
-     * @param role - Role to be associated with the specified account
+     * @param applicationRole - Role to be associated with the specified account
      * @return - operation status
      */
     @RequestMapping(value = "/addRoleToAccount/{accountId}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> addRoleToAccount(@RequestBody Role role,@PathVariable Long accountId){
-        if(getService().addRoleToAccount(role,accountId)){
+    public ResponseEntity<String> addRoleToAccount(@RequestBody ApplicationRole applicationRole,@PathVariable Long accountId){
+        if(getService().addRoleToAccount(applicationRole,accountId)){
             return new ResponseEntity<>("Role added successfully",HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Role could not be added",HttpStatus.BAD_REQUEST);
