@@ -28,7 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Inject
     @Qualifier("userDetailsPluginRegistry")
-    private PluginRegistry<UserDetailsPlugin,SecurityType> userDetailsPluginRegistry;
+    private PluginRegistry<UserDetailsPlugin, SecurityType> userDetailsPluginRegistry;
 
     @Override
     @Transactional(readOnly = true)
@@ -36,26 +36,25 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.debug("Authenticating {}", login);
         String lowercaseLogin = login.toLowerCase();
 
-        UserDetails ret=new DefaultUserDetails(lowercaseLogin);
+        UserDetails userDetails = new DefaultUserDetails(lowercaseLogin);
 
 
         List<UserDetailsPlugin> defaultUserDetailsPlugins =
                 userDetailsPluginRegistry.getPluginsFor(SecurityType.USER_DETAILS_DEFAULT);
 
 
-
-        List<UserDetailsPlugin> userDetailsPlugins =userDetailsPluginRegistry
+        List<UserDetailsPlugin> userDetailsPlugins = userDetailsPluginRegistry
                 .getPluginsFor(SecurityType.USER_DETAILS, defaultUserDetailsPlugins);
 
 
-        if(userDetailsPlugins !=null){
+        if (userDetailsPlugins != null) {
             for (UserDetailsPlugin userDetailsPlugin : userDetailsPlugins) {
                 //chaining user details plugins
-                ret= userDetailsPlugin.loadUserDetails(ret);
+                userDetails = userDetailsPlugin.loadUserDetails(userDetails);
             }
         }
 
-        return ret;
+        return userDetails;
 
     }
 }
