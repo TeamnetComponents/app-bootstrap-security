@@ -21,7 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.RememberMeServices;
 import ro.teamnet.bootstrap.constants.AuthoritiesConstants;
-import ro.teamnet.bootstrap.plugin.security.UserAuthenticationPlugin;
+import ro.teamnet.bootstrap.plugin.security.UserDetailsPlugin;
 import ro.teamnet.bootstrap.plugin.security.UserAuthorizationPlugin;
 import ro.teamnet.bootstrap.security.*;
 
@@ -30,7 +30,7 @@ import javax.inject.Inject;
 @Configuration
 @EnableWebSecurity
 @EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
-@EnablePluginRegistries({ UserAuthorizationPlugin.class, UserAuthenticationPlugin.class})
+@EnablePluginRegistries({ UserAuthorizationPlugin.class, UserDetailsPlugin.class})
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
