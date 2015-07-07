@@ -312,7 +312,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
 
         account.setModuleRights(moduleRights);
 
-        Set<Role> roles = new HashSet<>();
+        Set<RoleBase> roles = new HashSet<>();
         for(RoleDTO roleDTO: user.getRoles()) {
             roles.add(applicationRoleRepository.getOneById(roleDTO.getId()));
         }
