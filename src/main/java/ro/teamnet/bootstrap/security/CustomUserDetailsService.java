@@ -27,8 +27,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     private AccountRepository accountRepository;
 
     @Inject
-    @Qualifier("userAuthenticationPluginRegistry")
-    private PluginRegistry<UserDetailsPlugin,SecurityType> userAuthenticationPluginRegistry;
+    @Qualifier("userDetailsPluginRegistry")
+    private PluginRegistry<UserDetailsPlugin,SecurityType> userDetailsPluginRegistry;
 
     @Override
     @Transactional(readOnly = true)
@@ -40,11 +40,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 
         List<UserDetailsPlugin> defaultUserDetailsPlugins =
-                userAuthenticationPluginRegistry.getPluginsFor(SecurityType.USER_DETAILS_DEFAULT);
+                userDetailsPluginRegistry.getPluginsFor(SecurityType.USER_DETAILS_DEFAULT);
 
 
 
-        List<UserDetailsPlugin> userDetailsPlugins =userAuthenticationPluginRegistry
+        List<UserDetailsPlugin> userDetailsPlugins =userDetailsPluginRegistry
                 .getPluginsFor(SecurityType.USER_DETAILS, defaultUserDetailsPlugins);
 
 
