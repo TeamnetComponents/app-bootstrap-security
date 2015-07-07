@@ -8,7 +8,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import ro.teamnet.bootstrap.domain.ApplicationRole;
 import ro.teamnet.bootstrap.domain.ModuleRight;
+import ro.teamnet.bootstrap.domain.RoleBase;
 import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
+import ro.teamnet.bootstrap.web.filter.BootstrapFilterBase;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +25,7 @@ import java.util.List;
  * This class is a {@link Filter} that intercepts all request with the root mapping "rest".  For all entity access
  * and menu access the default request mapping will be /rest/entityName or /rest/menuName;
  */
-public class SecurityAccessFilter implements Filter {
+public class SecurityAccessFilter extends BootstrapFilterBase {
 
     public static final String APP_REST = "/app/rest";
     public static final String REST = "rest";
@@ -131,8 +133,8 @@ public class SecurityAccessFilter implements Filter {
             for (GrantedAuthority grantedAuthority : user.getAuthorities()) {
                 if (grantedAuthority instanceof ModuleRight) {
                     moduleRights.add((ModuleRight) grantedAuthority);
-                } else if (grantedAuthority instanceof ApplicationRole) {
-                    moduleRights.addAll(((ApplicationRole) grantedAuthority).getModuleRights());
+                } else if (grantedAuthority instanceof RoleBase) {
+                    moduleRights.addAll(((RoleBase) grantedAuthority).getModuleRights());
                 }
             }
 
