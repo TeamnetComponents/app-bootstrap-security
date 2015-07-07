@@ -51,8 +51,8 @@ public class AdminAccountResource extends AccountBaseResource {
     @RequestMapping(value = "/updateAccount",method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public Account update(@RequestBody Account user) {
-       return getService().updateAccount(user);
+    public Account update(@RequestBody AccountDTO accountDTO) {
+        return getService().updateAccount(accountDTO);
     }
 
 

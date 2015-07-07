@@ -40,6 +40,8 @@ public interface AccountService extends AbstractService<Account,Long>{
     //~~~~~~~~~~~~~~~~~~~~resolving TODO's from web.rest.account~~~~~~~~~~~~~~~~~~~~~
     public Account updateAccount(Account user);
 
+    public Account updateAccount(AccountDTO user);
+
     public List<PersistentToken> retrieveCurrentLogin();
 
     public void deleteByDecodedSeries(String series) throws UnsupportedEncodingException;

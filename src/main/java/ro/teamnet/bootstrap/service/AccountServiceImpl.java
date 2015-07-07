@@ -13,15 +13,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.domain.Account;
+import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.domain.PersistentToken;
 import ro.teamnet.bootstrap.domain.Role;
 import ro.teamnet.bootstrap.domain.util.AccountAndResponseBody;
 import ro.teamnet.bootstrap.repository.AccountRepository;
+import ro.teamnet.bootstrap.repository.ModuleRightRepository;
 import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
 import ro.teamnet.bootstrap.repository.RoleRepository;
 import ro.teamnet.bootstrap.security.util.SecurityUtils;
 import ro.teamnet.bootstrap.service.util.RandomUtil;
 import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
+import ro.teamnet.bootstrap.web.rest.dto.ModuleRightDTO;
+import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
@@ -53,6 +57,9 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
 
     @Inject
     private RoleRepository roleRepository;
+
+    @Inject
+    private ModuleRightRepository moduleRightRepository;
 
     @Inject
     public AccountServiceImpl(AccountRepository repository) {
@@ -274,6 +281,44 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
             }
         }
         return this.updateUser(user);
+    }
+
+    @Override
+    @Transactional
+    public Account updateAccount(AccountDTO user) {
+        Account account = accountRepository.findOne(user.getId());
+
+        account.setId(user.getId());
+        account.setLogin(user.getLogin());
+        account.setPassword(user.getPassword());
+        account.setFirstName(user.getFirstName());
+        account.setLastName(user.getLastName());
+        account.setEmail(user.getEmail());
+        account.setLangKey(user.getLangKey());
+        account.setGender(user.getGender());
+        account.setActivated(user.getActivated());
+
+        Set<ModuleRight> moduleRights = new HashSet<>();
+        if(user.getModuleRights() != null) {
+            Iterator it = user.getModuleRights().entrySet().iterator();
+
+            while(it.hasNext()) {
+                Map.Entry entry = (Map.Entry)it.next();
+                moduleRights.add(moduleRightRepository.findOne(((ModuleRightDTO) entry.getValue()).getId()));
+                it.remove();
+            }
+        }
+
+        account.setModuleRights(moduleRights);
+
+        Set<Role> roles = new HashSet<>();
+        for(RoleDTO roleDTO: user.getRoles()) {
+            roles.add(roleRepository.getOneById(roleDTO.getId()));
+        }
+
+        account.setRoles(roles);
+
+        return accountRepository.save(account);
     }
 
     @Override
