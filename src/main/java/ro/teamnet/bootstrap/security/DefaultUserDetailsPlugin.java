@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.domain.Account;
 import ro.teamnet.bootstrap.domain.RoleBase;
 import ro.teamnet.bootstrap.plugin.security.SecurityType;
-import ro.teamnet.bootstrap.plugin.security.UserAuthenticationPlugin;
+import ro.teamnet.bootstrap.plugin.security.UserDetailsPlugin;
 import ro.teamnet.bootstrap.repository.AccountRepository;
 
 import javax.inject.Inject;
@@ -19,23 +19,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-public class DatabaseUserAuthenticationPlugin implements UserAuthenticationPlugin {
+public class DefaultUserDetailsPlugin implements UserDetailsPlugin {
 
-    private final Logger log = LoggerFactory.getLogger(DatabaseUserAuthenticationPlugin.class);
+    private final Logger log = LoggerFactory.getLogger(DefaultUserDetailsPlugin.class);
     @Inject
     private AccountRepository accountRepository;
 
 
     @Override
     public boolean supports(SecurityType delimiter) {
-        return delimiter==SecurityType.USER_AUTHENTICATION_DEFAULT;
+        return delimiter==SecurityType.USER_DETAILS_DEFAULT;
     }
 
 
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails authenticate(UserDetails userDetails) {
+    public UserDetails loadUserDetails(UserDetails userDetails) {
         String login=userDetails.getUsername();
         log.debug("Authenticating {}", login);
         String lowercaseLogin = login.toLowerCase();
