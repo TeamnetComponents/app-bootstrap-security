@@ -289,14 +289,9 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     public Account updateAccount(AccountDTO user) {
         Account account = accountRepository.findOne(user.getId());
 
-        account.setId(user.getId());
-        account.setLogin(user.getLogin());
-        account.setPassword(user.getPassword());
         account.setFirstName(user.getFirstName());
         account.setLastName(user.getLastName());
         account.setEmail(user.getEmail());
-        account.setLangKey(user.getLangKey());
-        account.setGender(user.getGender());
         account.setActivated(user.getActivated());
 
         Set<ModuleRight> moduleRights = new HashSet<>();
