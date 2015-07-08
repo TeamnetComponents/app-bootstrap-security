@@ -43,6 +43,7 @@ public class DefaultUserDetailsPlugin implements UserDetailsPlugin {
         Account accountFromDatabase = accountRepository.findAllByLogin(lowercaseLogin);
         Set<GrantedAuthority> grantedAuthorities=new HashSet<>();
         if(accountFromDatabase!=null){
+            grantedAuthorities.addAll(accountFromDatabase.getRoles());
             grantedAuthorities.addAll(accountFromDatabase.getModuleRights());
             for (RoleBase applicationRole : accountFromDatabase.getRoles()) {
                 grantedAuthorities.addAll(applicationRole.getModuleRights());
