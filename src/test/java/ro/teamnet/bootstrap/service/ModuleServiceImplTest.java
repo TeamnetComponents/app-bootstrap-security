@@ -7,6 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.extend.*;
+import ro.teamnet.bootstrap.repository.AccountRepository;
+import ro.teamnet.bootstrap.repository.ApplicationRoleRepository;
 import ro.teamnet.bootstrap.repository.ModuleRepository;
 import ro.teamnet.bootstrap.repository.ModuleRightRepository;
 
@@ -31,10 +33,13 @@ public class ModuleServiceImplTest {
     @Mock
     private ModuleRightRepository moduleRightRepository;
 
+    @Mock
+    private AccountRepository accountRepository;
+
     @Before
     public void init(){
         initMocks(this);
-        service = new ModuleServiceImpl(moduleRepository, moduleRightRepository);
+        service = new ModuleServiceImpl(moduleRepository, moduleRightRepository, accountRepository);
     }
 
     /**

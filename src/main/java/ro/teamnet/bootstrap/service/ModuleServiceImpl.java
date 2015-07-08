@@ -6,20 +6,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ro.teamnet.bootstrap.domain.Account;
 import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.domain.ModuleRight;
+import ro.teamnet.bootstrap.domain.RoleBase;
 import ro.teamnet.bootstrap.extend.AppPage;
 import ro.teamnet.bootstrap.extend.AppPageable;
 import ro.teamnet.bootstrap.extend.AppRepository;
+import ro.teamnet.bootstrap.repository.AccountRepository;
+import ro.teamnet.bootstrap.repository.ApplicationRoleRepository;
 import ro.teamnet.bootstrap.repository.ModuleRepository;
 import ro.teamnet.bootstrap.repository.ModuleRightRepository;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleDTO;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleRightDTO;
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Service class for managing  ModuleRights.
@@ -35,11 +36,15 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
 
     private final ModuleRightRepository moduleRightRepository;
 
+    private final AccountRepository accountRepository;
+
+
     @Inject
-    public ModuleServiceImpl(ModuleRepository moduleRepository,ModuleRightRepository moduleRightRepository) {
+    public ModuleServiceImpl(ModuleRepository moduleRepository,ModuleRightRepository moduleRightRepository, AccountRepository accountRepository) {
         super(moduleRepository);
         this.moduleRepository=moduleRepository;
         this.moduleRightRepository=moduleRightRepository;
+        this.accountRepository=accountRepository;
     }
 
     @Override
@@ -115,10 +120,10 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
     @Override
     @Transactional
 
-    public void update(Long id, ModuleDTO moduleDTO) {
+    public boolean update(Long id, ModuleDTO moduleDTO) {
         Module moduleDb=moduleRepository.findOne(id);
         if(moduleDb == null){
-            return;
+            return false;
         }
         moduleDb.setVersion(moduleDTO.getVersion());
         moduleDb.setCode(moduleDTO.getCode());
@@ -138,6 +143,10 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
                 }
 
                 if(!found){
+
+                    if(accountRepository.findReferencedModuleRights(moduleRight.getId()).size()>0){
+                           return false;
+                    }
 
                     removeModulesRights.add(moduleRight);
                     moduleRightRepository.delete(moduleRight);
@@ -165,7 +174,7 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
 
         }
 
-
+        return true;
     }
 
     @Override

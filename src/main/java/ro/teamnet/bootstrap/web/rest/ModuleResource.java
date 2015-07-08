@@ -1,6 +1,9 @@
 package ro.teamnet.bootstrap.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -11,7 +14,9 @@ import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.service.ModuleService;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleDTO;
 
+import javax.activation.MimeType;
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,6 +27,7 @@ import java.util.List;
 public class ModuleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource<Module,Long>{
 
     private final Logger log = LoggerFactory.getLogger(ModuleRightResource.class);
+
 
 
     private ModuleService moduleService;
@@ -39,11 +45,13 @@ public class ModuleResource extends ro.teamnet.bootstrap.web.rest.AbstractResour
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> updateById(@PathVariable Long id,@RequestBody ModuleDTO moduleDTO) {
+    public ResponseEntity<?> updateById(@PathVariable Long id,@RequestBody ModuleDTO moduleDTO) throws JsonProcessingException{
         log.debug("REST request to update the module : {}", id);
-
-        moduleService.update(id, moduleDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        if(!moduleService.update(id, moduleDTO)){
+            return new ResponseEntity<>(ow.writeValueAsString(HttpStatus.FORBIDDEN),HttpStatus.OK);
+        }
+        return new ResponseEntity<>(ow.writeValueAsString(HttpStatus.OK),HttpStatus.OK);
     }
 
     @RequestMapping(value = "/rights",
