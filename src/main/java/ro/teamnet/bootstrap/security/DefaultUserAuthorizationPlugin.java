@@ -42,7 +42,7 @@ public class DefaultUserAuthorizationPlugin implements UserAuthorizationPlugin {
     private boolean moduleRightMatchesRequest(ModuleRight moduleRight, String resource, ModuleRightTypeEnum accessType) {
         String moduleCode = moduleRight.getModule().getCode();
         return moduleRight.getRight().equals(accessType.getRight()) && (moduleCode.equalsIgnoreCase(resource)
-                || plural(moduleCode).equalsIgnoreCase(resource) || moduleCode.equals(plural(resource)));
+                || plural(moduleCode).equalsIgnoreCase(resource) || moduleCode.equalsIgnoreCase(plural(resource)));
     }
 
 
