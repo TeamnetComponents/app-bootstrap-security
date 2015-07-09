@@ -4,21 +4,17 @@ package ro.teamnet.bootstrap.security.filter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import ro.teamnet.bootstrap.domain.ApplicationRole;
-import ro.teamnet.bootstrap.domain.ModuleRight;
-import ro.teamnet.bootstrap.domain.RoleBase;
+import org.springframework.security.core.userdetails.User;
 import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
+import ro.teamnet.bootstrap.security.DefaultUserAuthorizationPlugin;
+import ro.teamnet.bootstrap.security.util.SecurityUtils;
 import ro.teamnet.bootstrap.web.filter.BootstrapFilterBase;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 
 /**
@@ -59,7 +55,7 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        Date dataStart=new Date();
+        Date dataStart = new Date();
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
@@ -75,8 +71,8 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
              If not authenticated then return unauthorised
         */
         if (userName == null || userName.isEmpty()) {
-            boolean permitUnauthenticated=
-                    httpRequest.getRequestURI().startsWith(APP_REST_PUBLIC_REGISTER)||
+            boolean permitUnauthenticated =
+                    httpRequest.getRequestURI().startsWith(APP_REST_PUBLIC_REGISTER) ||
                             httpRequest.getRequestURI().startsWith(APP_REST_ACCOUNT_ACTIVATE);
             if (!permitUnauthenticated) {
                 httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -89,19 +85,24 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
             }
 
         } else if (httpRequest.getRequestURI().startsWith(APP_REST)) {
+            //verifying that the user has permission to the resource
+            AbstractAuthenticationToken user = (AbstractAuthenticationToken) httpRequest.getUserPrincipal();
+            User authenticatedUser = SecurityUtils.getAuthenticatedUser();
+            String resource = findResourceFromPath(httpRequest.getRequestURI());
+            if (resource != null) {
+                Boolean grantAccessToResource = new DefaultUserAuthorizationPlugin().grantAccessToResource(resource,
+                        ModuleRightTypeEnum.valueOf(PermissionMapping.valueOf(httpRequest.getMethod()).getAccess()));
 
-            //verifying that the principal has permission to the resource
-            Boolean access = verifyPermissionAccess(httpRequest);
-            if (!access) {
-                Date dateEnd=new Date();
-                logger.debug(" Accessing resource "+httpRequest.getRequestURI()+" ("+(dateEnd.getTime()-dataStart.getTime())+"ms)");
-                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
-                return;
+                if (!grantAccessToResource) {
+                    Date dateEnd = new Date();
+                    logger.debug(" Accessing resource " + httpRequest.getRequestURI() + " (" + (dateEnd.getTime() - dataStart.getTime()) + "ms)");
+                    httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+                    return;
+                }
             }
-
         }
-        Date dateEnd=new Date();
-        logger.debug(" Accessing resource "+httpRequest.getRequestURI()+" ("+(dateEnd.getTime()-dataStart.getTime())+"ms)");
+        Date dateEnd = new Date();
+        logger.debug(" Accessing resource " + httpRequest.getRequestURI() + " (" + (dateEnd.getTime() - dataStart.getTime()) + "ms)");
         // continue with the next filter in the chain
         filterChain.doFilter(servletRequest, servletResponse);
     }
@@ -110,70 +111,25 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
     public void destroy() {
     }
 
+
     /**
-     * This metod return true if the {@link UsernamePasswordAuthenticationToken} from the {@link HttpServletRequest} parameter
-     * has the required access wrights on the menu or the entity mapping or false otherwise.
-     * <p/>
-     * This works if the url match /app/rest/someService pattern
-     *
-     * @param httpRequest is an {@link HttpServletRequest} that contains all the servletRequest information
-     * @return true if the user has access rights or false otherwise.
+     * Extracts the resource name from a given path.
+     * This works if the path matches the pattern: /app/rest/resourceName .
+     * @param path the path to parse
+     * @return the resource name or null, if the path doesn't match the known pattern.
      */
-    private Boolean verifyPermissionAccess(HttpServletRequest httpRequest) {
-        String[] urlPaths = httpRequest.getRequestURI().split("/");
-
-        if (urlPaths.length >= 3) {
-            String resource = findResourceFromUrls(urlPaths);
-
-
-            String accessType = PermissionMapping.valueOf(httpRequest.getMethod()).getAccess();
-            AbstractAuthenticationToken user = (AbstractAuthenticationToken) httpRequest.getUserPrincipal();
-
-            List<ModuleRight> moduleRights = new ArrayList<>();
-            for (GrantedAuthority grantedAuthority : user.getAuthorities()) {
-                if (grantedAuthority instanceof ModuleRight) {
-                    moduleRights.add((ModuleRight) grantedAuthority);
-                } else if (grantedAuthority instanceof RoleBase) {
-                    moduleRights.addAll(((RoleBase) grantedAuthority).getModuleRights());
-                }
-            }
-
-            for (ModuleRight authority : moduleRights) {
-                ModuleRight permission;
-                Boolean hasPermission;
-                Boolean accessToResource;
-                permission = authority;
-                hasPermission = ModuleRightTypeEnum.getCodeByValue(permission.getRight()).equals(accessType);
-
-                String moduleCode=permission.getModule().getCode().toLowerCase();
-                String moduleCodeToPlural=moduleCode+"s";
-                String resourceToPlural=resource+"s";
-                accessToResource = hasPermission && (
-                        moduleCode.equals(resource) ||
-                                moduleCodeToPlural.equals(resource)||
-                                moduleCode.equals(resourceToPlural)
-                );
-                if (accessToResource) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private String findResourceFromUrls(String[] urlPaths) {
-        if (urlPaths == null || urlPaths.length < 3)
+    private String findResourceFromPath(String path) {
+        String[] pathTokens = path.split("/");
+        if (pathTokens == null || pathTokens.length < 3)
             return null;
         int pos = 0;
-        while (pos < urlPaths.length) {
-            if (urlPaths[pos].equals(REST) && pos < urlPaths.length - 1) {
-                return urlPaths[pos + 1].toLowerCase();
+        while (pos < pathTokens.length) {
+            if (pathTokens[pos].equals(REST) && pos < pathTokens.length - 1) {
+                return pathTokens[pos + 1].toLowerCase();
             } else {
                 pos++;
             }
-
         }
         return null;
-
     }
 }
