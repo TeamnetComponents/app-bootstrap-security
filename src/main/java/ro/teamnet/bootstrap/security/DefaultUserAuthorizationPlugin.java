@@ -2,6 +2,7 @@ package ro.teamnet.bootstrap.security;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.stereotype.Service;
 import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.domain.RoleBase;
 import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
@@ -12,6 +13,7 @@ import ro.teamnet.bootstrap.security.util.SecurityUtils;
 /**
  * A default implementation of the UserAuthorizationPlugin
  */
+@Service
 public class DefaultUserAuthorizationPlugin implements UserAuthorizationPlugin {
 
     @Override

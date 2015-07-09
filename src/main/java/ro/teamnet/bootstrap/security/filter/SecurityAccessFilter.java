@@ -3,11 +3,8 @@ package ro.teamnet.bootstrap.security.filter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.userdetails.User;
 import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
-import ro.teamnet.bootstrap.security.DefaultUserAuthorizationPlugin;
-import ro.teamnet.bootstrap.security.util.SecurityUtils;
+import ro.teamnet.bootstrap.plugin.security.UserAuthorizationPlugin;
 import ro.teamnet.bootstrap.web.filter.BootstrapFilterBase;
 
 import javax.servlet.*;
@@ -86,12 +83,16 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
 
         } else if (httpRequest.getRequestURI().startsWith(APP_REST)) {
             //verifying that the user has permission to the resource
-            AbstractAuthenticationToken user = (AbstractAuthenticationToken) httpRequest.getUserPrincipal();
-            User authenticatedUser = SecurityUtils.getAuthenticatedUser();
             String resource = findResourceFromPath(httpRequest.getRequestURI());
             if (resource != null) {
-                Boolean grantAccessToResource = new DefaultUserAuthorizationPlugin().grantAccessToResource(resource,
-                        ModuleRightTypeEnum.valueOf(PermissionMapping.valueOf(httpRequest.getMethod()).getAccess()));
+                Boolean grantAccessToResource = false;
+                for (UserAuthorizationPlugin userAuthorizationPlugin : getUserAuthorizationPlugins()) {
+                    grantAccessToResource = userAuthorizationPlugin.grantAccessToResource(resource,
+                            ModuleRightTypeEnum.valueOf(PermissionMapping.valueOf(httpRequest.getMethod()).getAccess()));
+                    if (grantAccessToResource) {
+                        break;
+                    }
+                }
 
                 if (!grantAccessToResource) {
                     Date dateEnd = new Date();
@@ -115,6 +116,7 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
     /**
      * Extracts the resource name from a given path.
      * This works if the path matches the pattern: /app/rest/resourceName .
+     *
      * @param path the path to parse
      * @return the resource name or null, if the path doesn't match the known pattern.
      */
