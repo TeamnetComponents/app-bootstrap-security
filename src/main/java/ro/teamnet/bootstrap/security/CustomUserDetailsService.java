@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.plugin.security.SecurityType;
 import ro.teamnet.bootstrap.plugin.security.UserDetailsPlugin;
-import ro.teamnet.bootstrap.repository.AccountRepository;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -23,8 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final Logger log = LoggerFactory.getLogger(CustomUserDetailsService.class);
 
-    @Inject
-    private AccountRepository accountRepository;
+    private static ThreadLocal<UserDetails> userDetailsThreadLocal = new ThreadLocal<>();
 
     @Inject
     @Qualifier("userDetailsPluginRegistry")
@@ -54,7 +52,13 @@ public class CustomUserDetailsService implements UserDetailsService {
             }
         }
 
+        userDetailsThreadLocal.set(userDetails);
+
         return userDetails;
 
+    }
+
+    public static UserDetails getUserDetails() {
+        return userDetailsThreadLocal.get();
     }
 }
