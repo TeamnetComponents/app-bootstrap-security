@@ -21,6 +21,9 @@ public class DefaultUserAuthorizationPlugin implements UserAuthorizationPlugin {
     @Override
     public Boolean grantAccessToResource(String resource, ModuleRightTypeEnum accessType) {
         UserDetails userDetails = CustomUserDetailsService.getUserDetails();
+        if (userDetails == null) {
+            return false; //TODO: should it return null instead?
+        }
 
         for (GrantedAuthority grantedAuthority : userDetails.getAuthorities()) {
             if (grantedAuthority instanceof ModuleRight) {
