@@ -14,10 +14,8 @@ import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.service.ModuleService;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleDTO;
 
-import javax.activation.MimeType;
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 /**
  * REST controller for managing modules.
@@ -27,7 +25,6 @@ import java.util.List;
 public class ModuleResource extends ro.teamnet.bootstrap.web.rest.AbstractResource<Module,Long>{
 
     private final Logger log = LoggerFactory.getLogger(ModuleRightResource.class);
-
 
 
     private ModuleService moduleService;
@@ -57,7 +54,7 @@ public class ModuleResource extends ro.teamnet.bootstrap.web.rest.AbstractResour
     @RequestMapping(value = "/rights",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Module> getAllModulesWithModuleRights() {
+    public Set<Module> getAllModulesWithModuleRights() {
         log.debug("REST request to get all modules");
         return  moduleService.getAllModulesWithModuleRights();
     }

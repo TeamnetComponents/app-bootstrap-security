@@ -2,8 +2,6 @@ package ro.teamnet.bootstrap.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.domain.Account;
@@ -19,8 +17,13 @@ import ro.teamnet.bootstrap.repository.ModuleRepository;
 import ro.teamnet.bootstrap.repository.ModuleRightRepository;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleDTO;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleRightDTO;
+
 import javax.inject.Inject;
 import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Service class for managing  ModuleRights.
@@ -93,23 +96,14 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
     }
 
     @Override
-    public List<Module> getAllModulesWithModuleRights() {
-        List<Module> moduleList = moduleRepository.getAllModulesWithModuleRights();
-        for (Module module : moduleList) {
-            List<ModuleRight> moduleRights = moduleRightRepository.findByModule(module);
-            for (ModuleRight moduleRight : moduleRights) {
-                moduleRight.setModule(null);
-            }
-
-            module.setModuleRights(moduleRightRepository.findByModule(module));
-        }
-        return moduleList;
+    public Set<Module> getAllModulesWithModuleRights() {
+        return moduleRepository.getAllModulesWithModuleRights();
     }
 
     @Override
     public Module getOne(Long id) {
         Module module = moduleRepository.getOne(id);
-        List<ModuleRight> moduleRights = moduleRightRepository.findByModule(module);
+        Set<ModuleRight> moduleRights = moduleRightRepository.findByModule(module);
         for (ModuleRight moduleRight : moduleRights) {
             moduleRight.setModule(null);
         }
@@ -119,23 +113,23 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
 
     @Override
     @Transactional
-
     public boolean update(Long id, ModuleDTO moduleDTO) {
         Module moduleDb=moduleRepository.findOne(id);
         if(moduleDb == null){
             return false;
         }
+
         moduleDb.setVersion(moduleDTO.getVersion());
         moduleDb.setCode(moduleDTO.getCode());
         moduleDb.setDescription(moduleDTO.getDescription());
         moduleDb.setType(moduleDTO.getType());
         moduleDb.setParentModule(moduleDTO.getParentModule());
 
-
         if(moduleDTO.getId()!=null){
             Collection<ModuleRight> removeModulesRights=new HashSet<>();
             Collection<ModuleRight> persistentModuleRight=new HashSet<>();
             Collection<ModuleRight> moduleRightList=moduleDb.getModuleRights();
+
             for (ModuleRight moduleRight : moduleRightList) {
                 boolean found=false;
                 for(ModuleRightDTO moduleRightDTO:moduleDTO.getModuleRights()){
@@ -143,7 +137,6 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
                 }
 
                 if(!found){
-
                     if(accountRepository.findReferencedModuleRights(moduleRight.getId()).size()>0){
                            return false;
                     }
@@ -159,6 +152,7 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
                 for(ModuleRight moduleRight1:moduleDb.getModuleRights()){
                     found=found||moduleRight1.getRight().equals(moduleRight.getRight());
                 }
+
                 if(!found){
                     ModuleRight moduleRightTr=new ModuleRight();
                     moduleRightTr.setRight(moduleRight.getRight());
@@ -168,6 +162,7 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
                     persistentModuleRight.add(moduleRightDb);
                 }
             }
+
             moduleDb.getModuleRights().removeAll(removeModulesRights);
             moduleDb.getModuleRights().addAll(persistentModuleRight);
             moduleRepository.save(moduleDb);
