@@ -1,5 +1,6 @@
 package ro.teamnet.bootstrap.security;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -11,21 +12,22 @@ import ro.teamnet.bootstrap.plugin.security.UserAuthorizationPlugin;
 import ro.teamnet.bootstrap.security.util.SecurityUtils;
 
 /**
- * A default implementation of the UserAuthorizationPlugin
+ * The default user authorization plugin and first in the authorizing chain.
  */
 @Service
+@Order(0)
 public class DefaultUserAuthorizationPlugin implements UserAuthorizationPlugin {
 
     @Override
     public boolean supports(SecurityType delimiter) {
-        return delimiter == SecurityType.DEFAULT_USER_AUTHORIZATION;
+        return delimiter == SecurityType.USER_AUTHORIZATION;
     }
 
     @Override
     public Boolean grantAccessToResource(String resource, ModuleRightTypeEnum accessLevel) {
         User authenticatedUser = SecurityUtils.getAuthenticatedUser();
-        if (authenticatedUser == null) {
-            return false; //TODO: should it return null instead?
+        if (authenticatedUser == null || accessLevel == null) {
+            return false;
         }
 
         for (GrantedAuthority grantedAuthority : authenticatedUser.getAuthorities()) {

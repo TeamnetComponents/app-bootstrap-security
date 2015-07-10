@@ -27,23 +27,6 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
     public static final String EMPTY = "";
     public static final String LOGIN = "/#/login";
 
-    private enum PermissionMapping {
-        POST("INSERT_ACCESS"),
-        GET("READ_ACCESS"),
-        PUT("WRITE_ACCESS"),
-        DELETE("DELETE_ACCESS");
-
-        private String access;
-
-        private PermissionMapping(String access) {
-            this.access = access;
-        }
-
-        public String getAccess() {
-            return this.access;
-        }
-    }
-
     private static final Log logger = LogFactory.getLog(SecurityAccessFilter.class);
 
     @Override
@@ -83,16 +66,10 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
 
         } else if (httpRequest.getRequestURI().startsWith(APP_REST)) {
             //verifying that the user has permission to the resource
-            String resource = findResourceFromPath(httpRequest.getRequestURI());
+            String resource = extractResourceFromPath(httpRequest.getRequestURI());
+            ModuleRightTypeEnum accessLevel = ModuleRightTypeEnum.findByHttpMethod(httpRequest.getMethod());
             if (resource != null) {
-                Boolean grantAccessToResource = false;
-                for (UserAuthorizationPlugin userAuthorizationPlugin : getUserAuthorizationPlugins()) {
-                    grantAccessToResource = userAuthorizationPlugin.grantAccessToResource(resource,
-                            ModuleRightTypeEnum.valueOf(PermissionMapping.valueOf(httpRequest.getMethod()).getAccess()));
-                    if (grantAccessToResource) {
-                        break;
-                    }
-                }
+                Boolean grantAccessToResource = grantAccessToResource(resource, accessLevel);
 
                 if (!grantAccessToResource) {
                     Date dateEnd = new Date();
@@ -108,6 +85,17 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
+    private Boolean grantAccessToResource(String resource, ModuleRightTypeEnum accessLevel) {
+        Boolean grantAccessToResource = Boolean.FALSE;
+        for (UserAuthorizationPlugin userAuthorizationPlugin : getUserAuthorizationPlugins()) {
+            grantAccessToResource = userAuthorizationPlugin.grantAccessToResource(resource, accessLevel);
+            if (grantAccessToResource) {
+                return grantAccessToResource;
+            }
+        }
+        return grantAccessToResource;
+    }
+
     @Override
     public void destroy() {
     }
@@ -120,16 +108,18 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
      * @param path the path to parse
      * @return the resource name or null, if the path doesn't match the known pattern.
      */
-    private String findResourceFromPath(String path) {
+    private String extractResourceFromPath(String path) {
         String[] pathTokens = path.split("/");
-        if (pathTokens == null || pathTokens.length < 3)
+        if (pathTokens == null || pathTokens.length < 3) {
             return null;
-        int pos = 0;
-        while (pos < pathTokens.length) {
-            if (pathTokens[pos].equals(REST) && pos < pathTokens.length - 1) {
-                return pathTokens[pos + 1].toLowerCase();
-            } else {
-                pos++;
+        }
+        boolean restTokenWasFound = false;
+        for (String pathToken : pathTokens) {
+            if (restTokenWasFound) {
+                return pathToken.toLowerCase();
+            }
+            if (pathToken.equals(REST)) {
+                restTokenWasFound = true;
             }
         }
         return null;
