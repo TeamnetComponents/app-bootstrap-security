@@ -34,8 +34,6 @@ public class ModuleRightResource extends ro.teamnet.bootstrap.web.rest.AbstractR
         this.moduleRightService = moduleRightService;
     }
 
-
-
     @RequestMapping(value = "/codes",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)

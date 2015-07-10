@@ -8,13 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.domain.Module;
 import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
-import ro.teamnet.bootstrap.extend.AppPage;
-import ro.teamnet.bootstrap.extend.AppPageable;
-import ro.teamnet.bootstrap.extend.AppRepository;
 import ro.teamnet.bootstrap.repository.ModuleRightRepository;
 
 import javax.inject.Inject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,13 +56,17 @@ public class ModuleRightServiceImpl extends AbstractServiceImpl<ModuleRight,Long
                 this.moduleRightCode = moduleRightCode;
             }
         }
+
         List moduleRightCodes = new ArrayList();
         for(ModuleRightTypeEnum moduleRightTypeEnum : ModuleRightTypeEnum.values()){
             Pair pair = new Pair();
+
             pair.setRight(moduleRightTypeEnum.getRight());
             pair.setModuleRightCode(ModuleRightTypeEnum.getCodeByValue(moduleRightTypeEnum.getRight()));
+
             moduleRightCodes.add(pair);
         }
+
         return moduleRightCodes;
     }
 
@@ -75,4 +75,8 @@ public class ModuleRightServiceImpl extends AbstractServiceImpl<ModuleRight,Long
         return moduleRightRepository.findByModuleAndRight(module, right);
     }
 
+    @Override
+    public List<ModuleRight> findAll() {
+        return new ArrayList<>(moduleRightRepository.findAllWithModule());
+    }
 }

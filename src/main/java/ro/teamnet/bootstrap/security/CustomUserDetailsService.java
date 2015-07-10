@@ -22,8 +22,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final Logger log = LoggerFactory.getLogger(CustomUserDetailsService.class);
 
-    private static ThreadLocal<UserDetails> userDetailsThreadLocal = new ThreadLocal<>();
-
     @Inject
     @Qualifier("userDetailsPluginRegistry")
     private PluginRegistry<UserDetailsPlugin, SecurityType> userDetailsPluginRegistry;
@@ -52,13 +50,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             }
         }
 
-        userDetailsThreadLocal.set(userDetails);
-
         return userDetails;
-
-    }
-
-    public static UserDetails getUserDetails() {
-        return userDetailsThreadLocal.get();
     }
 }
