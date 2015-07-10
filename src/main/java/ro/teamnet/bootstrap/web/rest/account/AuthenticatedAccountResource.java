@@ -50,6 +50,8 @@ public class AuthenticatedAccountResource {
 
 
 
+
+
     /**
      * POST  /rest/change_password -> changes the current user's password
      */
@@ -62,6 +64,16 @@ public class AuthenticatedAccountResource {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         accountService.changePassword(password);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/update",produces = MediaType.APPLICATION_JSON_VALUE,method = RequestMethod.PUT)
+    @Timed
+    public ResponseEntity<?> saveAccount(@RequestBody AccountDTO userDTO) {
+        String infoAboutUserEmail = accountService.updateCurrentAccount(userDTO);
+        if (infoAboutUserEmail.contains("already")) {
+            return new ResponseEntity<>(infoAboutUserEmail, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
