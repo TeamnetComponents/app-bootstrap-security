@@ -112,6 +112,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .frameOptions()
             .disable()
             .authorizeRequests()
+                .antMatchers("/app/cfg/app.json").permitAll()
                 .antMatchers("/app/rest/publicAccount/register").permitAll()
                 .antMatchers("/app/rest/activateAccount/activate").permitAll()
                 .antMatchers("/app/rest/dictionaryElement/**").permitAll()
