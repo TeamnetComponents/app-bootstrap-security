@@ -51,6 +51,14 @@ public class ModuleResource extends ro.teamnet.bootstrap.web.rest.AbstractResour
         return new ResponseEntity<>(ow.writeValueAsString(HttpStatus.OK),HttpStatus.OK);
     }
 
+//    @RequestMapping(method = RequestMethod.POST,
+//                    produces = MediaType.APPLICATION_JSON_VALUE)
+//    @Timed
+//    public ResponseEntity<?> create(@RequestBody ModuleDTO moduleDTO){
+//        moduleService.saveModule(moduleDTO);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
+
     @RequestMapping(value = "/rights",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)

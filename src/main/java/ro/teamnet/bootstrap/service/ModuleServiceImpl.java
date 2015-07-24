@@ -157,7 +157,6 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
                     ModuleRight moduleRightTr=new ModuleRight();
                     moduleRightTr.setRight(moduleRight.getRight());
                     moduleRightTr.setModule(moduleDb);
-                    moduleRightTr.setVersion(1L);
                     ModuleRight moduleRightDb=moduleRightRepository.save(moduleRightTr);
                     persistentModuleRight.add(moduleRightDb);
                 }
@@ -171,6 +170,22 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
 
         return true;
     }
+//
+//    @Override
+//    @Transactional
+//    public Module saveModule(ModuleDTO moduleDTO){
+//        Module module = new Module();
+//        module.setCode(moduleDTO.getCode());
+//        module.setParentModule(moduleDTO.getParentModule());
+//        module.setDescription(moduleDTO.getDescription());
+//        module.setType(moduleDTO.getType());
+//        Collection<ModuleRight> moduleRights = new HashSet<>();
+//        for(ModuleRightDTO moduleRightDTO:moduleDTO.getModuleRights()){
+//            moduleRights.add(moduleRightDTO.getModuleRight());
+//        }
+//        module.setModuleRights(moduleRights);
+//        return moduleRepository.save(module);
+//    }
 
     @Override
     @Transactional
