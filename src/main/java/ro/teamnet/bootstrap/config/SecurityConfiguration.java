@@ -3,7 +3,10 @@ package ro.teamnet.bootstrap.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.plugin.core.config.EnablePluginRegistries;
@@ -22,7 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.RememberMeServices;
 import ro.teamnet.bootstrap.constants.AuthoritiesConstants;
 import ro.teamnet.bootstrap.plugin.security.UserDetailsPlugin;
-import ro.teamnet.bootstrap.plugin.security.UserAuthorizationPlugin;
 import ro.teamnet.bootstrap.security.*;
 
 import javax.inject.Inject;
@@ -30,7 +32,7 @@ import javax.inject.Inject;
 @Configuration
 @EnableWebSecurity
 @EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
-@EnablePluginRegistries({ UserAuthorizationPlugin.class, UserDetailsPlugin.class})
+@EnablePluginRegistries({ UserDetailsPlugin.class})
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
