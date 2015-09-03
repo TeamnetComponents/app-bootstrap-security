@@ -24,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.RememberMeServices;
 import ro.teamnet.bootstrap.constants.AuthoritiesConstants;
+import ro.teamnet.bootstrap.holder.SessionHolder;
 import ro.teamnet.bootstrap.plugin.security.UserDetailsPlugin;
 import ro.teamnet.bootstrap.security.*;
 
@@ -172,9 +173,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         }
     }
 
-    @Bean
-    @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public SessionHolder sessionHolder() {
-        return new SessionHolder();
-    }
 }
