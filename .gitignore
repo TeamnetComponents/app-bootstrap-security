@@ -1,5 +1,5 @@
 target
-.idea
-.iml
-.classpath
-.project
+*.idea
+*.iml
+*.classpath
+*.project
