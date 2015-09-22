@@ -2,6 +2,7 @@ package ro.teamnet.bootstrap.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
+@Order(0)
 public class DefaultUserDetailsPlugin implements UserDetailsPlugin {
 
     private final Logger log = LoggerFactory.getLogger(DefaultUserDetailsPlugin.class);

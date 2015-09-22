@@ -29,6 +29,8 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
 
     private static final Log logger = LogFactory.getLog(SecurityAccessFilter.class);
 
+    public static final String[] STATIC_RESOURCE={".js",".css",".ico",".html",".jpeg",".jpg",".json",".html",".png",".ttf",".tiff",".eot" ,".otf" ,".svg" , ".woff",".gif"};
+
     @Override
     public void init(FilterConfig config) throws ServletException {
     }
@@ -51,9 +53,16 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
              If not authenticated then return unauthorised
         */
         if (userName == null || userName.isEmpty()) {
+
+            boolean staticResource=false;
+            for (String s : STATIC_RESOURCE) {
+                staticResource=staticResource||httpRequest.getRequestURI().endsWith(s);
+            }
+
             boolean permitUnauthenticated =
                     httpRequest.getRequestURI().startsWith(APP_REST_PUBLIC_REGISTER) ||
-                            httpRequest.getRequestURI().startsWith(APP_REST_ACCOUNT_ACTIVATE);
+                            httpRequest.getRequestURI().startsWith(APP_REST_ACCOUNT_ACTIVATE)||staticResource||
+                    httpRequest.getRequestURI().equals("/");
             if (!permitUnauthenticated) {
                 httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 
