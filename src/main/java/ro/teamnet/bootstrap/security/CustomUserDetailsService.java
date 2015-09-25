@@ -1,3 +1,4 @@
+/*
 package ro.teamnet.bootstrap.security;
 
 import org.slf4j.Logger;
@@ -14,11 +15,13 @@ import ro.teamnet.bootstrap.plugin.security.UserDetailsPlugin;
 import javax.inject.Inject;
 import java.util.List;
 
+*/
 /**
  * Authenticate a user from the database.
- */
+ *//*
+
 @Component("customUserDetailsService")
-public class CustomUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsService {
 
     private final Logger log = LoggerFactory.getLogger(CustomUserDetailsService.class);
 
@@ -26,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Qualifier("userDetailsPluginRegistry")
     private PluginRegistry<UserDetailsPlugin, SecurityType> userDetailsPluginRegistry;
 
-    @Override
+    //@Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(final String login) {
         log.debug("Authenticating {}", login);
@@ -53,3 +56,4 @@ public class CustomUserDetailsService implements UserDetailsService {
         return userDetails;
     }
 }
+*/

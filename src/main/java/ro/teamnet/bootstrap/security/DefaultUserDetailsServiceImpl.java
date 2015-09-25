@@ -1,51 +1,43 @@
-/*
 package ro.teamnet.bootstrap.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ro.teamnet.bootstrap.domain.Account;
 import ro.teamnet.bootstrap.domain.RoleBase;
-import ro.teamnet.bootstrap.plugin.security.SecurityType;
-import ro.teamnet.bootstrap.plugin.security.UserDetailsPlugin;
 import ro.teamnet.bootstrap.repository.AccountRepository;
 
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
 
-@Service
-@Order(0)
-public class DefaultUserDetailsPlugin implements UserDetailsPlugin {
+/**
+ * Created by Marian.Spoiala on 9/24/2015.
+ */
+@Component("defaultUserDetailsServiceImpl")
+public class DefaultUserDetailsServiceImpl implements UserDetailsService {
 
-    private final Logger log = LoggerFactory.getLogger(DefaultUserDetailsPlugin.class);
+    private final Logger log = LoggerFactory.getLogger(DefaultUserDetailsServiceImpl.class);
+
     @Inject
     private AccountRepository accountRepository;
 
-
-    @Override
-    public boolean supports(SecurityType delimiter) {
-        return delimiter==SecurityType.USER_DETAILS_DEFAULT;
-    }
-
-
-
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserDetails(UserDetails userDetails) {
-        String login=userDetails.getUsername();
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        String login = username;
         log.debug("Authenticating {}", login);
         String lowercaseLogin = login.toLowerCase();
 
         Account accountFromDatabase = accountRepository.findAllByLogin(lowercaseLogin);
-        Set<GrantedAuthority> grantedAuthorities=new HashSet<>();
-        if(accountFromDatabase!=null){
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        if (accountFromDatabase != null) {
             grantedAuthorities.addAll(accountFromDatabase.getRoles());
             grantedAuthorities.addAll(accountFromDatabase.getModuleRights());
             for (RoleBase applicationRole : accountFromDatabase.getRoles()) {
@@ -62,4 +54,3 @@ public class DefaultUserDetailsPlugin implements UserDetailsPlugin {
         return new User(lowercaseLogin, accountFromDatabase.getPassword(), grantedAuthorities);
     }
 }
-*/

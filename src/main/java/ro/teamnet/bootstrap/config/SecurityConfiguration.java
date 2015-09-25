@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.plugin.core.config.EnablePluginRegistries;
@@ -24,8 +22,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.RememberMeServices;
 import ro.teamnet.bootstrap.constants.AuthoritiesConstants;
-import ro.teamnet.bootstrap.holder.SessionHolder;
-import ro.teamnet.bootstrap.plugin.security.UserDetailsPlugin;
+import ro.teamnet.bootstrap.plugin.security.AuthenticationProviderPlugin;
+import ro.teamnet.bootstrap.plugin.security.UserDetailsDecoratorPlugin;
 import ro.teamnet.bootstrap.security.*;
 
 import javax.inject.Inject;
@@ -33,7 +31,7 @@ import javax.inject.Inject;
 @Configuration
 @EnableWebSecurity
 @EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
-@EnablePluginRegistries({ UserDetailsPlugin.class})
+@EnablePluginRegistries({AuthenticationProviderPlugin.class, UserDetailsDecoratorPlugin.class})
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
@@ -54,8 +52,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private Http401UnauthorizedEntryPoint authenticationEntryPoint;
 
     @Inject
-    @Qualifier(value = "customUserDetailsService")
-    private UserDetailsService customUserDetailsService;
+    @Qualifier(value = "defaultUserDetailsServiceImpl")
+    private UserDetailsService defaultUserDetailsService;
+
+    @Inject
+    @Qualifier("customUserDetailsDecoratorService")
+    private CustomUserDetailsDecoratorService customUserDetailsDecoratorService;
+
+    @Inject
+    @Qualifier(value = "customAuthenticationProviderService")
+    private CustomAuthenticationProviderService customAuthenticationProviderService;
 
     @Inject
     private RememberMeServices rememberMeServices;
@@ -67,54 +73,61 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Inject
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+
+        //Used as default authenticator, if LDAP fails.
+        CustomDaoAuthenticationProvider customDaoAuthenticationProvider = new CustomDaoAuthenticationProvider();
+        customDaoAuthenticationProvider.setUserDetailsService(defaultUserDetailsService);
+        customDaoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        customDaoAuthenticationProvider.setCustomUserDetailsDecoratorService(customUserDetailsDecoratorService);
+
         auth
-            .userDetailsService(customUserDetailsService)
-            .passwordEncoder(passwordEncoder());
+                .authenticationProvider(customAuthenticationProviderService.getAuthenticationProvider())
+                .authenticationProvider(customDaoAuthenticationProvider);
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
-            .antMatchers("/bower_components/**")
-            .antMatchers("/fonts/**")
-            .antMatchers("/images/**")
-            .antMatchers("/scripts/**")
-            .antMatchers("/styles/**")
-            .antMatchers("/views/**")
-            .antMatchers("/i18n/**")
-            .antMatchers("/swagger-ui/**");
+                .antMatchers("/bower_components/**")
+                .antMatchers("/fonts/**")
+                .antMatchers("/images/**")
+                .antMatchers("/scripts/**")
+                .antMatchers("/styles/**")
+                .antMatchers("/views/**")
+                .antMatchers("/i18n/**")
+                .antMatchers("/swagger-ui/**");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .exceptionHandling()
-            .authenticationEntryPoint(authenticationEntryPoint)
-        .and()
-            .rememberMe()
-            .rememberMeServices(rememberMeServices)
-            .key(env.getProperty("jhipster.security.rememberme.key"))
-        .and()
-            .formLogin()
-            .loginProcessingUrl("/app/authentication")
-            .successHandler(ajaxAuthenticationSuccessHandler)
-            .failureHandler(ajaxAuthenticationFailureHandler)
-            .usernameParameter("j_username")
-            .passwordParameter("j_password")
-            .permitAll()
-        .and()
-            .logout()
-            .logoutUrl("/app/logout")
-            .logoutSuccessHandler(ajaxLogoutSuccessHandler)
-            .deleteCookies("JSESSIONID")
-            .permitAll()
-        .and()
-            .csrf()
-            .disable()
-            .headers()
-            .frameOptions()
-            .disable()
-            .authorizeRequests()
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .and()
+                .rememberMe()
+                .rememberMeServices(rememberMeServices)
+                .key(env.getProperty("jhipster.security.rememberme.key"))
+                .and()
+                .formLogin()
+                .loginProcessingUrl("/app/authentication")
+                .successHandler(ajaxAuthenticationSuccessHandler)
+                .failureHandler(ajaxAuthenticationFailureHandler)
+                .usernameParameter("j_username")
+                .passwordParameter("j_password")
+                .permitAll()
+                .and()
+                .logout()
+                .logoutUrl("/app/logout")
+                .logoutSuccessHandler(ajaxLogoutSuccessHandler)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
+                .and()
+                .csrf()
+                .disable()
+                .headers()
+                .frameOptions()
+                .disable()
+                .authorizeRequests()
                 .antMatchers("/app/cfg/app.json").permitAll()
                 .antMatchers("/app/rest/publicAccount/register").permitAll()
                 .antMatchers("/app/rest/activateAccount/activate").permitAll()
@@ -148,9 +161,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     /**
      * Built-In Expression @http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-permission-evaluator
+     *
      * @return {@link org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler}
      */
-    @Bean(name="expressionHandler")
+    @Bean(name = "expressionHandler")
     public DefaultMethodSecurityExpressionHandler createExpressionHandler() {
         log.debug("Configuring Custom Expression Handler");
         CustomMethodSecurityExpressionHandler expressionHandler = new CustomMethodSecurityExpressionHandler();
@@ -161,10 +175,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
      * Create a {@link GlobalMethodSecurityConfiguration} that uses our {@link CustomMethodSecurityExpressionHandler}
      * in order to filter {@link ro.teamnet.bootstrap.extend.AppPageImpl} objects;
      * <p>Usage
+     *
      * @PreAuthorize("hasRole('ROLE_ADMIN')") on the @Controller or @Service method
      * @PostFilter("filterObject.owner == authentication.name")
      * </p>
-     *
      */
     @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
     private static class CustomGlobalSecurityConfiguration extends GlobalMethodSecurityConfiguration {
