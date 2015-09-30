@@ -38,7 +38,7 @@ public abstract class CustomBaseAuthenticationProvider implements Authentication
     private UserDetails decorateUserDetails(UserDetails userDetails) {
 
         if (customUserDetailsDecoratorService != null) {
-            customUserDetailsDecoratorService.decorateUserDetails(userDetails);
+            return customUserDetailsDecoratorService.decorateUserDetails(userDetails);
         }
         return userDetails;
     }
