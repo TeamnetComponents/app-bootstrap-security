@@ -25,7 +25,6 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
     public static final String APP_REST_PUBLIC_REGISTER = "/app/rest/publicAccount/register";
     public static final String APP_REST_ACCOUNT_ACTIVATE = "/app/rest/activateAccount/activate";
     public static final String EMPTY = "";
-    public static final String LOGIN = "/#/login";
 
     private static final Log logger = LogFactory.getLog(SecurityAccessFilter.class);
 
@@ -65,11 +64,6 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
                     httpRequest.getRequestURI().equals("/");
             if (!permitUnauthenticated) {
                 httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-
-                String url = httpRequest.getScheme() + "://" + httpRequest.getServerName()
-                        + ":" + httpRequest.getServerPort()
-                        + LOGIN;
-                httpResponse.sendRedirect(url);
                 return;
             }
 
