@@ -198,8 +198,9 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
             }
         }
 
-
-//        currentAccount.getAuthorities().size(); // eagerly load the association
+        if (account == null) {
+            return new AccountDTO(userDetails, grantedAuthorities);
+        }
         return new AccountDTO(account,grantedAuthorities);
     }
 
