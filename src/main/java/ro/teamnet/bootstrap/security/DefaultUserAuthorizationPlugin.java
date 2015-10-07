@@ -2,7 +2,7 @@ package ro.teamnet.bootstrap.security;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.domain.RoleBase;
@@ -25,7 +25,7 @@ public class DefaultUserAuthorizationPlugin implements UserAuthorizationPlugin {
 
     @Override
     public Boolean grantAccessToResource(String resource, ModuleRightTypeEnum accessLevel) {
-        User authenticatedUser = SecurityUtils.getAuthenticatedUser();
+        UserDetails authenticatedUser = SecurityUtils.getAuthenticatedUser();
         if (authenticatedUser == null || accessLevel == null) {
             return false;
         }

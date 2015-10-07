@@ -35,10 +35,10 @@ public abstract class CustomBaseAuthenticationProvider implements Authentication
         this.customUserDetailsDecoratorService = customUserDetailsDecoratorService;
     }
 
-    private UserDetails decorateUserDetails(UserDetails userDetails) {
+    private UserDetails decorateUserDetails(UserDetails userDetails, Object details) {
 
         if (customUserDetailsDecoratorService != null) {
-            return customUserDetailsDecoratorService.decorateUserDetails(userDetails);
+            return customUserDetailsDecoratorService.decorateUserDetails(userDetails, details);
         }
         return userDetails;
     }
@@ -97,7 +97,6 @@ public abstract class CustomBaseAuthenticationProvider implements Authentication
 
             try {
                 user = retrieveUser(username, (UsernamePasswordAuthenticationToken) authentication);
-                user = decorateUserDetails(user);
             } catch (UsernameNotFoundException notFound) {
                 logger.debug("User '" + username + "' not found");
 
@@ -127,7 +126,7 @@ public abstract class CustomBaseAuthenticationProvider implements Authentication
                 throw exception;
             }
         }
-
+        user = decorateUserDetails(user, authentication.getDetails());
         postAuthenticationChecks.check(user);
 
         if (!cacheWasUsed) {

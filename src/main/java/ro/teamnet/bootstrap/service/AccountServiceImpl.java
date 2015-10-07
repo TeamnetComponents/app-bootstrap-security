@@ -8,20 +8,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ro.teamnet.bootstrap.domain.Account;
-import ro.teamnet.bootstrap.domain.ModuleRight;
-import ro.teamnet.bootstrap.domain.ApplicationRole;
-import ro.teamnet.bootstrap.domain.PersistentToken;
-import ro.teamnet.bootstrap.domain.RoleBase;
+import ro.teamnet.bootstrap.domain.*;
 import ro.teamnet.bootstrap.domain.util.AccountAndResponseBody;
 import ro.teamnet.bootstrap.repository.AccountRepository;
+import ro.teamnet.bootstrap.repository.ApplicationRoleRepository;
 import ro.teamnet.bootstrap.repository.ModuleRightRepository;
 import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
-import ro.teamnet.bootstrap.repository.ApplicationRoleRepository;
 import ro.teamnet.bootstrap.security.util.SecurityUtils;
 import ro.teamnet.bootstrap.service.util.RandomUtil;
 import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
@@ -179,14 +175,14 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     @Transactional(readOnly = true)
     public AccountDTO getUserWithAuthorities() {
 
-        User userDetails=SecurityUtils.getAuthenticatedUser();
+        UserDetails userDetails=SecurityUtils.getAuthenticatedUser();
         Account account;
         String login=SecurityUtils.getCurrentLogin();
-        Collection<GrantedAuthority> grantedAuthorities;
+        Collection<GrantedAuthority> grantedAuthorities = new HashSet<>();
         if(userDetails!=null){
             account=accountRepository.findByLogin(login);
-            grantedAuthorities=SecurityUtils.getAuthenticatedUser().getAuthorities();
-        }else{
+            grantedAuthorities.addAll(userDetails.getAuthorities());
+        } else {
             grantedAuthorities=new HashSet<>();
             account=accountRepository.findAllByLogin(login);
             if(account!=null){

@@ -21,14 +21,15 @@ import java.util.Date;
 public class SecurityAccessFilter extends BootstrapFilterBase {
 
     public static final String APP_REST = "/app/rest";
+    public static final String APP_PUBLIC = "/app/public";
     public static final String REST = "rest";
     public static final String APP_REST_PUBLIC_REGISTER = "/app/rest/publicAccount/register";
     public static final String APP_REST_ACCOUNT_ACTIVATE = "/app/rest/activateAccount/activate";
     public static final String EMPTY = "";
 
     private static final Log logger = LogFactory.getLog(SecurityAccessFilter.class);
-
-    public static final String[] STATIC_RESOURCE={".js",".css",".ico",".html",".jpeg",".jpg",".json",".html",".png",".ttf",".tiff",".eot" ,".otf" ,".svg" , ".woff",".gif"};
+    public static final String[] PUBLIC_RESOURCES = {APP_REST_PUBLIC_REGISTER, APP_REST_ACCOUNT_ACTIVATE, APP_PUBLIC};
+    public static final String[] STATIC_RESOURCE = {".js", ".css", ".ico", ".html", ".jpeg", ".jpg", ".json", ".html", ".png", ".ttf", ".tiff", ".eot", ".otf", ".svg", ".woff", ".gif"};
 
     @Override
     public void init(FilterConfig config) throws ServletException {
@@ -41,7 +42,8 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
 
-        logger.debug("Authorising request for protected resource: " + httpRequest.getRequestURI());
+        String requestURI = httpRequest.getRequestURI();
+        logger.debug("Authorising request for protected resource: " + requestURI);
 
         //get the userPrincipal
         String userName = httpRequest.getUserPrincipal() != null ? httpRequest.getUserPrincipal().getName() : EMPTY;
@@ -52,40 +54,55 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
              If not authenticated then return unauthorised
         */
         if (userName == null || userName.isEmpty()) {
-
-            boolean staticResource=false;
-            for (String s : STATIC_RESOURCE) {
-                staticResource=staticResource||httpRequest.getRequestURI().endsWith(s);
-            }
-
-            boolean permitUnauthenticated =
-                    httpRequest.getRequestURI().startsWith(APP_REST_PUBLIC_REGISTER) ||
-                            httpRequest.getRequestURI().startsWith(APP_REST_ACCOUNT_ACTIVATE)||staticResource||
-                    httpRequest.getRequestURI().equals("/");
-            if (!permitUnauthenticated) {
+            if (!allowUnauthenticatedAccess(requestURI)) {
                 httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
-
-        } else if (httpRequest.getRequestURI().startsWith(APP_REST)) {
+        } else if (requestURI.startsWith(APP_REST)) {
             //verifying that the user has permission to the resource
-            String resource = extractResourceFromPath(httpRequest.getRequestURI());
+            String resource = extractResourceFromPath(requestURI);
             ModuleRightTypeEnum accessLevel = ModuleRightTypeEnum.findByHttpMethod(httpRequest.getMethod());
             if (resource != null) {
-                Boolean grantAccessToResource = grantAccessToResource(resource, accessLevel);
-
-                if (!grantAccessToResource) {
-                    Date dateEnd = new Date();
-                    logger.debug(" Accessing resource " + httpRequest.getRequestURI() + " (" + (dateEnd.getTime() - dataStart.getTime()) + "ms)");
+                if (!grantAccessToResource(resource, accessLevel)) {
+                    logAccess(dataStart, requestURI);
                     httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
                     return;
                 }
             }
         }
-        Date dateEnd = new Date();
-        logger.debug(" Accessing resource " + httpRequest.getRequestURI() + " (" + (dateEnd.getTime() - dataStart.getTime()) + "ms)");
+        logAccess(dataStart, requestURI);
         // continue with the next filter in the chain
         filterChain.doFilter(servletRequest, servletResponse);
+    }
+
+    private void logAccess(Date dataStart, String requestURI) {
+        Date dateEnd = new Date();
+        logger.debug(" Accessing resource " + requestURI + " (" + (dateEnd.getTime() - dataStart.getTime()) + "ms)");
+    }
+
+    private boolean allowUnauthenticatedAccess(String requestURI) {
+        return isStaticResource(requestURI) || isPublicResource(requestURI);
+    }
+
+    private boolean isPublicResource(String requestURI) {
+        if (requestURI.equals("/")) {
+            return true;
+        }
+        for (String publicResource : PUBLIC_RESOURCES) {
+            if (requestURI.startsWith(publicResource)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isStaticResource(String requestURI) {
+        for (String s : STATIC_RESOURCE) {
+            if (requestURI.endsWith(s)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Boolean grantAccessToResource(String resource, ModuleRightTypeEnum accessLevel) {

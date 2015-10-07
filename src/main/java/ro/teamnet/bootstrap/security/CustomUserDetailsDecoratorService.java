@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import ro.teamnet.bootstrap.plugin.security.UserDetailsDecoratorPlugin;
 import ro.teamnet.bootstrap.plugin.security.UserDetailsDecoratorType;
+import ro.teamnet.bootstrap.plugin.security.UserDetailsExtension;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -24,8 +25,8 @@ public class CustomUserDetailsDecoratorService {
     @Qualifier("userDetailsDecoratorPluginRegistry")
     private PluginRegistry<UserDetailsDecoratorPlugin, UserDetailsDecoratorType> userDetailsDecoratorPluginRegistry;
 
-    public UserDetails decorateUserDetails(UserDetails userDetails) {
-
+    public UserDetailsExtension decorateUserDetails(UserDetails userDetails, Object details) {
+        UserDetailsExtension userDetailsExtension = new UserExtension(userDetails);
         if (userDetailsDecoratorPluginRegistry != null) {
             List<UserDetailsDecoratorPlugin> userDetailsDecoratorPlugins = userDetailsDecoratorPluginRegistry
                     .getPluginsFor(UserDetailsDecoratorType.DEFAULT);
@@ -33,11 +34,11 @@ public class CustomUserDetailsDecoratorService {
 
             if (userDetailsDecoratorPlugins != null) {
                 for (UserDetailsDecoratorPlugin userDetailsDecoratorPlugin : userDetailsDecoratorPlugins) {
-                    userDetails = userDetailsDecoratorPlugin.extendUserDetails(userDetails);
+                    userDetailsExtension = userDetailsDecoratorPlugin.extendUserDetails(userDetailsExtension, details);
                 }
             }
         }
 
-        return userDetails;
+        return userDetailsExtension;
     }
 }

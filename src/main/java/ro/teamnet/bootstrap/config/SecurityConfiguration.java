@@ -113,7 +113,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         HttpSecurity httpSecurity = shouldSkipLogin
                 ? http.exceptionHandling().and()
                 : http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint).and();
-        httpSecurity = addRememberMe(httpSecurity);
+
+//        httpSecurity = addRememberMe(httpSecurity); // remember me option is disabled because it's not yet compatible with the other extensions
+
         for (PreAuthenticationFilterPlugin preAuthenticationFilterPlugin : preAuthenticationFilterPluginRegistry.getPlugins()) {
             Filter preAuthenticationFilter = preAuthenticationFilterPlugin.getFilter();
             if (preAuthenticationFilterPlugin.supports(PreAuthenticationFilterType.PROVIDES_AUTHENTICATION)
@@ -136,6 +138,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/app/rest/activateAccount/activate").permitAll()
                     .antMatchers("/app/rest/dictionaryElement/**").permitAll()
                     .antMatchers("/app/rest/authenticate").permitAll()
+                    .antMatchers("/app/public/**").permitAll()
                     .antMatchers("/app/rest/role").authenticated()
                     .antMatchers("/app/rest/logs/**").hasAuthority(AuthoritiesConstants.ADMIN)
                     .antMatchers("/app/**").authenticated()
@@ -168,6 +171,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/app/rest/activateAccount/activate").permitAll()
                     .antMatchers("/app/rest/dictionaryElement/**").permitAll()
                     .antMatchers("/app/rest/authenticate").permitAll()
+                    .antMatchers("/app/public/**").permitAll()
                     .antMatchers("/app/rest/role").authenticated()
                     .antMatchers("/app/**").authenticated()
                     .antMatchers("/websocket/**").permitAll()
@@ -179,6 +183,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return httpSecurity
                 .formLogin()
                 .loginProcessingUrl("/app/authentication")
+                .authenticationDetailsSource(new CustomWebAuthenticationDetailsSource())
                 .successHandler(ajaxAuthenticationSuccessHandler)
                 .failureHandler(ajaxAuthenticationFailureHandler)
                 .usernameParameter("j_username")
