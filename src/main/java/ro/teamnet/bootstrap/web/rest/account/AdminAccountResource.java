@@ -103,7 +103,7 @@ public class AdminAccountResource extends AccountBaseResource {
     /**
      * GET  /rest/users/:login -> get the "login" user.
      */
-    @RequestMapping(value = "/accountByLogin/{login}",
+    @RequestMapping(value = "/accountByLogin/{login:.+}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed

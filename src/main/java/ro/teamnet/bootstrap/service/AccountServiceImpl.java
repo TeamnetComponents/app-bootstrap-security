@@ -84,7 +84,6 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
         return account;
     }
 
-
     /**
      * This method saves a new Account for the input parameters
      * @param login
@@ -99,6 +98,23 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     @Override
     public Account createUserInformation(String login, String password, String firstName, String lastName, String email,
                                       String langKey,String gender) {
+        return createUserInformation(login, password, firstName, lastName, email, langKey, gender, false);
+    }
+
+    /**
+     * This method saves a new Account for the input parameters
+     * @param login
+     * @param password
+     * @param firstName
+     * @param lastName
+     * @param email
+     * @param langKey
+     * @param gender
+     * @param isActive
+     * @return the new saved Account
+     */
+    public Account createUserInformation(String login, String password, String firstName, String lastName, String email,
+                                         String langKey,String gender, Boolean isActive) {
         Account newAccount = new Account();
         ApplicationRole applicationRole = applicationRoleRepository.findByCode("ROLE_USER");
         Set<RoleBase> applicationRoles = new HashSet<>();
@@ -112,7 +128,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
         newAccount.setLangKey(langKey);
         newAccount.setGender(gender);
         // new Account is not active
-        newAccount.setActivated(false);
+        newAccount.setActivated(isActive);
         // new Account gets registration key
         newAccount.setActivationKey(RandomUtil.generateActivationKey());
         applicationRoles.add(applicationRole);
@@ -122,6 +138,28 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
         return newAccount;
     }
 
+    public Account createUserInfoNoPassword(String login, String firstName, String lastName, String email,
+                                         String langKey,String gender, Boolean isActive) {
+        Account newAccount = new Account();
+        ApplicationRole applicationRole = applicationRoleRepository.findByCode("ROLE_USER");
+        Set<RoleBase> applicationRoles = new HashSet<>();
+        newAccount.setLogin(login);
+        // new Account gets initially a generated password
+        newAccount.setFirstName(firstName);
+        newAccount.setLastName(lastName);
+        newAccount.setEmail(email);
+        newAccount.setLangKey(langKey);
+        newAccount.setGender(gender);
+        // new Account is not active
+        newAccount.setActivated(isActive);
+        // new Account gets registration key
+        newAccount.setActivationKey(RandomUtil.generateActivationKey());
+        applicationRoles.add(applicationRole);
+        newAccount.setRoles(applicationRoles);
+        accountRepository.save(newAccount);
+        log.debug("Created Information for User: {}", newAccount);
+        return newAccount;
+    }
 
     /**
      * This method updates an Account with the input parameters.

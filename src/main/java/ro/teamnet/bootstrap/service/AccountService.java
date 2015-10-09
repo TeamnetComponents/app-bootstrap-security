@@ -17,6 +17,12 @@ public interface AccountService extends AbstractService<Account,Long>{
     public Account createUserInformation(String login, String password, String firstName, String lastName, String email,
                                          String langKey,String gender);
 
+    public Account createUserInformation(String login, String password, String firstName, String lastName, String email,
+                                         String langKey,String gender, Boolean isActive);
+
+    public Account createUserInfoNoPassword(String login, String firstName, String lastName, String email,
+                                            String langKey,String gender, Boolean isActive);
+
     public void updateUserInformation(String firstName, String lastName, String email);
 
     public Account updateUser(Account account);
