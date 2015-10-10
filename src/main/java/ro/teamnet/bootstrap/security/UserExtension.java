@@ -4,7 +4,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ro.teamnet.bootstrap.plugin.security.UserDetailsExtension;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public class UserExtension implements UserDetailsExtension {
     private UserDetails userDetails;
@@ -12,7 +15,11 @@ public class UserExtension implements UserDetailsExtension {
     private Collection<GrantedAuthority> authorities;
 
     public UserExtension(UserDetails userDetails) {
-        this(userDetails, userDetails.getAuthorities(), new HashMap<String, Object>());
+        this(userDetails, new HashMap<String, Object>());
+    }
+
+    public UserExtension(UserDetails userDetails, Map<String, Object> extensions) {
+        this(userDetails, userDetails.getAuthorities(), extensions);
     }
 
     public UserExtension(UserDetails userDetails, Collection<? extends GrantedAuthority> grantedAuthorities,

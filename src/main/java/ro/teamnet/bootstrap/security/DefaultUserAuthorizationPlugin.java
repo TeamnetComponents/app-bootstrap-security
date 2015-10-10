@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.domain.RoleBase;
 import ro.teamnet.bootstrap.domain.util.ModuleRightTypeEnum;
+import ro.teamnet.bootstrap.plugin.security.BaseUserAuthorizationPlugin;
 import ro.teamnet.bootstrap.plugin.security.SecurityType;
-import ro.teamnet.bootstrap.plugin.security.UserAuthorizationPlugin;
 import ro.teamnet.bootstrap.security.util.SecurityUtils;
 
 /**
@@ -16,7 +16,7 @@ import ro.teamnet.bootstrap.security.util.SecurityUtils;
  */
 @Service
 @Order(0)
-public class DefaultUserAuthorizationPlugin implements UserAuthorizationPlugin {
+public class DefaultUserAuthorizationPlugin extends BaseUserAuthorizationPlugin {
 
     @Override
     public boolean supports(SecurityType delimiter) {
@@ -47,14 +47,4 @@ public class DefaultUserAuthorizationPlugin implements UserAuthorizationPlugin {
         return false;
     }
 
-    private boolean moduleRightMatchesRequest(ModuleRight moduleRight, String resource, ModuleRightTypeEnum accessLevel) {
-        String moduleCode = moduleRight.getModule().getCode();
-        return moduleRight.getRight().equals(accessLevel.getRight()) && (moduleCode.equalsIgnoreCase(resource)
-                || plural(moduleCode).equalsIgnoreCase(resource) || moduleCode.equalsIgnoreCase(plural(resource)));
-    }
-
-
-    private String plural(String singular) {
-        return singular + 's';
-    }
 }

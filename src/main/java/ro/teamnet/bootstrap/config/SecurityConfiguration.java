@@ -140,6 +140,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/app/rest/authenticate").permitAll()
                     .antMatchers("/app/public/**").permitAll()
                     .antMatchers("/app/rest/role").authenticated()
+                    .antMatchers("/app/rest/loginStep/**").authenticated()
                     .antMatchers("/app/rest/logs/**").hasAuthority(AuthoritiesConstants.ADMIN)
                     .antMatchers("/app/**").authenticated()
                     .antMatchers("/websocket/tracker").hasAuthority(AuthoritiesConstants.ADMIN)
@@ -173,6 +174,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/app/rest/authenticate").permitAll()
                     .antMatchers("/app/public/**").permitAll()
                     .antMatchers("/app/rest/role").authenticated()
+                    .antMatchers("/app/rest/loginStep/**").authenticated()
                     .antMatchers("/app/**").authenticated()
                     .antMatchers("/websocket/**").permitAll()
                     .antMatchers("/protected/**").authenticated();

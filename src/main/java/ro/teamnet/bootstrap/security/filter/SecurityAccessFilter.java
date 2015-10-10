@@ -25,6 +25,7 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
     public static final String REST = "rest";
     public static final String APP_REST_PUBLIC_REGISTER = "/app/rest/publicAccount/register";
     public static final String APP_REST_ACCOUNT_ACTIVATE = "/app/rest/activateAccount/activate";
+    public static final String APP_REST_LOGIN_STEP = "/app/rest/loginStep";
     public static final String EMPTY = "";
 
     private static final Log logger = LogFactory.getLog(SecurityAccessFilter.class);
@@ -58,7 +59,7 @@ public class SecurityAccessFilter extends BootstrapFilterBase {
                 httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
-        } else if (requestURI.startsWith(APP_REST)) {
+        } else if (requestURI.startsWith(APP_REST) && !requestURI.startsWith(APP_REST_LOGIN_STEP)) {
             //verifying that the user has permission to the resource
             String resource = extractResourceFromPath(requestURI);
             ModuleRightTypeEnum accessLevel = ModuleRightTypeEnum.findByHttpMethod(httpRequest.getMethod());
