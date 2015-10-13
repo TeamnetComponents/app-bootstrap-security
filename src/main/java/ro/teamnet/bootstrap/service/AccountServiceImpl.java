@@ -206,6 +206,19 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     }
 
     /**
+     * This method updates an Account password with the one given as a parameter.
+     * @param password
+     */
+    @Override
+    public void changePassword(String username, String password) {
+        Account currentAccount = accountRepository.findByLogin(username);
+        String encryptedPassword = passwordEncoder.encode(password);
+        currentAccount.setPassword(encryptedPassword);
+        accountRepository.save(currentAccount);
+        log.debug("Changed password for User: {}", currentAccount);
+    }
+
+    /**
      * This method gets the current Account with all it authorities
      * @return the Account logged in instance with all it authorities
      */

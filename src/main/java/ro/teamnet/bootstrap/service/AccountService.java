@@ -29,6 +29,8 @@ public interface AccountService extends AbstractService<Account,Long>{
 
     public void changePassword(String password);
 
+    public void changePassword(String username, String password);
+
     public AccountDTO getUserWithAuthorities();
 
     public void removeOldPersistentTokens();
