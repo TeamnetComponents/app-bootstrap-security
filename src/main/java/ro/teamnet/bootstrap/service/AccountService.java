@@ -39,6 +39,8 @@ public interface AccountService extends AbstractService<Account,Long>{
 
     public boolean addRole(ApplicationRole applicationRole);
 
+    public List<AccountDTO> findAllExtended();
+
     Account findOneByEmail(String email);
 
     Account findByLogin(String currentLogin);
