@@ -21,6 +21,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import ro.teamnet.bootstrap.constants.AuthoritiesConstants;
@@ -29,6 +30,7 @@ import ro.teamnet.bootstrap.plugin.security.PreAuthenticationFilterPlugin;
 import ro.teamnet.bootstrap.plugin.security.PreAuthenticationFilterType;
 import ro.teamnet.bootstrap.plugin.security.UserDetailsDecoratorPlugin;
 import ro.teamnet.bootstrap.security.*;
+import ro.teamnet.bootstrap.security.filter.CorsFilter;
 
 import javax.inject.Inject;
 import javax.servlet.Filter;
@@ -183,6 +185,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private HttpSecurity addLogin(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+                .addFilterAfter(new CorsFilter(), ChannelProcessingFilter.class)
                 .formLogin()
                 .loginProcessingUrl("/app/authentication")
                 .authenticationDetailsSource(new CustomWebAuthenticationDetailsSource())
@@ -196,6 +199,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private HttpSecurity addLogout(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+                .addFilterAfter(new CorsFilter(), ChannelProcessingFilter.class)
                 .logout()
                 .logoutUrl("/app/logout")
                 .logoutSuccessHandler(ajaxLogoutSuccessHandler)
