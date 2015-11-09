@@ -41,6 +41,17 @@ public class AdminAccountResource extends AccountBaseResource {
         return getService().findAll();
     }
 
+
+    /**
+     * GET  /rest/account -> get the current user.
+     */
+    @RequestMapping(value = "/allAccountsExtended", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public List<AccountDTO> getAccountsExtended() {
+        return getService().findAllExtended();
+    }
+
     /**
      * POST  /rest/account -> update the user information.
      */

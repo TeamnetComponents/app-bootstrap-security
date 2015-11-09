@@ -20,6 +20,7 @@ import ro.teamnet.bootstrap.repository.ModuleRightRepository;
 import ro.teamnet.bootstrap.repository.PersistentTokenRepository;
 import ro.teamnet.bootstrap.security.util.SecurityUtils;
 import ro.teamnet.bootstrap.service.util.RandomUtil;
+import ro.teamnet.bootstrap.web.rest.ApplicationRoleResource;
 import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
 import ro.teamnet.bootstrap.web.rest.dto.ModuleRightDTO;
 import ro.teamnet.bootstrap.web.rest.dto.RoleDTO;
@@ -249,6 +250,27 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
             return new AccountDTO(userDetails, grantedAuthorities);
         }
         return new AccountDTO(account,grantedAuthorities);
+    }
+
+    /**
+     * This method returns all users with roles & password
+     * Should be exposed as an admin-only resource
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<AccountDTO> findAllExtended() {
+        List<AccountDTO> accountDTOs = new ArrayList<>();
+        Collection<GrantedAuthority> grantedRoles;
+
+        List<Account> accounts = accountRepository.findAll();
+        for (Account account: accounts) {
+            grantedRoles = new HashSet<>();
+            grantedRoles.addAll(account.getRoles());
+            accountDTOs.add(new AccountDTO(account, grantedRoles));
+        }
+
+        return accountDTOs;
     }
 
     /**
