@@ -19,6 +19,10 @@ public class AjaxAuthenticationFailureHandler extends SimpleUrlAuthenticationFai
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
 
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed");
+        if (exception.getCause() instanceof ro.teamnet.bootstrap.security.UserNotActivatedException) {
+            response.sendError(HttpServletResponse.SC_PAYMENT_REQUIRED, "Authentication failed");
+        } else {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed");
+        }
     }
 }
