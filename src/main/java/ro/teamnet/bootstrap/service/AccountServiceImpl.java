@@ -263,7 +263,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
         List<AccountDTO> accountDTOs = new ArrayList<>();
         Collection<GrantedAuthority> grantedRoles;
 
-        List<Account> accounts = accountRepository.findAll();
+        List<Account> accounts = accountRepository.findAllEager();
         for (Account account: accounts) {
             grantedRoles = new HashSet<>();
             grantedRoles.addAll(account.getRoles());

@@ -31,4 +31,7 @@ public interface AccountRepository extends AppRepository<Account, Long> {
 
     public Account findByLogin(String login);
 
+    @Query("select u from Account u join fetch u.roles")
+    public List<Account> findAllEager();
+
 }
