@@ -23,15 +23,15 @@ public interface AccountRepository extends AppRepository<Account, Long> {
 
     public Account findOneByEmail(String email);
 
-    @Query("select u from Account u join fetch u.roles r left join fetch u.moduleRights left join fetch r.moduleRights where u.login=?1")
+    @Query("select u from Account u left join fetch u.roles r left join fetch u.moduleRights left join fetch r.moduleRights where u.login=?1")
     public Account findAllByLogin(String login);
 
-   @Query("select u from Account u join u.roles r join u.moduleRights m join r.moduleRights m1 where (m.id = ?1 or m1.id = ?1)")
+   @Query("select u from Account u left join u.roles r left join u.moduleRights m join r.moduleRights m1 where (m.id = ?1 or m1.id = ?1)")
    public List<Account> findReferencedModuleRights(Long id);
 
     public Account findByLogin(String login);
 
-    @Query("select u from Account u join fetch u.roles")
+    @Query("select u from Account u left join fetch u.roles")
     public List<Account> findAllEager();
 
 }
