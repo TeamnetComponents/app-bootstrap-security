@@ -9,6 +9,7 @@ import ro.teamnet.bootstrap.domain.ModuleRight;
 import ro.teamnet.bootstrap.extend.AppRepository;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Spring Data JPA repository for the UserProfile entity.
@@ -32,6 +33,6 @@ public interface AccountRepository extends AppRepository<Account, Long> {
     public Account findByLogin(String login);
 
     @Query("select u from Account u left join fetch u.roles")
-    public List<Account> findAllEager();
+    public Set<Account> findAllEager();
 
 }
