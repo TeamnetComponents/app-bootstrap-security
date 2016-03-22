@@ -83,7 +83,7 @@ public class CustomPersistentRememberMeServices extends
     }
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request, HttpServletResponse response) {
 
         PersistentToken token = getPersistentToken(cookieTokens);
@@ -134,7 +134,7 @@ public class CustomPersistentRememberMeServices extends
      * current user, so when he logs out from one browser, all his other sessions are destroyed.
      */
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         String rememberMeCookie = extractRememberMeCookie(request);
         if (rememberMeCookie != null && rememberMeCookie.length() != 0) {

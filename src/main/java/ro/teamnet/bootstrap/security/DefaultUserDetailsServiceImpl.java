@@ -29,7 +29,7 @@ public class DefaultUserDetailsServiceImpl implements UserDetailsService {
     private AccountRepository accountRepository;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(value="transactionManager", readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         String login = username;
         log.debug("Authenticating {}", login);

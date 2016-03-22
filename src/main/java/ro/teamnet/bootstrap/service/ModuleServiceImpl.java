@@ -29,7 +29,7 @@ import java.util.Set;
  * Service class for managing  ModuleRights.
  */
 @Service
-@Transactional(readOnly = true)
+@Transactional(value="transactionManager", readOnly = true)
 public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implements ModuleService {
 
     private final Logger log = LoggerFactory.getLogger(ModuleServiceImpl.class);
@@ -51,7 +51,7 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
     }
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public Module save(Module module) {
         if(module.getId()!=null){
             Module moduleDb=moduleRepository.findOne(module.getId());
@@ -112,7 +112,7 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
     }
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public boolean update(Long id, ModuleDTO moduleDTO) {
         Module moduleDb=moduleRepository.findOne(id);
         if(moduleDb == null){
@@ -172,7 +172,7 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
     }
 //
 //    @Override
-//    @Transactional
+//    @Transactional(value="transactionManager")
 //    public Module saveModule(ModuleDTO moduleDTO){
 //        Module module = new Module();
 //        module.setCode(moduleDTO.getCode());
@@ -188,7 +188,7 @@ public class ModuleServiceImpl extends AbstractServiceImpl<Module,Long> implemen
 //    }
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public void delete(Long id) {
         moduleRepository.delete(id);
     }

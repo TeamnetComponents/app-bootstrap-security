@@ -117,7 +117,7 @@ Index: src/main/java/ro/teamnet/bootstrap/security/UserDetailsService.java
 -    private UserRepository userRepository;
 -
 -    @Override
--    @Transactional
+-    @Transactional(value="transactionManager")
 -    public UserDetails loadUserByUsername(final String login) {
 -        log.debug("Authenticating {}", login);
 -        String lowercaseLogin = login.toLowerCase();
@@ -1048,7 +1048,7 @@ Index: src/main/java/ro/teamnet/bootstrap/service/UserService.java
 - * Service class for managing users.
 - */
 -@Service
--@Transactional
+-@Transactional(value="transactionManager")
 -public class UserService {
 -
 -    private final Logger log = LoggerFactory.getLogger(UserService.class);
@@ -1121,7 +1121,7 @@ Index: src/main/java/ro/teamnet/bootstrap/service/UserService.java
 -        log.debug("Changed password for User: {}", currentUser);
 -    }
 -
--    @Transactional(readOnly = true)
+-    @Transactional(value="transactionManager", readOnly = true)
 -    public User getUserWithAuthorities() {
 -        User currentUser = userRepository.findOne(SecurityUtils.getCurrentLogin());
 -        currentUser.getAuthorities().size(); // eagerly load the association
@@ -1514,7 +1514,7 @@ Index: src/main/java/ro/teamnet/bootstrap/security/CustomPersistentRememberMeSer
 -    }
 -
 -    @Override
--    @Transactional
+-    @Transactional(value="transactionManager")
 -    protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request, HttpServletResponse response) {
 -
 -        PersistentToken token = getPersistentToken(cookieTokens);
@@ -1565,7 +1565,7 @@ Index: src/main/java/ro/teamnet/bootstrap/security/CustomPersistentRememberMeSer
 -     * current user, so when he logs out from one browser, all his other sessions are destroyed.
 -     */
 -    @Override
--    @Transactional
+-    @Transactional(value="transactionManager")
 -    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 -        String rememberMeCookie = extractRememberMeCookie(request);
 -        if (rememberMeCookie != null && rememberMeCookie.length() != 0) {
