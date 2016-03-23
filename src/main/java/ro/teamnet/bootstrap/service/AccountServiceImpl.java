@@ -334,6 +334,11 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
 
     @Override
     public Account findByLogin(String currentLogin) {
+        return accountRepository.findByLogin(currentLogin);
+    }
+
+    @Override
+    public Account findAllByLogin(String currentLogin) {
         return accountRepository.findAllByLogin(currentLogin);
     }
 

@@ -45,6 +45,8 @@ public interface AccountService extends AbstractService<Account,Long>{
 
     Account findByLogin(String currentLogin);
 
+    Account findAllByLogin(String currentLogin);
+
     boolean addRoleToAccount(ApplicationRole applicationRole, Long accountId);
 
     //~~~~~~~~~~~~~~~~~~~~resolving TODO's from web.rest.account~~~~~~~~~~~~~~~~~~~~~
