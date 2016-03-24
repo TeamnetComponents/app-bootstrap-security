@@ -260,18 +260,10 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     @Override
     @Transactional(value="transactionManager", readOnly = true)
     public List<AccountDTO> findAllExtended() {
-        HashMap<Account, Collection<GrantedAuthority>> userRoles = new HashMap<>();
         List<AccountDTO> accountDTOs = new ArrayList<>();
         Set<Account> accounts = accountRepository.findAllEager();
         for (Account account : accounts) {
-            if (userRoles.containsKey(account)) {
-                userRoles.get(account).addAll(account.getRoles());
-            } else {
-                userRoles.put(account, new HashSet<GrantedAuthority>(account.getRoles()));
-            }
-        }
-        for (Map.Entry<Account, Collection<GrantedAuthority>> entry : userRoles.entrySet()) {
-            accountDTOs.add(new AccountDTO(entry.getKey(), entry.getValue()));
+            accountDTOs.add(new AccountDTO(account, new HashSet<GrantedAuthority>(account.getRoles())));
         }
         return accountDTOs;
     }
