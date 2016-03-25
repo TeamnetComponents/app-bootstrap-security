@@ -34,7 +34,7 @@ import java.util.*;
  * Service class for managing users.
  */
 @Service
-@Transactional(value="transactionManager")
+@Transactional(value="jpaTransactionManager")
 public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implements AccountService {
 
     private final Logger log = LoggerFactory.getLogger(AccountServiceImpl.class);
@@ -224,7 +224,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
      * @return the Account logged in instance with all it authorities
      */
     @Override
-    @Transactional(value="transactionManager", readOnly = true)
+    @Transactional(value="jpaTransactionManager", readOnly = true)
     public AccountDTO getUserWithAuthorities() {
 
         UserDetails userDetails=SecurityUtils.getAuthenticatedUser();
@@ -258,7 +258,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
      * @return
      */
     @Override
-    @Transactional(value="transactionManager", readOnly = true)
+    @Transactional(value="jpaTransactionManager", readOnly = true)
     public List<AccountDTO> findAllExtended() {
         List<AccountDTO> accountDTOs = new ArrayList<>();
         Set<Account> accounts = accountRepository.findAllEager();
@@ -337,7 +337,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     }
 
     @Override
-    @Transactional(value="transactionManager")
+    @Transactional(value="jpaTransactionManager")
     public Account updateAccount(Account user) {
         Account account = this.findOne(user.getId());
         if(!account.getEmail().equals(user.getEmail())){
@@ -350,7 +350,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     }
 
     @Override
-    @Transactional(value="transactionManager")
+    @Transactional(value="jpaTransactionManager")
     public Account updateAccount(AccountDTO user) {
         Account account = accountRepository.findOne(user.getId());
 
@@ -383,7 +383,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     }
 
     @Override
-    @Transactional(value="transactionManager")
+    @Transactional(value="jpaTransactionManager")
     public List<PersistentToken> retrieveCurrentLogin() {
         Account account = this.findByLogin(SecurityUtils.getCurrentLogin());
         if (account == null) {
@@ -393,7 +393,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     }
 
     @Override
-    @Transactional(value="transactionManager")
+    @Transactional(value="jpaTransactionManager")
     public void deleteByDecodedSeries(String series) throws UnsupportedEncodingException {
         String decodedSeries = URLDecoder.decode(series, "UTF-8");
         Account account = this.findByLogin(SecurityUtils.getCurrentLogin());
@@ -406,7 +406,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     }
 
     @Override
-    @Transactional(value="transactionManager")
+    @Transactional(value="jpaTransactionManager")
     public String updateCurrentAccount(AccountDTO userDTO) {
         Account accountHavingThisEmail = this.findOneByEmail(userDTO.getEmail());
         if (accountHavingThisEmail != null && !accountHavingThisEmail.getLogin().equals(SecurityUtils.getCurrentLogin())) {
@@ -417,7 +417,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     }
 
     @Override
-    @Transactional(value="transactionManager")
+    @Transactional(value="jpaTransactionManager")
     public AccountAndResponseBody createAccount(AccountDTO accountDTO) {
 
         Account account = this.findOne(accountDTO.getId());

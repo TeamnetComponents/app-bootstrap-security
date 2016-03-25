@@ -19,7 +19,7 @@ import java.util.List;
  * Service class for managing  ModuleRights.
  */
 @Service
-@Transactional(value="transactionManager", readOnly = true)
+@Transactional(value="jpaTransactionManager", readOnly = true)
 public class ModuleRightServiceImpl extends AbstractServiceImpl<ModuleRight,Long> implements ModuleRightService {
 
     private final Logger log = LoggerFactory.getLogger(ModuleRightServiceImpl.class);

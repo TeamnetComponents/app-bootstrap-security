@@ -21,7 +21,7 @@ import java.util.Set;
  * Service class for managing  ModuleRights.
  */
 @Service
-@Transactional(value="transactionManager")
+@Transactional(value="jpaTransactionManager")
 public class ApplicationRoleServiceImpl extends AbstractServiceImpl<ApplicationRole,Long> implements RoleService {
 
 
