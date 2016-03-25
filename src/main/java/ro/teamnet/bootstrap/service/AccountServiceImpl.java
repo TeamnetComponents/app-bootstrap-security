@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -259,6 +260,7 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
      */
     @Override
     @Transactional(value="jpaTransactionManager", readOnly = true)
+    @Cacheable(value = {"accountsExt"})
     public List<AccountDTO> findAllExtended() {
         List<AccountDTO> accountDTOs = new ArrayList<>();
         Set<Account> accounts = accountRepository.findAllEager();

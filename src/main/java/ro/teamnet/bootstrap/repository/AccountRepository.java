@@ -41,7 +41,6 @@ public interface AccountRepository extends AppRepository<Account, Long> {
     public Account findByLogin(String login);
 
     @Query("select u from Account u left join fetch u.roles")
-    @QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     public Set<Account> findAllEager();
 
 }
