@@ -40,6 +40,9 @@ public interface AccountRepository extends AppRepository<Account, Long> {
 
     public Account findByLogin(String login);
 
+    @Query("select u from Account u left join fetch u.roles where u.id = ?1")
+    public Account getOneEager(Long id);
+
     @Query("select u from Account u left join fetch u.roles")
     public Set<Account> findAllEager();
 
