@@ -49,6 +49,8 @@ public class ApplicationRoleServiceImpl extends AbstractServiceImpl<ApplicationR
         return applicationRoleRepository.getOneById(id);
     }
 
+    @Override
+    public ApplicationRole findByCode(String code) { return applicationRoleRepository.findByCode(code); }
 
     @Override
     public ApplicationRole update(ApplicationRole applicationRole) {

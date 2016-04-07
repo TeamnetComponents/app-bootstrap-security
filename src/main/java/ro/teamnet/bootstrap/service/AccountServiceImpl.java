@@ -58,6 +58,9 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     private ApplicationRoleRepository applicationRoleRepository;
 
     @Inject
+    private RoleService roleService;
+
+    @Inject
     private ModuleRightRepository moduleRightRepository;
 
     @Inject
@@ -251,6 +254,24 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
             return new AccountDTO(userDetails, grantedAuthorities);
         }
         return new AccountDTO(account,grantedAuthorities);
+    }
+
+    /**
+     * This method is here because reasons
+     * @return role with module rights in a usable format
+     */
+    @Override
+    @Transactional(value="jpaTransactionManager", readOnly = true)
+    public AccountDTO getRoleAsFakeUser(String code) {
+        AccountDTO accountDTO = null;
+        Collection<GrantedAuthority> grantedAuthorities;
+        ApplicationRole applicationRole = roleService.findByCode(code);
+        if (applicationRole != null) {
+            grantedAuthorities=new HashSet<>();
+            grantedAuthorities.addAll(applicationRole.getModuleRights());
+            accountDTO = new AccountDTO(grantedAuthorities);
+        }
+        return accountDTO;
     }
 
     /**

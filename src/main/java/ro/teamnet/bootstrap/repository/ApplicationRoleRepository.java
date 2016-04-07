@@ -12,7 +12,8 @@ import java.util.Set;
  */
 public interface ApplicationRoleRepository extends AppRepository<ApplicationRole, Long> {
 
-    public ApplicationRole findByCode(String code);
+    @Query("select r from ApplicationRole r left join fetch r.moduleRights where r.code =:code")
+    public ApplicationRole findByCode(@Param("code") String code);
 
     @Query("select r from ApplicationRole r left join fetch r.moduleRights where r.id =:id")
     ApplicationRole getOneById(@Param("id") Long id);
