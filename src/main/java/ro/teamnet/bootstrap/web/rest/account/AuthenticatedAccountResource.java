@@ -5,10 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ro.teamnet.bootstrap.service.AccountService;
 import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
 
@@ -77,6 +74,16 @@ public class AuthenticatedAccountResource {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
+    @RequestMapping(value = "/getRole/{code}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<AccountDTO> get(@PathVariable String code) {
+        AccountDTO accountRole = accountService.getRoleAsFakeUser(code);
+        if (accountRole == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(accountRole, HttpStatus.OK);
+    }
 
 }
