@@ -10,6 +10,7 @@ import ro.teamnet.bootstrap.service.AccountService;
 import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 
 /**
  * REST controller for managing the current user's account.
@@ -43,7 +44,17 @@ public class AuthenticatedAccountResource {
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/getCurrentLimited",method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<AccountDTO> getAccountLimited(@RequestParam(value="role") String[] roleArray) {
+        AccountDTO account = accountService.getUserWithLimitedAuthorities(Arrays.asList(roleArray));
+        if (account == null) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
+        return new ResponseEntity<>(account, HttpStatus.OK);
+    }
 
 
 

@@ -33,6 +33,8 @@ public interface AccountService extends AbstractService<Account,Long>{
 
     public AccountDTO getUserWithAuthorities();
 
+    public AccountDTO getUserWithLimitedAuthorities(List<String> wantedRoleCodes);
+
     public AccountDTO getRoleAsFakeUser(String code);
 
     public void removeOldPersistentTokens();

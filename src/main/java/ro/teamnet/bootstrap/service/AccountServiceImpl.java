@@ -257,6 +257,44 @@ public class AccountServiceImpl extends AbstractServiceImpl<Account,Long> implem
     }
 
     /**
+     * Limits returned authorities to requested roles if found,
+     * returns all otherwise
+     */
+    @Override
+    @Transactional(value="jpaTransactionManager", readOnly = true)
+    public AccountDTO getUserWithLimitedAuthorities(List<String> wantedRoleCodes) {
+        Boolean foundARole = false;
+        Account account;
+        String login=SecurityUtils.getCurrentLogin();
+        Collection<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        account=accountRepository.findAllByLogin(login);
+        if(account!=null){
+            grantedAuthorities.addAll(account.getModuleRights());
+            for (RoleBase applicationRole : account.getRoles()) {
+                for (String wantedRoleCode: wantedRoleCodes) {
+                    if (applicationRole.getCode().equals(wantedRoleCode)) {
+                        foundARole = true;
+                        grantedAuthorities.add(applicationRole);
+                        grantedAuthorities.addAll(applicationRole.getModuleRights());
+                    }
+                }
+            }
+            if (!foundARole) {
+                for (RoleBase applicationRole : account.getRoles()) {
+                    grantedAuthorities.add(applicationRole);
+                    grantedAuthorities.addAll(applicationRole.getModuleRights());
+                }
+            }
+        }
+
+        if (account == null) {
+            return new AccountDTO();
+        }
+        return new AccountDTO(account,grantedAuthorities);
+    }
+
+
+    /**
      * This method is here because reasons
      * @return role with module rights in a usable format
      */
