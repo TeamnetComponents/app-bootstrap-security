@@ -138,6 +138,19 @@ public class AdminAccountResource extends AccountBaseResource {
 
 
     /**
+     * Change password for user
+     */
+    @RequestMapping(value = "/changePassword",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<?> changePassword(@RequestBody AccountDTO userDTO) {
+        getService().changePassword(userDTO.getLogin(), userDTO.getPassword());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    /**
      * Associate roles to an already register account
      *
      * @param applicationRole - Role to be associated with the specified account
