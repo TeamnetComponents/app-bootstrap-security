@@ -17,6 +17,7 @@ import ro.teamnet.bootstrap.domain.util.AccountAndResponseBody;
 import ro.teamnet.bootstrap.service.AccountService;
 import ro.teamnet.bootstrap.service.MailService;
 import ro.teamnet.bootstrap.web.rest.dto.AccountDTO;
+import ro.teamnet.bootstrap.web.rest.dto.GenericResponseDTO;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
@@ -64,6 +65,16 @@ public class PublicAccountResource{
     public ResponseEntity<?> registerAccount(@Valid @RequestBody AccountDTO accountDTO,
                                              HttpServletRequest request,
                                              HttpServletResponse response) {
+        Account existingAccount;
+        existingAccount = accountService.findByLogin(accountDTO.getLogin());
+        if (existingAccount != null) {
+            return new ResponseEntity<>(new GenericResponseDTO("login"), HttpStatus.CONFLICT);
+        }
+        existingAccount = accountService.findOneByEmail(accountDTO.getEmail());
+        if (existingAccount != null) {
+            return new ResponseEntity<>(new GenericResponseDTO("email"), HttpStatus.CONFLICT);
+        }
+
         AccountAndResponseBody accountAndResponseBody = accountService.createAccount(accountDTO);
         if (accountAndResponseBody.getInfoAboutAccount() != null) {
             return new ResponseEntity<>(accountAndResponseBody.getInfoAboutAccount(), HttpStatus.BAD_REQUEST);
