@@ -47,7 +47,7 @@ public class AuthenticatedAccountResource {
     @RequestMapping(value = "/getCurrentLimited",method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<AccountDTO> getAccountLimited(@RequestParam(value="role") String[] roleArray) {
+    public ResponseEntity<AccountDTO> getAccountLimited(@RequestParam(value="role",required=false) String[] roleArray) {
         AccountDTO account = accountService.getUserWithLimitedAuthorities(Arrays.asList(roleArray));
         if (account == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
