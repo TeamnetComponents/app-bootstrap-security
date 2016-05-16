@@ -48,7 +48,12 @@ public class AuthenticatedAccountResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<AccountDTO> getAccountLimited(@RequestParam(value="role",required=false) String[] roleArray) {
-        AccountDTO account = accountService.getUserWithLimitedAuthorities(Arrays.asList(roleArray));
+        AccountDTO account;
+        if (roleArray == null) {
+            account = accountService.getUserWithAuthorities();
+        } else {
+            account = accountService.getUserWithLimitedAuthorities(Arrays.asList(roleArray));
+        }
         if (account == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
