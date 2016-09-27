@@ -5,13 +5,13 @@
     <parent>
         <groupId>ro.teamnet.bootstrap</groupId>
         <artifactId>bootstrap-dependencies</artifactId>
-        <version>0.2.15</version>
+        <version>0.2.16-SNAPSHOT</version>
         <relativePath />
     </parent>
 
     <artifactId>app-bootstrap-security</artifactId>
     <name>app-bootstrap-security</name>
-    <version>0.2.15</version>
+    <version>0.2.16-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <distributionManagement>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>ro.teamnet.bootstrap</groupId>
             <artifactId>app-bootstrap-commons</artifactId>
-            <version>0.2.15</version>
+            <version>0.2.16-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
